@@ -632,7 +632,7 @@ body {
   /* Navbar Mobile Grid */
   .nav-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-rows: auto auto;
     height: auto;
     padding: 15px 0;
@@ -644,6 +644,9 @@ body {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     justify-self: start;
+  }
+  .logo-text span {
+    display: none;
   }
   .cart-toggle {
     position: static;

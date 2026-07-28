@@ -131,7 +131,6 @@ function addToCart(id) {
   }
   
   updateCartUI();
-  openCart();
 }
 
 function removeFromCart(id) {
