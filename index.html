@@ -1,149 +1,17 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>El Terruño - Catálogo y Pedidos</title>
+    <title>El Terruño - Almacén Gourmet & Vinos Boutique</title>
     <link rel="icon" type="image/png" href="/logoterruno_circle.png" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
   </head>
-  <body>
-    <!-- Navbar -->
-    <header class="navbar">
-      <div class="container nav-content">
-        <div class="logo">
-          <img src="/logoterruno_circle.png" alt="Logo El Terruño" class="logo-img" />
-          <div class="logo-text">
-            <h1>El Terruño</h1>
-            <span>Almacén Gourmet & Vinos Boutique</span>
-          </div>
-        </div>
-        <nav class="nav-links">
-          <a href="#home">Inicio</a>
-          <a href="#about">El Local</a>
-          <a href="#catalog">Catálogo</a>
-        </nav>
-        <button id="cart-toggle" class="cart-toggle">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-          <span id="cart-count">0</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Hero (Home) -->
-    <section id="home" class="hero">
-      <div class="container hero-content">
-        <h2>Sabores con Historia y Raíz</h2>
-        <p>De Jesús María a tu mesa. Seleccionamos los mejores productos artesanales y vinos de autor para crear experiencias inolvidables.</p>
-        <a href="#catalog" class="cta-btn">Ver Catálogo</a>
-      </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="about-section">
-      <div class="container about-container">
-        <div class="about-text">
-          <h3 class="section-title">Nuestro Rincón en Jesús María</h3>
-          <p>Ubicados en el corazón de Córdoba, <strong>El Terruño</strong> es más que un almacén: es un punto de encuentro para los amantes del buen vivir. Nuestras estanterías de madera rústica albergan los secretos mejor guardados de las bodegas boutique argentinas y los productores artesanales de la Colonia Caroya.</p>
-          <p>Vení a visitarnos, degustá un buen vino y llevate un pedazo de nuestra tierra.</p>
-        </div>
-        <div class="about-image">
-          <img src="/local_store.jpg" alt="Interior del almacén">
-        </div>
-      </div>
-    </section>
-
-    <!-- Products Grid -->
-    <main id="catalog" class="container products-section">
-      <h3 class="section-title">Nuestro Catálogo</h3>
-      
-      <!-- Search -->
-      <div class="search-container">
-        <div class="search-box">
-          <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </span>
-          <input type="text" id="search-input" placeholder="Buscar un sabor..." autocomplete="off">
-        </div>
-      </div>
-      
-      <!-- Filters -->
-      <div class="filters-container">
-        <button class="filter-btn active" data-filter="Todos">Todos</button>
-        <button class="filter-btn" data-filter="Vinos">Vinos</button>
-        <button class="filter-btn" data-filter="Almacén">Almacén</button>
-        <button class="filter-btn" data-filter="Fiambres">Fiambres</button>
-        <button class="filter-btn" data-filter="Regalos">Regalos</button>
-      </div>
-
-      <div id="products-grid" class="products-grid">
-        <!-- Products will be injected by JS -->
-      </div>
-      
-      <!-- Pagination -->
-      <div class="pagination-container" id="pagination-container">
-        <!-- Pagination buttons injected by JS -->
-      </div>
-    </main>
-
-    <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="cart-sidebar">
-      <div class="cart-header">
-        <h2>Tu Pedido</h2>
-        <button id="close-cart" class="close-cart">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
-      </div>
-      <div id="cart-items" class="cart-items">
-        <!-- Cart items injected by JS -->
-        <p class="empty-cart-msg">Tu carrito está vacío.</p>
-      </div>
-      <div class="cart-footer">
-        <div class="cart-total">
-          <span>Total:</span>
-          <span id="cart-total-price">$0</span>
-        </div>
-        <button id="checkout-btn" class="checkout-btn" disabled style="display:flex; justify-content:center; align-items:center; gap:8px;">
-          Pedir por WhatsApp
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
-        </button>
-        <button id="clear-cart-btn" class="clear-cart-btn">Vaciar Carrito</button>
-      </div>
-    </div>
-    <div id="cart-overlay" class="cart-overlay"></div>
-
-    <!-- Toast Container -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container footer-content">
-        <div class="footer-brand">
-          <img src="/logoterruno_circle.png" alt="Logo El Terruño" class="footer-logo">
-          <p>Almacén Gourmet & Vinos Boutique.</p>
-          <p>De nuestra tierra a tu mesa.</p>
-        </div>
-        <div class="footer-contact">
-          <h4>Contacto</h4>
-          <p><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Av. Juan B. Justo 1234, Jesús María</p>
-          <p><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg> +54 9 3525 518649</p>
-          <p><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> hola@elterruno.com.ar</p>
-        </div>
-        <div class="footer-hours">
-          <h4>Horarios</h4>
-          <p>Lun a Vie: 9:00 - 13:00 / 17:00 - 21:00</p>
-          <p>Sábados: 9:00 - 14:00</p>
-          <p>Domingos y Feriados: Cerrado</p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 El Terruño. Todos los derechos reservados.</p>
-      </div>
-    </footer>
-
-    <script type="module" src="/src/main.js"></script>
+  <body class="bg-[#F7F5EE] text-[#3D2C23] font-sans antialiased selection:bg-[#70232B] selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
