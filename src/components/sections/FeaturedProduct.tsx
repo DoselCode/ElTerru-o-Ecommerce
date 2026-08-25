@@ -8,12 +8,6 @@ interface FeaturedProductProps {
 }
 
 export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, storeInfo }) => {
-  const handleWhatsAppConsult = () => {
-    const text = `Hola ${storeInfo.name}! Quisiera consultar sobre el producto destacado: *${product.name} ${product.year ? product.year : ''}* ($${product.price.toLocaleString('es-AR')}). ¿Tienen disponibilidad?`;
-    const url = `https://wa.me/${storeInfo.whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-  };
-
   return (
     <section className="py-20 px-6 md:px-12 bg-[#F7F5EE]">
       <div className="max-w-6xl mx-auto">
@@ -36,6 +30,7 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
                 <img
                   src={product.image}
                   alt={product.name}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
 
@@ -108,21 +103,17 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
               {product.stock !== undefined && (
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#70232B]" />
-                  <span><strong>Stock limitado:</strong> {product.stock} unidades disponibles</span>
+                  <span>
+                    <strong>Disponibilidad:</strong>{' '}
+                    {product.stock === 0 ? (
+                      <span className="text-red-500 font-semibold">Sin stock</span>
+                    ) : (
+                      `${product.stock} unidades disponibles`
+                    )}
+                  </span>
                 </li>
               )}
             </ul>
-
-            {/* WhatsApp CTA Button */}
-            <div className="pt-2">
-              <button
-                onClick={handleWhatsAppConsult}
-                className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-[#70232B] hover:bg-[#581B22] text-white font-medium text-base shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer"
-              >
-                <span>Consultar por WhatsApp</span>
-                <ArrowRight size={18} />
-              </button>
-            </div>
           </div>
         </div>
       </div>
