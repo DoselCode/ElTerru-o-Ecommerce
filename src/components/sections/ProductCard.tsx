@@ -9,7 +9,7 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo }) => {
   return (
     <article
-      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col border border-[#3D2C23]/5 group"
+      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-[#3D2C23]/5 group"
     >
       {/* Image with category tag */}
       <div className="relative h-64 overflow-hidden bg-[#F7F5EE]">
@@ -32,18 +32,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo }) 
       </div>
 
       {/* Card Details */}
-      <div className="p-6 flex flex-col flex-grow justify-between space-y-4">
-        <div className="space-y-2">
-          <h3 className="font-serif text-xl font-bold text-[#3D2C23] group-hover:text-[#70232B] transition-colors leading-snug">
+      <div className="p-5 flex flex-col flex-grow justify-between space-y-3">
+        <div className="space-y-1.5">
+          <h3 className="font-serif text-lg font-bold text-[#3D2C23] group-hover:text-[#70232B] transition-colors leading-snug">
             {product.name}
           </h3>
-          <p className="text-sm text-[#7C726A] line-clamp-2 leading-relaxed">
+          <p className="text-xs sm:text-[13px] text-[#7C726A] line-clamp-2 leading-relaxed">
             {product.description}
           </p>
         </div>
 
-        <div className="pt-2 flex items-center justify-between">
-          <span className="font-serif text-2xl font-bold text-[#70232B]">
+        <div className="pt-1 flex items-center justify-between">
+          <span className="font-serif text-xl font-bold text-[#70232B]">
             ${product.price.toLocaleString('es-AR')}
           </span>
         </div>

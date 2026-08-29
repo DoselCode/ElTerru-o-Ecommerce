@@ -107,9 +107,9 @@ const Storefront: React.FC = () => {
       <Navbar storeInfo={storeInfo} />
       <main>
         <Hero storeInfo={storeInfo} />
+        <About storeInfo={storeInfo} />
         {featuredProduct && <FeaturedProduct product={featuredProduct} storeInfo={storeInfo} />}
         <Catalog products={products} storeInfo={storeInfo} />
-        <About storeInfo={storeInfo} />
       </main>
       <Footer storeInfo={storeInfo} />
     </div>

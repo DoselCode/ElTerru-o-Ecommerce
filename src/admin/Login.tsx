@@ -40,8 +40,8 @@ export const Login: React.FC = () => {
           <div className="w-16 h-16 bg-[#70232B] rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-serif text-[#3D2C23]">Admin Access</h1>
-          <p className="text-[#8B7355] mt-2">Ingresar to manage your store</p>
+          <h1 className="text-2xl font-serif text-[#3D2C23]">Acceso de Administrador</h1>
+          <p className="text-[#8B7355] mt-2">Ingresar para gestionar tu tienda</p>
         </div>
 
         {error && (
@@ -54,7 +54,7 @@ export const Login: React.FC = () => {
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-[#3D2C23] mb-2">
-              Email Address
+              Dirección de Email
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -73,7 +73,7 @@ export const Login: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-[#3D2C23] mb-2">
-              Password
+              Contraseña
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -98,7 +98,7 @@ export const Login: React.FC = () => {
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              'Sign In'
+              'Iniciar Sesión'
             )}
           </button>
         </form>
