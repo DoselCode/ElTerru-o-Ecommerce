@@ -92,7 +92,7 @@ export const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#70232B]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terruno-burgundy"></div>
       </div>
     );
   }
@@ -100,10 +100,10 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-serif font-bold text-[#3D2C23]">Productos</h1>
+        <h1 className="text-2xl font-serif font-bold text-terruno-brown">Productos</h1>
         <Link
           to="/admin/products/new"
-          className="flex items-center gap-2 bg-[#70232B] text-white px-4 py-2 rounded-xl hover:bg-[#8b2b35] transition-colors shadow-sm"
+          className="flex items-center gap-2 bg-terruno-burgundy text-white px-4 py-2 rounded-xl hover:bg-terruno-burgundy-light transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>Nuevo Producto</span>
@@ -116,11 +116,11 @@ export const Dashboard: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-[#EBE6D8] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-2xl shadow-sm border border-terruno-border overflow-hidden flex flex-col">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#F7F5EE] border-b border-[#EBE6D8] text-[#8C7A70]">
+              <tr className="bg-terruno-bg border-b border-terruno-border text-terruno-muted">
                 <th className="p-4 font-medium text-sm">Producto</th>
                 <th className="p-4 font-medium text-sm">Categoría</th>
                 <th className="p-4 font-medium text-sm">Precio</th>
@@ -129,12 +129,12 @@ export const Dashboard: React.FC = () => {
                 <th className="p-4 font-medium text-sm text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#EBE6D8]">
+            <tbody className="divide-y divide-terruno-border">
               {currentProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-[#F7F5EE]/50 transition-colors">
+                <tr key={product.id} className="hover:bg-terruno-bg/50 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-[#EBE6D8]">
+                      <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-terruno-border">
                         {product.image ? (
                           <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                         ) : (
@@ -142,25 +142,25 @@ export const Dashboard: React.FC = () => {
                         )}
                       </div>
                       <div>
-                        <div className="font-medium text-[#3D2C23] flex items-center gap-2">
+                        <div className="font-medium text-terruno-brown flex items-center gap-2">
                           {product.name}
                           {product.isFeatured && (
                             <Star className="w-3 h-3 text-yellow-500 fill-current" />
                           )}
                         </div>
-                        {product.winery && <div className="text-sm text-[#8C7A70]">{product.winery}</div>}
+                        {product.winery && <div className="text-sm text-terruno-muted">{product.winery}</div>}
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#EBE6D8] text-[#70232B]">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-terruno-border text-terruno-burgundy">
                       {product.category}
                     </span>
                   </td>
-                  <td className="p-4 font-medium text-[#3D2C23]">
+                  <td className="p-4 font-medium text-terruno-brown">
                     ${product.price.toLocaleString()}
                   </td>
-                  <td className="p-4 text-[#8C7A70]">
+                  <td className="p-4 text-terruno-muted">
                     {product.stock ?? 0}
                   </td>
                   <td className="p-4">
@@ -181,7 +181,7 @@ export const Dashboard: React.FC = () => {
                       {!product.isFeatured && (
                         <button
                           onClick={() => setFeatured(product.id)}
-                          className="p-2 text-[#8C7A70] hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                          className="p-2 text-terruno-muted hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
                           title="Marcar como destacado"
                         >
                           <Star className="w-4 h-4" />
@@ -189,14 +189,14 @@ export const Dashboard: React.FC = () => {
                       )}
                       <Link
                         to={`/admin/products/edit/${product.id}`}
-                        className="p-2 text-[#8C7A70] hover:text-[#70232B] hover:bg-[#F7F5EE] rounded-lg transition-colors"
+                        className="p-2 text-terruno-muted hover:text-terruno-burgundy hover:bg-terruno-bg rounded-lg transition-colors"
                         title="Editar"
                       >
                         <Edit className="w-4 h-4" />
                       </Link>
                       <button
                         onClick={() => setProductToDelete(product.id)}
-                        className="p-2 text-[#8C7A70] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-terruno-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Eliminar"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -207,7 +207,7 @@ export const Dashboard: React.FC = () => {
               ))}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-[#8C7A70]">
+                  <td colSpan={6} className="p-8 text-center text-terruno-muted">
                     No se encontraron productos. Agregá tu primer producto para empezar.
                   </td>
                 </tr>
@@ -218,21 +218,21 @@ export const Dashboard: React.FC = () => {
         
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between p-4 border-t border-[#EBE6D8] bg-white">
+          <div className="flex items-center justify-between p-4 border-t border-terruno-border bg-white">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
               disabled={currentPage === 1}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-[#70232B] hover:bg-[#F7F5EE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-terruno-burgundy hover:bg-terruno-bg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Anterior
             </button>
-            <span className="text-sm text-[#8C7A70]">
+            <span className="text-sm text-terruno-muted">
               Página {currentPage} de {totalPages}
             </span>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
               disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-[#70232B] hover:bg-[#F7F5EE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-terruno-burgundy hover:bg-terruno-bg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Siguiente
             </button>
@@ -243,9 +243,9 @@ export const Dashboard: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {productToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-[#EBE6D8] animate-in fade-in zoom-in duration-200">
-            <h3 className="text-lg font-bold text-[#3D2C23] mb-2">Eliminar Producto</h3>
-            <p className="text-[#8C7A70] mb-6 text-sm">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-terruno-border animate-in fade-in zoom-in duration-200">
+            <h3 className="text-lg font-bold text-terruno-brown mb-2">Eliminar Producto</h3>
+            <p className="text-terruno-muted mb-6 text-sm">
               ¿Estás seguro que querés eliminar este producto? Esta acción no se puede deshacer.
             </p>
             <div className="flex justify-end gap-3">

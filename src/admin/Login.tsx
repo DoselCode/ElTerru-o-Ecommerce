@@ -34,14 +34,14 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F5EE] flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-[#EBE6D8]">
+    <div className="min-h-screen bg-terruno-bg flex items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-terruno-border">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#70232B] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-terruno-burgundy rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-serif text-[#3D2C23]">Acceso de Administrador</h1>
-          <p className="text-[#8B7355] mt-2">Ingresar para gestionar tu tienda</p>
+          <h1 className="text-2xl font-serif text-terruno-brown">Acceso de Administrador</h1>
+          <p className="text-terruno-accent mt-2">Ingresar para gestionar tu tienda</p>
         </div>
 
         {error && (
@@ -53,7 +53,7 @@ export const Login: React.FC = () => {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-[#3D2C23] mb-2">
+            <label className="block text-sm font-medium text-terruno-brown mb-2">
               Dirección de Email
             </label>
             <div className="relative">
@@ -65,14 +65,14 @@ export const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="block w-full pl-10 pr-3 py-3 border border-[#EBE6D8] rounded-xl focus:ring-[#70232B] focus:border-[#70232B] bg-[#F7F5EE] outline-none transition-colors"
+                className="block w-full pl-10 pr-3 py-3 border border-terruno-border rounded-xl focus:ring-terruno-burgundy focus:border-terruno-burgundy bg-terruno-bg outline-none transition-colors"
                 placeholder="admin@example.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#3D2C23] mb-2">
+            <label className="block text-sm font-medium text-terruno-brown mb-2">
               Contraseña
             </label>
             <div className="relative">
@@ -84,7 +84,7 @@ export const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="block w-full pl-10 pr-3 py-3 border border-[#EBE6D8] rounded-xl focus:ring-[#70232B] focus:border-[#70232B] bg-[#F7F5EE] outline-none transition-colors"
+                className="block w-full pl-10 pr-3 py-3 border border-terruno-border rounded-xl focus:ring-terruno-burgundy focus:border-terruno-burgundy bg-terruno-bg outline-none transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -93,7 +93,7 @@ export const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-xl text-white bg-[#70232B] hover:bg-[#5A1C22] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#70232B] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-xl text-white bg-terruno-burgundy hover:bg-terruno-burgundy-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-terruno-burgundy transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

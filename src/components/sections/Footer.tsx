@@ -10,7 +10,7 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
   return (
     <footer
-      className="bg-[#3D2C23] text-white pt-12 sm:pt-16 px-4 sm:px-6 md:px-12 border-t border-[#70232B]/30 relative z-10"
+      className="bg-terruno-brown text-white pt-12 sm:pt-16 px-4 sm:px-6 md:px-12 border-t border-terruno-burgundy/30 relative z-10"
       style={{
         paddingBottom: 'max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem))'
       }}
@@ -28,7 +28,7 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
               <h3 className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-white">
                 {storeInfo.name}
               </h3>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-[#55633D] font-semibold">
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] text-terruno-olive font-semibold">
                 {storeInfo.tagline}
               </p>
             </div>
@@ -40,20 +40,20 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
 
         {/* Contact Column */}
         <Reveal variant="fade-up" delay={90} className="space-y-3 sm:space-y-4">
-          <h4 className="font-serif text-base sm:text-lg font-bold text-white relative inline-block after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-[#55633D]">
+          <h4 className="font-serif text-base sm:text-lg font-bold text-white relative inline-block after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-terruno-olive">
             Contacto
           </h4>
           <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm text-white/70">
             <li className="flex items-start gap-2.5">
-              <MapPin size={16} className="text-[#55633D] shrink-0 mt-0.5" />
+              <MapPin size={16} className="text-terruno-olive shrink-0 mt-0.5" />
               <span>{storeInfo.address}</span>
             </li>
             <li className="flex items-center gap-2.5">
-              <Phone size={16} className="text-[#55633D] shrink-0" />
+              <Phone size={16} className="text-terruno-olive shrink-0" />
               <span>{storeInfo.phone}</span>
             </li>
             <li className="flex items-center gap-2.5">
-              <Mail size={16} className="text-[#55633D] shrink-0" />
+              <Mail size={16} className="text-terruno-olive shrink-0" />
               <span>{storeInfo.email}</span>
             </li>
           </ul>
@@ -61,7 +61,7 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
 
         {/* Hours Column */}
         <Reveal variant="fade-up" delay={180} className="space-y-3 sm:space-y-4">
-          <h4 className="font-serif text-base sm:text-lg font-bold text-white relative inline-block after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-[#55633D]">
+          <h4 className="font-serif text-base sm:text-lg font-bold text-white relative inline-block after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-terruno-olive">
             Horarios
           </h4>
           <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-white/70">

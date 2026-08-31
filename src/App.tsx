@@ -99,11 +99,11 @@ const Storefront: React.FC = () => {
   }, []);
 
   if (loading || !storeInfo) {
-    return <div className="min-h-screen flex items-center justify-center bg-[#F7F5EE]"><p>Cargando tienda...</p></div>;
+    return <div className="min-h-screen flex items-center justify-center bg-terruno-bg"><p>Cargando tienda...</p></div>;
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F5EE] text-[#3D2C23] font-sans selection:bg-[#70232B] selection:text-white">
+    <div className="min-h-screen bg-terruno-bg text-terruno-brown font-sans selection:bg-terruno-burgundy selection:text-white">
       <Navbar storeInfo={storeInfo} />
       <main>
         <Hero storeInfo={storeInfo} />

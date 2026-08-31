@@ -189,7 +189,7 @@ export const ProductForm: React.FC = () => {
   if (fetching) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#70232B] animate-spin" />
+        <Loader2 className="w-8 h-8 text-terruno-burgundy animate-spin" />
       </div>
     );
   }
@@ -197,10 +197,10 @@ export const ProductForm: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Link to="/admin" className="p-2 text-[#8C7A70] hover:bg-[#EBE6D8] rounded-xl transition-colors">
+        <Link to="/admin" className="p-2 text-terruno-muted hover:bg-terruno-border rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="text-2xl font-serif font-bold text-[#3D2C23]">
+        <h1 className="text-2xl font-serif font-bold text-terruno-brown">
           {isEditing ? 'Editar Producto' : 'Nuevo Producto'}
         </h1>
       </div>
@@ -211,29 +211,29 @@ export const ProductForm: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} noValidate className="bg-white rounded-2xl shadow-sm border border-[#EBE6D8] p-6 md:p-8 space-y-8">
+      <form onSubmit={handleSubmit} noValidate className="bg-white rounded-2xl shadow-sm border border-terruno-border p-6 md:p-8 space-y-8">
         {/* Basic Info */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#3D2C23] border-b border-[#EBE6D8] pb-2">Información Básica</h2>
+          <h2 className="text-lg font-medium text-terruno-brown border-b border-terruno-border pb-2">Información Básica</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Nombre *</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Nombre *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full p-3 rounded-xl border bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all ${errors.name ? 'border-red-500' : 'border-[#EBE6D8]'}`}
+                className={`w-full p-3 rounded-xl border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all ${errors.name ? 'border-red-500' : 'border-terruno-border'}`}
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Categoría *</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Categoría *</label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className={`w-full p-3 rounded-xl border bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all ${errors.category ? 'border-red-500' : 'border-[#EBE6D8]'}`}
+                className={`w-full p-3 rounded-xl border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all ${errors.category ? 'border-red-500' : 'border-terruno-border'}`}
               >
                 <option value="Vinos">Vinos</option>
                 <option value="Almacén">Almacén</option>
@@ -246,38 +246,38 @@ export const ProductForm: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Precio *</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Precio *</label>
               <input
                 type="number"
                 step="0.01"
                 name="price"
                 value={formData.price}
                 onChange={handleChange}
-                className={`w-full p-3 rounded-xl border bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all ${errors.price ? 'border-red-500' : 'border-[#EBE6D8]'}`}
+                className={`w-full p-3 rounded-xl border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all ${errors.price ? 'border-red-500' : 'border-terruno-border'}`}
               />
               {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Precio Original (opcional)</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Precio Original (opcional)</label>
               <input
                 type="number"
                 step="0.01"
                 name="original_price"
                 value={formData.original_price}
                 onChange={handleChange}
-                className="w-full p-3 rounded-xl border border-[#EBE6D8] bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all"
+                className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all"
               />
             </div>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-[#8C7A70] mb-1">Descripción *</label>
+            <label className="block text-sm font-medium text-terruno-muted mb-1">Descripción *</label>
             <textarea
               rows={4}
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className={`w-full p-3 rounded-xl border bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all ${errors.description ? 'border-red-500' : 'border-[#EBE6D8]'}`}
+              className={`w-full p-3 rounded-xl border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all ${errors.description ? 'border-red-500' : 'border-terruno-border'}`}
             />
             {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
           </div>
@@ -285,70 +285,70 @@ export const ProductForm: React.FC = () => {
 
         {/* Details */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#3D2C23] border-b border-[#EBE6D8] pb-2">Detalles del Producto</h2>
+          <h2 className="text-lg font-medium text-terruno-brown border-b border-terruno-border pb-2">Detalles del Producto</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Bodega (opcional)</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Bodega (opcional)</label>
               <input
                 type="text"
                 name="winery"
                 value={formData.winery}
                 onChange={handleChange}
-                className="w-full p-3 rounded-xl border border-[#EBE6D8] bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all"
+                className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Año (opcional)</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Año (opcional)</label>
               <input
                 type="text"
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className="w-full p-3 rounded-xl border border-[#EBE6D8] bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all"
+                className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#8C7A70] mb-1">Maridaje (opcional)</label>
+            <label className="block text-sm font-medium text-terruno-muted mb-1">Maridaje (opcional)</label>
             <input
               type="text"
               name="pairing"
               value={formData.pairing}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl border border-[#EBE6D8] bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all"
+              className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Stock</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Stock</label>
               <input
                 type="number"
                 name="stock"
                 value={formData.stock}
                 onChange={handleChange}
-                className="w-full p-3 rounded-xl border border-[#EBE6D8] bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all"
+                className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Etiqueta (opc.) ej: Novedad</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Etiqueta (opc.) ej: Novedad</label>
               <input
                 type="text"
                 name="badge"
                 value={formData.badge}
                 onChange={handleChange}
-                className="w-full p-3 rounded-xl border border-[#EBE6D8] bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all"
+                className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#8C7A70] mb-1">Desc. Etiqueta (opc.) ej: -20%</label>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Desc. Etiqueta (opc.) ej: -20%</label>
               <input
                 type="text"
                 name="discount_badge"
                 value={formData.discount_badge}
                 onChange={handleChange}
-                className="w-full p-3 rounded-xl border border-[#EBE6D8] bg-[#F7F5EE] focus:outline-none focus:ring-2 focus:ring-[#70232B]/20 focus:border-[#70232B] transition-all"
+                className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all"
               />
             </div>
           </div>
@@ -360,9 +360,9 @@ export const ProductForm: React.FC = () => {
               name="is_visible"
               checked={formData.is_visible}
               onChange={handleChange}
-              className="w-4 h-4 text-[#70232B] bg-[#F7F5EE] border-[#EBE6D8] rounded focus:ring-[#70232B]"
+              className="w-4 h-4 text-terruno-burgundy bg-terruno-bg border-terruno-border rounded focus:ring-terruno-burgundy"
             />
-            <label htmlFor="is_visible" className="text-sm font-medium text-[#3D2C23]">
+            <label htmlFor="is_visible" className="text-sm font-medium text-terruno-brown">
               Visible en la tienda
             </label>
           </div>
@@ -370,16 +370,16 @@ export const ProductForm: React.FC = () => {
 
         {/* Image Upload */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium text-[#3D2C23] border-b border-[#EBE6D8] pb-2">Imagen del Producto</h2>
+          <h2 className="text-lg font-medium text-terruno-brown border-b border-terruno-border pb-2">Imagen del Producto</h2>
           <div className="flex items-start gap-6">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-[#8C7A70] mb-2">
+              <label className="block text-sm font-medium text-terruno-muted mb-2">
                 Subir Imagen {(!isEditing && !imageFile) && '*'}
               </label>
-              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer bg-[#F7F5EE] hover:bg-[#EBE6D8]/50 transition-colors ${errors.image ? 'border-red-500' : 'border-[#EBE6D8]'}`}>
+              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer bg-terruno-bg hover:bg-terruno-border/50 transition-colors ${errors.image ? 'border-red-500' : 'border-terruno-border'}`}>
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Upload className="w-6 h-6 mb-2 text-[#8C7A70]" />
-                  <p className="text-sm text-[#8C7A70]">Hacé clic para subir o arrastrá la imagen</p>
+                  <Upload className="w-6 h-6 mb-2 text-terruno-muted" />
+                  <p className="text-sm text-terruno-muted">Hacé clic para subir o arrastrá la imagen</p>
                 </div>
                 <input
                   type="file"
@@ -391,22 +391,22 @@ export const ProductForm: React.FC = () => {
               {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
             </div>
             {imagePreview ? (
-              <div className="w-32 h-32 rounded-xl border border-[#EBE6D8] overflow-hidden bg-[#F7F5EE] flex-shrink-0 flex items-center justify-center">
+              <div className="w-32 h-32 rounded-xl border border-terruno-border overflow-hidden bg-terruno-bg flex-shrink-0 flex items-center justify-center">
                 <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-32 h-32 rounded-xl border border-[#EBE6D8] border-dashed bg-[#F7F5EE] flex-shrink-0 flex items-center justify-center text-[#8C7A70]">
+              <div className="w-32 h-32 rounded-xl border border-terruno-border border-dashed bg-terruno-bg flex-shrink-0 flex items-center justify-center text-terruno-muted">
                 <ImageIcon className="w-8 h-8 opacity-50" />
               </div>
             )}
           </div>
         </div>
 
-        <div className="pt-6 border-t border-[#EBE6D8] flex justify-end">
+        <div className="pt-6 border-t border-terruno-border flex justify-end">
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 bg-[#70232B] text-white px-6 py-3 rounded-xl hover:bg-[#8b2b35] transition-colors disabled:opacity-70 disabled:cursor-not-allowed font-medium shadow-sm"
+            className="flex items-center gap-2 bg-terruno-burgundy text-white px-6 py-3 rounded-xl hover:bg-terruno-burgundy-light transition-colors disabled:opacity-70 disabled:cursor-not-allowed font-medium shadow-sm"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
             <span>{loading ? 'Guardando...' : 'Guardar Producto'}</span>

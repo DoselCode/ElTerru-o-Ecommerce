@@ -34,8 +34,8 @@ export const AdminLayout: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F7F5EE] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#70232B] animate-spin" />
+      <div className="min-h-screen bg-terruno-bg flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-terruno-burgundy animate-spin" />
       </div>
     );
   }
@@ -50,11 +50,11 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F7F5EE] flex flex-col md:flex-row">
+    <div className="min-h-screen bg-terruno-bg flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white border-r border-[#EBE6D8] flex flex-col">
-        <div className="p-6 border-b border-[#EBE6D8]">
-          <Link to="/admin" className="flex items-center gap-2 text-[#70232B]">
+      <aside className="w-full md:w-64 bg-white border-r border-terruno-border flex flex-col">
+        <div className="p-6 border-b border-terruno-border">
+          <Link to="/admin" className="flex items-center gap-2 text-terruno-burgundy">
             <Store className="w-6 h-6" />
             <span className="font-serif font-bold text-xl">Admin</span>
           </Link>
@@ -70,8 +70,8 @@ export const AdminLayout: React.FC = () => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                   isActive
-                    ? 'bg-[#70232B] text-white'
-                    : 'text-[#3D2C23] hover:bg-[#F7F5EE]'
+                    ? 'bg-terruno-burgundy text-white'
+                    : 'text-terruno-brown hover:bg-terruno-bg'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -81,7 +81,7 @@ export const AdminLayout: React.FC = () => {
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#EBE6D8]">
+        <div className="p-4 border-t border-terruno-border">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
@@ -94,8 +94,8 @@ export const AdminLayout: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        <header className="bg-white border-b border-[#EBE6D8] p-4 flex justify-between items-center md:hidden">
-          <span className="font-serif font-bold text-[#70232B]">El Terruño</span>
+        <header className="bg-white border-b border-terruno-border p-4 flex justify-between items-center md:hidden">
+          <span className="font-serif font-bold text-terruno-burgundy">El Terruño</span>
         </header>
         <div className="flex-1 overflow-auto p-4 md:p-8">
           <Outlet />
