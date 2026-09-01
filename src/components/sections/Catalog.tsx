@@ -1,6 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Product, Category, StoreInfo } from '../../types/product';
 import { ProductCard } from './ProductCard';
+import { Reveal } from '../ui/Reveal';
+import { Pagination } from '../ui/Pagination';
 import { Search } from 'lucide-react';
 
 interface CatalogProps {
@@ -13,6 +15,13 @@ const CATEGORIES: Category[] = ['Todos', 'Vinos', 'Almacén', 'Fiambres', 'Regal
 export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // 6 productos por página (2 filas de 3 en pantallas grandes)
+
+  // Reset pagination to page 1 if user searches or changes category
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -32,63 +41,93 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
     });
   }, [products, selectedCategory, searchQuery]);
 
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const currentProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
-    <section id="catalog" className="py-20 px-6 md:px-12 bg-[#F7F5EE]">
-      <div className="max-w-6xl mx-auto space-y-10">
+    <section id="catalog" className="py-14 sm:py-20 px-4 sm:px-6 md:px-12 bg-terruno-bg">
+      <div className="max-w-6xl mx-auto space-y-8 sm:space-y-10">
         {/* Header */}
-        <div className="text-center space-y-3">
-          <span className="text-[#55633D] font-semibold text-xs uppercase tracking-[0.25em]">
+        <Reveal variant="fade-up" className="text-center space-y-2.5">
+          <span className="text-terruno-olive font-semibold text-[11px] sm:text-xs uppercase tracking-[0.22em] sm:tracking-[0.25em]">
             — NUESTRO CATÁLOGO —
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#70232B]">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-terruno-burgundy">
             Explorá lo que tenemos
           </h2>
-        </div>
+        </Reveal>
 
         {/* Search Bar */}
-        <div className="max-w-xl mx-auto">
+        <Reveal variant="fade-up" delay={80} className="max-w-md mx-auto">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7C726A]" size={20} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-terruno-subtle" size={18} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar un sabor..."
-              className="w-full pl-12 pr-6 py-3.5 rounded-full bg-white border border-[#3D2C23]/15 text-[#3D2C23] placeholder-[#7C726A] focus:outline-none focus:border-[#70232B] focus:ring-2 focus:ring-[#70232B]/20 shadow-sm transition-all text-base"
+              maxLength={100}
+              className="w-full pl-11 pr-5 py-2.5 sm:py-3 rounded-full bg-white border border-terruno-brown/15 text-terruno-brown placeholder-terruno-subtle focus:outline-none focus:border-terruno-burgundy focus:ring-2 focus:ring-terruno-burgundy/20 shadow-sm transition-all text-sm"
             />
           </div>
-        </div>
+        </Reveal>
 
         {/* Category Filters */}
-        <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-3">
+        <Reveal variant="fade-up" delay={120} className="flex items-center justify-center flex-wrap gap-2 sm:gap-2.5">
           {CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#70232B] text-white shadow-md'
-                    : 'bg-white border border-[#3D2C23]/15 text-[#3D2C23] hover:border-[#70232B] hover:text-[#70232B]'
+                    ? 'bg-terruno-burgundy text-white shadow-sm'
+                    : 'bg-white border border-terruno-brown/15 text-terruno-brown hover:border-terruno-burgundy hover:text-terruno-burgundy'
                 }`}
               >
                 {cat}
               </button>
             );
           })}
-        </div>
+        </Reveal>
 
         {/* Products Grid */}
         {filteredProducts.length === 0 ? (
-          <div className="text-center py-16 text-[#7C726A]">
-            <p className="text-lg">No encontramos productos en esta categoría.</p>
+          <div className="text-center py-16 text-terruno-subtle">
+            <p className="text-base">No encontramos productos en esta categoría.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} storeInfo={storeInfo} />
-            ))}
+          <div className="space-y-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 pt-2">
+              {currentProducts.map((product, i) => (
+                <Reveal
+                  key={`${product.id}-${currentPage}`}
+                  variant="scale-in"
+                  delay={(i % 3) * 70 + Math.floor(i / 3) * 40}
+                  className="h-full"
+                >
+                  <ProductCard product={product} storeInfo={storeInfo} />
+                </Reveal>
+              ))}
+            </div>
+            
+            {/* Pagination Controls */}
+            <div className="pt-6 border-t border-terruno-border/50">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                variant="footer"
+                hideOnSinglePage={false}
+              />
+            </div>
           </div>
         )}
       </div>

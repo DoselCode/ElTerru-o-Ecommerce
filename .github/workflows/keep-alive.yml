@@ -1,0 +1,31 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Corre todos los lunes y jueves a las 12:00 UTC (9:00 AM Argentina)
+    - cron: '0 12 * * 1,4'
+  workflow_dispatch: # Permite ejecutarlo a mano desde GH si querés probarlo
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          echo "Haciendo ping a Supabase para evitar suspensión..."
+          
+          # Hacemos una consulta a la raíz de la API REST (limit=1 no duele)
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/?limit=1")
+          
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "✅ Ping exitoso (Status: $HTTP_STATUS)"
+          else
+            echo "❌ Falló el ping (Status: $HTTP_STATUS)"
+            exit 1
+          fi
