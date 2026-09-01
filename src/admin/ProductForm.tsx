@@ -161,6 +161,7 @@ export const ProductForm: React.FC = () => {
     }
   };
 
+  /* Próximamente: Integración con Google Drive 
   const handleGoogleDrivePick = async () => {
     try {
       setLoadingDrive(true);
@@ -184,6 +185,7 @@ export const ProductForm: React.FC = () => {
       setLoadingDrive(false);
     }
   };
+  */
 
   const uploadImage = async (file: File | Blob): Promise<string> => {
     const ext = file instanceof File ? file.name.split('.').pop() : 'jpg';
@@ -606,8 +608,8 @@ export const ProductForm: React.FC = () => {
                 Seleccionar Imagen {(!isEditing && !imageFile && !formData.image) && '*'}
               </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Botón Google Drive */}
+              <div className="grid grid-cols-1 gap-3">
+                {/* Próximamente: Integración con Google Drive
                 <button
                   type="button"
                   onClick={handleGoogleDrivePick}
@@ -629,6 +631,7 @@ export const ProductForm: React.FC = () => {
                     </div>
                   )}
                 </button>
+                */}
 
                 {/* Subida Local */}
                 <label className={`flex flex-col items-center justify-center p-5 border-2 border-dashed rounded-xl cursor-pointer bg-terruno-bg hover:bg-terruno-border/60 transition-all text-center min-h-[125px] ${errors.image ? 'border-red-500' : 'border-terruno-border'}`}>
@@ -668,7 +671,15 @@ export const ProductForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="pt-6 border-t border-terruno-border flex justify-end">
+        <div className="pt-6 border-t border-terruno-border flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/admin')}
+            disabled={loading}
+            className="px-6 py-3 rounded-xl border border-terruno-border text-terruno-brown hover:bg-terruno-bg transition-colors font-medium cursor-pointer"
+          >
+            Cancelar
+          </button>
           <button
             type="submit"
             disabled={loading}
