@@ -69,6 +69,7 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar un sabor..."
+              maxLength={100}
               className="w-full pl-11 pr-5 py-2.5 sm:py-3 rounded-full bg-white border border-terruno-brown/15 text-terruno-brown placeholder-terruno-subtle focus:outline-none focus:border-terruno-burgundy focus:ring-2 focus:ring-terruno-burgundy/20 shadow-sm transition-all text-sm"
             />
           </div>

@@ -64,10 +64,25 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
           <h4 className="font-serif text-base sm:text-lg font-bold text-white relative inline-block after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-8 after:h-[2px] after:bg-terruno-olive">
             Horarios
           </h4>
-          <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-white/70">
-            <li>{storeInfo.hoursWeekdays}</li>
-            <li>{storeInfo.hoursSaturday}</li>
-            <li>{storeInfo.hoursSunday}</li>
+          <ul className="space-y-2 text-xs sm:text-sm text-white/70">
+            {storeInfo.hoursWeekdays && (
+              <li>
+                <span className="font-semibold text-white">Lunes a viernes:</span>{' '}
+                <span>{storeInfo.hoursWeekdays.replace(/^lunes\s+a\s+viernes\s*[:\-]?\s*/i, '')}</span>
+              </li>
+            )}
+            {storeInfo.hoursSaturday && (
+              <li>
+                <span className="font-semibold text-white">Sábados:</span>{' '}
+                <span>{storeInfo.hoursSaturday.replace(/^s[aá]bados?\s*[:\-]?\s*/i, '')}</span>
+              </li>
+            )}
+            {storeInfo.hoursSunday && (
+              <li>
+                <span className="font-semibold text-white">Domingos:</span>{' '}
+                <span>{storeInfo.hoursSunday.replace(/^domingos?\s*[:\-]?\s*/i, '')}</span>
+              </li>
+            )}
           </ul>
         </Reveal>
       </div>

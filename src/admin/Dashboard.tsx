@@ -1,18 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types/product';
-import { Plus, Edit, Trash2, Eye, EyeOff, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, Search, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Pagination } from '../components/ui/Pagination';
 
 export const Dashboard: React.FC = () => {
   const [products, setProductos] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   
-  // Modal & Pagination State
+  // Search, Modal & Pagination State
+  const [searchQuery, setSearchQuery] = useState('');
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+
+  // Reset pagination on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const fetchProductos = async () => {
     try {
@@ -85,9 +92,22 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Pagination logic
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const currentProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  // Filter & Pagination logic
+  const filteredProducts = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return products;
+    return products.filter((product) => {
+      return (
+        product.name.toLowerCase().includes(query) ||
+        (product.winery && product.winery.toLowerCase().includes(query)) ||
+        product.category.toLowerCase().includes(query) ||
+        (product.description && product.description.toLowerCase().includes(query))
+      );
+    });
+  }, [products, searchQuery]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const currentProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   if (loading) {
     return (
@@ -99,15 +119,46 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-serif font-bold text-terruno-brown">Productos</h1>
-        <Link
-          to="/admin/products/new"
-          className="flex items-center gap-2 bg-terruno-burgundy text-white px-4 py-2 rounded-xl hover:bg-terruno-burgundy-light transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nuevo Producto</span>
-        </Link>
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-serif font-bold text-terruno-brown">Productos</h1>
+          <span className="text-xs bg-terruno-border text-terruno-burgundy font-semibold px-2.5 py-0.5 rounded-full">
+            {products.length}
+          </span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          {/* Search Bar */}
+          <div className="relative min-w-[240px] sm:min-w-[280px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-terruno-muted w-4 h-4" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por nombre, bodega, categoría..."
+              maxLength={100}
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-white border border-terruno-border text-sm text-terruno-brown placeholder-terruno-muted focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/20 focus:border-terruno-burgundy transition-all shadow-xs"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-terruno-muted hover:text-terruno-brown p-1"
+                title="Limpiar búsqueda"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <Link
+            to="/admin/products/new"
+            className="flex items-center justify-center gap-2 bg-terruno-burgundy text-white px-4 py-2 rounded-xl hover:bg-terruno-burgundy-light transition-colors shadow-sm whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuevo Producto</span>
+          </Link>
+        </div>
       </div>
 
       {errorMsg && (
@@ -205,10 +256,23 @@ export const Dashboard: React.FC = () => {
                   </td>
                 </tr>
               ))}
-              {products.length === 0 && (
+              {filteredProducts.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-terruno-muted">
-                    No se encontraron productos. Agregá tu primer producto para empezar.
+                    {searchQuery ? (
+                      <div className="space-y-2">
+                        <p>No se encontraron productos que coincidan con &ldquo;{searchQuery}&rdquo;.</p>
+                        <button
+                          type="button"
+                          onClick={() => setSearchQuery('')}
+                          className="text-xs text-terruno-burgundy font-medium hover:underline cursor-pointer"
+                        >
+                          Limpiar búsqueda
+                        </button>
+                      </div>
+                    ) : (
+                      <p>No se encontraron productos. Agregá tu primer producto para empezar.</p>
+                    )}
                   </td>
                 </tr>
               )}
@@ -217,27 +281,18 @@ export const Dashboard: React.FC = () => {
         </div>
         
         {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between p-4 border-t border-terruno-border bg-white">
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
-              disabled={currentPage === 1}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-terruno-burgundy hover:bg-terruno-bg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Anterior
-            </button>
-            <span className="text-sm text-terruno-muted">
-              Página {currentPage} de {totalPages}
-            </span>
-            <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-terruno-burgundy hover:bg-terruno-bg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Siguiente
-            </button>
-          </div>
-        )}
+        <div className="p-4 border-t border-terruno-border bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span className="text-xs sm:text-sm text-terruno-muted">
+            Mostrando {filteredProducts.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredProducts.length)} de {filteredProducts.length} productos {searchQuery && `(filtrados de ${products.length})`}
+          </span>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+            variant="footer"
+            hideOnSinglePage={false}
+          />
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
