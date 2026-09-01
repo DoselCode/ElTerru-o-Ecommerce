@@ -45,7 +45,7 @@ export const AdminLayout: React.FC = () => {
   }
 
   const navItems = [
-    { name: 'Inicio', path: '/admin', icon: LayoutDashboard },
+    { name: 'Catálogo Web', path: '/admin', icon: LayoutDashboard },
     { name: 'Configuración', path: '/admin/settings', icon: Settings },
   ];
 
@@ -56,7 +56,7 @@ export const AdminLayout: React.FC = () => {
         <div className="p-6 border-b border-terruno-border">
           <Link to="/admin" className="flex items-center gap-2 text-terruno-burgundy">
             <Store className="w-6 h-6" />
-            <span className="font-serif font-bold text-xl">Admin</span>
+            <span className="font-serif font-bold text-xl">Panel Operativo</span>
           </Link>
         </div>
 
