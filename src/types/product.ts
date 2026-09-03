@@ -44,4 +44,5 @@ export interface StoreInfo {
   statYears: string;
   statProducers: string;
   statProducts: string;
+  instagramUrl?: string;
 }

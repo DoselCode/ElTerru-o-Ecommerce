@@ -71,7 +71,7 @@ export const SettingsForm: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState('');
 
   const [formData, setFormData] = useState<any>({
-    name: '', tagline: '', logo: '', phone: '', whatsapp_number: '', email: '', address: '',
+    name: '', tagline: '', logo: '', phone: '', whatsapp_number: '', email: '', address: '', instagram_url: '',
     hours_weekdays: '', hours_saturday: '', hours_sunday: '',
     hero_badge: '', hero_title: '', hero_subtitle: '', hero_bg_image: '',
     about_title: '', about_quote: '', about_quote_author: '',
@@ -261,6 +261,28 @@ export const SettingsForm: React.FC = () => {
               <div className="relative">
                 <MapPin className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 <input type="text" name="address" value={formData.address || ''} onChange={handleChange} className="w-full pl-10 p-3 rounded-xl border border-terruno-border bg-terruno-bg" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-terruno-muted mb-1">Perfil de Instagram (URL)</label>
+              <div className="relative">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="absolute left-3 top-3.5 w-4 h-4 text-gray-400"
+                >
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                </svg>
+                <input type="url" name="instagram_url" placeholder="ej. https://instagram.com/terruno" value={formData.instagram_url || ''} onChange={handleChange} className="w-full pl-10 p-3 rounded-xl border border-terruno-border bg-terruno-bg" />
               </div>
             </div>
           </div>

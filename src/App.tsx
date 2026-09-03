@@ -59,6 +59,7 @@ const Storefront: React.FC = () => {
           statYears: storeData.stat_years,
           statProducers: storeData.stat_producers,
           statProducts: storeData.stat_products,
+          instagramUrl: storeData.instagram_url,
         } as StoreInfo);
       }
 
