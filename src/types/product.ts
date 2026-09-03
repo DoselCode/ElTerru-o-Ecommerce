@@ -44,4 +44,10 @@ export interface StoreInfo {
   statYears: string;
   statProducers: string;
   statProducts: string;
+  instagramUrl?: string;
+  showPhone?: boolean;
+  showWhatsapp?: boolean;
+  showEmail?: boolean;
+  showAddress?: boolean;
+  showInstagram?: boolean;
 }
