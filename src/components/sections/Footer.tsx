@@ -44,19 +44,51 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
             Contacto
           </h4>
           <ul className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm text-white/80">
-            <li className="flex items-start gap-2.5">
-              <MapPin size={16} className="text-terruno-cream shrink-0 mt-0.5" />
-              <span>{storeInfo.address}</span>
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Phone size={16} className="text-terruno-cream shrink-0" />
-              <span>{storeInfo.phone}</span>
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Mail size={16} className="text-terruno-cream shrink-0" />
-              <span>{storeInfo.email}</span>
-            </li>
-            {storeInfo.instagramUrl && (
+            {storeInfo.showAddress !== false && storeInfo.address && (
+              <li className="flex items-start gap-2.5">
+                <MapPin size={16} className="text-terruno-cream shrink-0 mt-0.5" />
+                <span>{storeInfo.address}</span>
+              </li>
+            )}
+            {storeInfo.showPhone !== false && storeInfo.phone && (
+              <li className="flex items-center gap-2.5">
+                <Phone size={16} className="text-terruno-cream shrink-0" />
+                <span>{storeInfo.phone}</span>
+              </li>
+            )}
+            {storeInfo.showWhatsapp !== false && storeInfo.whatsappNumber && (
+              <li className="flex items-center gap-2.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-terruno-cream shrink-0"
+                >
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+                <a
+                  href={`https://wa.me/${storeInfo.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-terruno-cream transition-colors"
+                >
+                  {storeInfo.whatsappNumber}
+                </a>
+              </li>
+            )}
+            {storeInfo.showEmail !== false && storeInfo.email && (
+              <li className="flex items-center gap-2.5">
+                <Mail size={16} className="text-terruno-cream shrink-0" />
+                <span>{storeInfo.email}</span>
+              </li>
+            )}
+            {storeInfo.showInstagram !== false && storeInfo.instagramUrl && (
               <li className="flex items-center gap-2.5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +107,7 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
                   <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
                 </svg>
                 <a href={storeInfo.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-terruno-cream transition-colors">
-                  Síguenos en Instagram
+                  El Terruno
                 </a>
               </li>
             )}

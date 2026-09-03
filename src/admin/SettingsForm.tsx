@@ -72,6 +72,7 @@ export const SettingsForm: React.FC = () => {
 
   const [formData, setFormData] = useState<any>({
     name: '', tagline: '', logo: '', phone: '', whatsapp_number: '', email: '', address: '', instagram_url: '',
+    show_phone: true, show_whatsapp: true, show_email: true, show_address: true, show_instagram: true,
     hours_weekdays: '', hours_saturday: '', hours_sunday: '',
     hero_badge: '', hero_title: '', hero_subtitle: '', hero_bg_image: '',
     about_title: '', about_quote: '', about_quote_author: '',
@@ -239,32 +240,90 @@ export const SettingsForm: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-terruno-muted mb-1">Teléfono (Visible)</label>
+              <div className="mb-1 flex items-center justify-between gap-3">
+                <label className="block text-sm font-medium text-terruno-muted">Teléfono</label>
+                <label className="flex items-center gap-2 text-xs text-terruno-muted">
+                  <input type="checkbox" checked={formData.show_phone !== false} onChange={(e) => setFormData((prev: any) => ({ ...prev, show_phone: e.target.checked }))} className="rounded text-terruno-burgundy" />
+                  Mostrar en footer
+                </label>
+              </div>
               <div className="relative">
                 <Phone className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 <input type="text" name="phone" value={formData.phone || ''} onChange={handleChange} className="w-full pl-10 p-3 rounded-xl border border-terruno-border bg-terruno-bg" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-terruno-muted mb-1">Número de WhatsApp</label>
-              <input type="text" name="whatsapp_number" placeholder="ej. +5493525518649" value={formData.whatsapp_number || ''} onChange={handleChange} className="w-full p-3 rounded-xl border border-terruno-border bg-terruno-bg" />
+              <div className="mb-1 flex items-center justify-between gap-3">
+                <label className="block text-sm font-medium text-terruno-muted">Número de WhatsApp</label>
+                <label className="flex items-center gap-2 text-xs text-terruno-muted">
+                  <input
+                    type="checkbox"
+                    checked={formData.show_whatsapp !== false}
+                    onChange={(e) => setFormData((prev: any) => ({ ...prev, show_whatsapp: e.target.checked }))}
+                    className="rounded text-terruno-burgundy"
+                  />
+                  Mostrar en footer
+                </label>
+              </div>
+              <div className="relative">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="absolute left-3 top-3.5 w-4 h-4 text-gray-400"
+                >
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+                <input
+                  type="text"
+                  name="whatsapp_number"
+                  placeholder="ej. +5493525518649"
+                  value={formData.whatsapp_number || ''}
+                  onChange={handleChange}
+                  className="w-full pl-10 p-3 rounded-xl border border-terruno-border bg-terruno-bg"
+                />
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-terruno-muted mb-1">Correo Electrónico</label>
+              <div className="mb-1 flex items-center justify-between gap-3">
+                <label className="block text-sm font-medium text-terruno-muted">Correo Electrónico</label>
+                <label className="flex items-center gap-2 text-xs text-terruno-muted">
+                  <input type="checkbox" checked={formData.show_email !== false} onChange={(e) => setFormData((prev: any) => ({ ...prev, show_email: e.target.checked }))} className="rounded text-terruno-burgundy" />
+                  Mostrar en footer
+                </label>
+              </div>
               <div className="relative">
                 <Mail className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 <input type="email" name="email" value={formData.email || ''} onChange={handleChange} className="w-full pl-10 p-3 rounded-xl border border-terruno-border bg-terruno-bg" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-terruno-muted mb-1">Dirección Física</label>
+              <div className="mb-1 flex items-center justify-between gap-3">
+                <label className="block text-sm font-medium text-terruno-muted">Dirección Física</label>
+                <label className="flex items-center gap-2 text-xs text-terruno-muted">
+                  <input type="checkbox" checked={formData.show_address !== false} onChange={(e) => setFormData((prev: any) => ({ ...prev, show_address: e.target.checked }))} className="rounded text-terruno-burgundy" />
+                  Mostrar en footer
+                </label>
+              </div>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 <input type="text" name="address" value={formData.address || ''} onChange={handleChange} className="w-full pl-10 p-3 rounded-xl border border-terruno-border bg-terruno-bg" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-terruno-muted mb-1">Perfil de Instagram (URL)</label>
+              <div className="mb-1 flex items-center justify-between gap-3">
+                <label className="block text-sm font-medium text-terruno-muted">Perfil de Instagram (URL)</label>
+                <label className="flex items-center gap-2 text-xs text-terruno-muted">
+                  <input type="checkbox" checked={formData.show_instagram !== false} onChange={(e) => setFormData((prev: any) => ({ ...prev, show_instagram: e.target.checked }))} className="rounded text-terruno-burgundy" />
+                  Mostrar en footer
+                </label>
+              </div>
               <div className="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
