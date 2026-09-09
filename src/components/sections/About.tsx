@@ -8,7 +8,7 @@ interface AboutProps {
 
 export const About: React.FC<AboutProps> = ({ storeInfo }) => {
   return (
-    <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 md:px-12 bg-terruno-bg">
+    <section id="about" className="-mt-[1px] relative z-10 py-16 sm:py-24 px-4 sm:px-6 md:px-12 bg-terruno-bg">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           {/* Left Column: Image Composition */}
