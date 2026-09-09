@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://www.tudominio.com/sitemap.xml
+Sitemap: https://www.xn--elterruo-j3a.online/sitemap.xml
