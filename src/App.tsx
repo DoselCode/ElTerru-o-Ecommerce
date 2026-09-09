@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
 import { Product, StoreInfo } from './types/product';
 import { Navbar } from './components/navbar/Navbar';
@@ -24,12 +25,13 @@ const Storefront: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      // Fetch store info
-      const { data: storeData } = await supabase
-        .from('store_info')
-        .select('*')
-        .eq('id', 1)
-        .single();
+      const [storeResponse, productsResponse] = await Promise.all([
+        supabase.from('store_info').select('*').eq('id', 1).single(),
+        supabase.from('products').select('*').order('id', { ascending: false })
+      ]);
+
+      const storeData = storeResponse.data;
+      const productsData = productsResponse.data;
 
       if (storeData) {
         // Map snake_case database fields to camelCase StoreInfo format
@@ -68,12 +70,6 @@ const Storefront: React.FC = () => {
         } as StoreInfo);
       }
 
-      // Fetch products
-      const { data: productsData } = await supabase
-        .from('products')
-        .select('*')
-        .order('id', { ascending: false });
-
       if (productsData) {
         const mappedProducts = productsData.map((p) => ({
           id: p.id.toString(),
@@ -110,6 +106,10 @@ const Storefront: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-terruno-bg text-terruno-brown font-sans selection:bg-terruno-burgundy selection:text-white">
+      <Helmet>
+        <title>{storeInfo.name}{storeInfo.tagline ? ` | ${storeInfo.tagline}` : ''}</title>
+        <meta name="description" content={storeInfo.heroSubtitle || storeInfo.aboutParagraph1 || 'Tienda de vinos'} />
+      </Helmet>
       <Navbar storeInfo={storeInfo} />
       <main>
         <Hero storeInfo={storeInfo} />
@@ -124,19 +124,24 @@ const Storefront: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Storefront />} />
+    <>
+      <Helmet>
+        <title>El Terruño - Almacén Gourmet & Vinos Boutique</title>
+      </Helmet>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Storefront />} />
 
-      {/* Admin Routes */}
-      <Route path="/admin/login" element={<Login />} />
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="products/new" element={<ProductForm />} />
-        <Route path="products/edit/:id" element={<ProductForm />} />
-        <Route path="settings" element={<SettingsForm />} />
-      </Route>
-    </Routes>
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<Login />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="products/new" element={<ProductForm />} />
+          <Route path="products/edit/:id" element={<ProductForm />} />
+          <Route path="settings" element={<SettingsForm />} />
+        </Route>
+      </Routes>
+    </>
   );
 };
 
