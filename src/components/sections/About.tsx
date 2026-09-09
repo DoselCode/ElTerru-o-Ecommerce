@@ -8,7 +8,7 @@ interface AboutProps {
 
 export const About: React.FC<AboutProps> = ({ storeInfo }) => {
   return (
-    <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 md:px-12 bg-terruno-bg border-t border-terruno-brown/5">
+    <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 md:px-12 bg-terruno-bg">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           {/* Left Column: Image Composition */}
@@ -19,6 +19,7 @@ export const About: React.FC<AboutProps> = ({ storeInfo }) => {
                 <img
                   src={storeInfo.aboutMainImage}
                   alt="Fundadoras de El Terruño"
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -28,6 +29,7 @@ export const About: React.FC<AboutProps> = ({ storeInfo }) => {
                 <img
                   src={storeInfo.aboutSubImage}
                   alt="Interior del almacén El Terruño"
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               </div>

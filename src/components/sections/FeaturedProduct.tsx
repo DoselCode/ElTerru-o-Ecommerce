@@ -16,7 +16,7 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
     : `${rawDiscount} esta semana`;
 
   return (
-    <section className="py-14 sm:py-20 px-4 sm:px-6 md:px-12 bg-terruno-bg overflow-hidden">
+    <article className="py-14 sm:py-20 px-4 sm:px-6 md:px-12 bg-terruno-bg overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Section Tag Header */}
         <Reveal variant="fade-up" className="text-center mb-10 sm:mb-16">
@@ -132,7 +132,7 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
           </div>
         </div>
       </div>
-    </section>
+    </article>
   );
 };
 
