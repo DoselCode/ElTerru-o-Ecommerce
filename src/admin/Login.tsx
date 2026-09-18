@@ -27,7 +27,12 @@ export const Login: React.FC = () => {
 
       navigate('/admin');
     } catch (err: any) {
-      setError(err.message || 'An error occurred during login');
+      console.error('[Login]', err);
+      if (err?.status === 429) {
+        setError('Demasiados intentos. Espera unos minutos antes de volver a intentar.');
+      } else {
+        setError('Email o contrasena incorrectos. Verifica tus datos.');
+      }
     } finally {
       setLoading(false);
     }

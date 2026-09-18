@@ -41,12 +41,19 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
                   src={product.image}
                   alt={product.name}
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                  className={`w-full h-full object-cover transition-transform duration-700 ${(product.stock || 0) <= 0 ? 'grayscale opacity-70' : 'hover:scale-105'}`}
                 />
               </div>
 
-              {/* Top Right Badge: Best Seller */}
-              <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 z-20 bg-terruno-burgundy text-white w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full flex flex-col items-center justify-center p-1 sm:p-1.5 shadow-xl border-2 border-terruno-bg">
+              {/* Top Right Badge: Best Seller or Agotado */}
+              {(product.stock || 0) <= 0 ? (
+                <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 z-20 bg-red-600 text-white w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full flex flex-col items-center justify-center p-1 sm:p-1.5 shadow-xl border-2 border-terruno-bg">
+                  <span className="text-[9px] sm:text-[10px] md:text-[11px] font-bold tracking-wider uppercase text-center leading-tight">
+                    AGOTADO
+                  </span>
+                </div>
+              ) : (
+                <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 z-20 bg-terruno-burgundy text-white w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full flex flex-col items-center justify-center p-1 sm:p-1.5 shadow-xl border-2 border-terruno-bg">
                 <Star size={12} className="fill-white text-white mb-0.5 sm:w-3.5 sm:h-3.5" />
                 <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold tracking-wider uppercase text-center leading-tight">
                   {badgeText.includes(' ') ? (
@@ -61,11 +68,14 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
                   )}
                 </span>
               </div>
+              )}
 
-              {/* Bottom Left Badge: Offer Tag */}
-              <div className="absolute -bottom-2.5 -left-2.5 sm:-bottom-4 sm:-left-4 z-20 bg-terruno-olive text-white px-3 py-1 sm:px-5 sm:py-2 rounded-full text-[10px] sm:text-xs md:text-sm font-bold shadow-xl border-2 border-terruno-bg whitespace-nowrap">
-                {discountText}
-              </div>
+              {/* Bottom Left Badge: Offer Tag — only shown when in stock */}
+              {(product.stock || 0) > 0 && (
+                <div className="absolute -bottom-2.5 -left-2.5 sm:-bottom-4 sm:-left-4 z-20 bg-terruno-olive text-white px-3 py-1 sm:px-5 sm:py-2 rounded-full text-[10px] sm:text-xs md:text-sm font-bold shadow-xl border-2 border-terruno-bg whitespace-nowrap">
+                  {discountText}
+                </div>
+              )}
             </Reveal>
           </div>
 

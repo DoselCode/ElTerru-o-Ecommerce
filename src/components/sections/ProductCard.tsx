@@ -17,15 +17,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo }) 
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className={`w-full h-full object-cover transition-transform duration-500 ${product.stock === 0 ? 'grayscale opacity-70' : 'group-hover:scale-105'}`}
+          className={`w-full h-full object-cover transition-transform duration-500 ${(product.stock || 0) <= 0 ? 'grayscale opacity-70' : 'group-hover:scale-105'}`}
         />
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-md text-[10px] font-semibold text-terruno-brown uppercase tracking-[0.15em] shadow-sm w-fit">
             {product.category}
           </div>
-          {product.stock === 0 && (
+          {(product.stock || 0) <= 0 && (
             <div className="bg-red-500/90 backdrop-blur-sm px-3 py-1 rounded-md text-[10px] font-semibold text-white uppercase tracking-[0.15em] shadow-sm w-fit">
-              Sin stock
+              Agotado
             </div>
           )}
         </div>
