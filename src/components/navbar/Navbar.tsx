@@ -56,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({ storeInfo }) => {
         {/* Mobile Hamburger Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg text-terruno-brown hover:text-terruno-burgundy hover:bg-terruno-brown/5 transition-colors focus:outline-none"
+          className="md:hidden p-2 rounded-lg text-terruno-brown hover:text-terruno-burgundy hover:bg-terruno-brown/5 transition-colors focus:outline-none focus:ring-2 focus:ring-terruno-burgundy/50"
           aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

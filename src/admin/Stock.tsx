@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAdmin } from './AdminContext';
-import { PencilSimple, Trash, UploadSimple } from '@phosphor-icons/react';
-import { supabase } from '../lib/supabase';
+import { PencilSimple, Trash, UploadSimple, Star, Eye, EyeSlash } from '@phosphor-icons/react';
+import { insforge } from '../lib/insforge';
 
 export const Stock: React.FC = () => {
+  const navigate = useNavigate();
   const { state, addMerma, createProduct, updateProduct, deleteProduct, showToast } = useAdmin();
   const [search, setSearch] = useState('');
   const [showMerma, setShowMerma] = useState(false);
@@ -15,6 +17,19 @@ export const Stock: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', type: 'Vinos', stock: 10, price: 1000, image: '' });
   const [mermaData, setMermaData] = useState({ prodId: '', qty: 1 });
   const [uploading, setUploading] = useState(false);
+
+  
+  const handleToggleFeatured = async (product: any) => {
+    if (!product.isFeatured) {
+      const currentlyFeatured = state.products.filter(p => p.isFeatured && p.id !== product.id);
+      for (const p of currentlyFeatured) {
+        await updateProduct(p.id, { isFeatured: false });
+      }
+      await updateProduct(product.id, { isFeatured: true });
+    } else {
+      await updateProduct(product.id, { isFeatured: false });
+    }
+  };
 
   const filteredProducts = state.products.filter(p => {
     if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
@@ -37,8 +52,8 @@ export const Stock: React.FC = () => {
     if (!file) return;
 
     // C-3a: Verify session before upload
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const { data: { user } } = await insforge.auth.getCurrentUser();
+    if (!user) {
       showToast('No autorizado para subir archivos', 'error');
       return;
     }
@@ -55,14 +70,14 @@ export const Stock: React.FC = () => {
     // M-7: Use crypto.randomUUID() to avoid filename collisions
     const fileName = `products/${crypto.randomUUID()}.${fileExt}`;
 
-    const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
+    const { error: uploadError } = await insforge.storage.from('product-images').upload(fileName, file);
     if (uploadError) {
       showToast('Error al subir la imagen', 'error');
       setUploading(false);
       return;
     }
 
-    const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
+    const { data } = insforge.storage.from('product-images').getPublicUrl(fileName);
     setFormData(prev => ({ ...prev, image: data.publicUrl }));
     setUploading(false);
     showToast('Imagen subida exitosamente', 'success');
@@ -127,7 +142,7 @@ export const Stock: React.FC = () => {
           <button className="btn-secondary" style={{ color: 'var(--danger)', background: '#ffeeee', border: 'none', borderRadius: '50px', padding: '0.65rem 1rem', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }} onClick={() => setShowMerma(true)}>
             - Reducciones
           </button>
-          <button className="btn-accent" style={{ padding: '0.65rem 1.5rem' }} onClick={() => handleOpenProduct()}>
+          <button className="btn-accent" style={{ padding: '0.65rem 1.5rem' }} onClick={() => navigate('/admin/products/new')}>
             + Nuevo Producto
           </button>
         </div>
@@ -138,27 +153,41 @@ export const Stock: React.FC = () => {
           <thead>
             <tr>
               <th>Producto</th>
-              <th>Tipo/Categoría</th>
-              <th>Stock</th>
+              <th>Categoría</th>
               <th>Precio</th>
+              <th>Stock</th>
               <th>Estado</th>
-              <th>Acciones</th>
+              <th style={{ textAlign: 'right' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filteredProducts.map(p => {
-              const badgeClass = p.stock > 5 ? 'success' : 'warning';
-              const statusText = p.stock > 5 ? 'Óptimo' : 'Bajo Stock';
+              const badgeClass = p.category === 'Vinos' ? 'warning' : 'info'; // Just a visual pill color based on category
               return (
                 <tr key={p.id}>
-                  <td><strong>{p.name}</strong></td>
-                  <td><span style={{ textTransform: 'capitalize' }}>{p.category}</span></td>
-                  <td>{p.stock}</td>
-                  <td>${p.price.toLocaleString()}</td>
-                  <td><span className={`badge ${badgeClass}`}>{statusText}</span></td>
                   <td>
-                    <button className="btn-icon" onClick={() => handleOpenProduct(p)}><PencilSimple /></button>
-                    <button className="btn-icon" style={{ color: 'var(--danger)' }} onClick={() => setDeleteConfirmId(p.id)}><Trash /></button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <img src={p.image || 'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2240%22 height%3D%2240%22 viewBox%3D%220 0 40 40%22%3E%3Crect width%3D%2240%22 height%3D%2240%22 fill%3D%22%23e8e3d9%22%2F%3E%3Ctext x%3D%2250%25%22 y%3D%2255%25%22 text-anchor%3D%22middle%22 fill%3D%22%23a09070%22 font-size%3D%2218%22%3E%3F%3C%2Ftext%3E%3C%2Fsvg%3E'} alt={p.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-color)' }} />
+                      <strong>{p.name}</strong>
+                    </div>
+                  </td>
+                  <td><span className="badge warning" style={{ textTransform: 'capitalize' }}>{p.category}</span></td>
+                  <td><strong>${p.price.toLocaleString()}</strong></td>
+                  <td style={{ color: p.stock <= 5 ? 'var(--danger)' : 'inherit' }}>{p.stock}</td>
+                  <td>
+                    <span className={`badge ${p.isVisible ? 'success' : 'danger'}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.5rem', opacity: p.isVisible ? 1 : 0.7 }}>
+                       {p.isVisible ? <Eye weight="bold" /> : <EyeSlash weight="bold" />}
+                       {p.isVisible ? 'Visible' : 'Oculto'}
+                     </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                      <button className="btn-icon" title={p.isFeatured ? 'Quitar Best Seller' : 'Marcar Best Seller'} aria-label={p.isFeatured ? 'Quitar Best Seller' : 'Marcar Best Seller'} onClick={() => handleToggleFeatured(p)} style={{ color: p.isFeatured ? 'var(--accent-color)' : 'var(--text-muted)' }}>
+                        <Star weight={p.isFeatured ? 'fill' : 'regular'} />
+                      </button>
+                      <button className="btn-icon" aria-label={`Editar producto ${p.name}`} onClick={() => navigate(`/admin/products/edit/${p.id}`)}><PencilSimple /></button>
+                      <button className="btn-icon" aria-label={`Eliminar producto ${p.name}`} style={{ color: 'var(--danger)' }} onClick={() => setDeleteConfirmId(p.id)}><Trash /></button>
+                    </div>
                   </td>
                 </tr>
               );

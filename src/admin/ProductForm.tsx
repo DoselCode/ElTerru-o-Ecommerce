@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { insforge } from '../lib/insforge';
 import { ArrowLeft, Save, Upload, Loader2, Image as ImageIcon, FolderDown, CheckCircle2, PlusCircle } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
-import { openGoogleDrivePicker } from '../lib/googleDrivePicker';
+// import { openGoogleDrivePicker } from '../lib/googleDrivePicker'; // Feature disabled — uncomment when ready
 
 const GoogleDriveIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
   <svg className={className} viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
@@ -52,8 +52,7 @@ export const ProductForm: React.FC = () => {
     if (isEditing) {
       const fetchProduct = async () => {
         try {
-          const { data, error } = await supabase
-            .from('products')
+          const { data, error } = await insforge.database.from('products')
             .select('*')
             .eq('id', id)
             .single();
@@ -155,10 +154,24 @@ export const ProductForm: React.FC = () => {
     }
   };
 
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const MAX_IMAGE_SIZE_MB = 5;
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      await processAndSetImage(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // SEC-03: Validate type against allowlist (accept attr is bypassable)
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setErrors(prev => ({ ...prev, image: 'Tipo no permitido. Solo JPG, PNG, WEBP o GIF.' }));
+      return;
     }
+    if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, image: `La imagen no puede superar ${MAX_IMAGE_SIZE_MB}MB.` }));
+      return;
+    }
+
+    await processAndSetImage(file);
   };
 
   /* Próximamente: Integración con Google Drive 
@@ -188,14 +201,19 @@ export const ProductForm: React.FC = () => {
   */
 
   const uploadImage = async (file: File | Blob): Promise<string> => {
-    const ext = file instanceof File ? file.name.split('.').pop() : 'jpg';
-    const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
+    // SEC-04: Verify session before uploading
+    const { data: { user } } = await insforge.auth.getCurrentUser();
+    if (!user) throw new Error('No autorizado para subir archivos');
+
+    // SEC-05: Use crypto.randomUUID() — not Math.random()
+    const ext = file instanceof File ? (file.name.split('.').pop() || 'jpg') : 'jpg';
+    const fileName = `products/${crypto.randomUUID()}.${ext}`;
+    const { error: uploadError } = await insforge.storage
       .from('product-images')
       .upload(fileName, file);
 
     if (uploadError) throw uploadError;
-    const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
+    const { data } = insforge.storage.from('product-images').getPublicUrl(fileName);
     return data.publicUrl;
   };
 
@@ -358,10 +376,10 @@ export const ProductForm: React.FC = () => {
       };
 
       if (isEditing) {
-        const { error } = await supabase.from('products').update(payload).eq('id', id);
+        const { error } = await insforge.database.from('products').update(payload).eq('id', id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('products').insert([payload]);
+        const { error } = await insforge.database.from('products').insert([payload]);
         if (error) throw error;
       }
 
@@ -384,7 +402,8 @@ export const ProductForm: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="view-section active">
+      <div className="max-w-4xl mx-auto space-y-6 pb-12 pr-4">
       <div className="flex items-center gap-4">
         <Link to="/admin" className="p-2 text-terruno-muted hover:bg-terruno-border rounded-xl transition-colors">
           <ArrowLeft className="w-5 h-5" />
@@ -739,6 +758,7 @@ export const ProductForm: React.FC = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

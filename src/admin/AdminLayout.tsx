@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { Session } from '@supabase/supabase-js';
+import { insforge } from '../lib/insforge';
+
 import { SquaresFour, Storefront, CashRegister, Package, Receipt, CaretDown, ArrowsLeftRight, CheckCircle, XCircle, WarningCircle, SignOut } from '@phosphor-icons/react';
 import { AdminProvider, useAdmin } from './AdminContext';
 import './admin.css';
@@ -160,7 +160,7 @@ const AdminInner: React.FC = () => {
   const location = useLocation();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await insforge.auth.signOut();
   };
 
   const { isOnline, isSyncing } = useAdmin();
@@ -237,22 +237,19 @@ const AdminInner: React.FC = () => {
 };
 
 export const AdminLayout: React.FC = () => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    insforge.auth.getCurrentUser().then(({ data: { user } }) => {
+      setUser(user);
       setLoadingAuth(false);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => subscription.unsubscribe();
+    const unsubscribe = insforge.auth.onAuthStateChange(async () => { const { data: { user } } = await insforge.auth.getCurrentUser(); setUser(user); }); return () => unsubscribe();
   }, []);
 
   if (loadingAuth) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Cargando...</div>;
-  if (!session) return <Navigate to="/admin/login" replace />;
+  if (!user) return <Navigate to="/admin/login" replace />;
 
   return (
     <AdminProvider>

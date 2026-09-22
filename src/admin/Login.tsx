@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { insforge } from '../lib/insforge';
 import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -16,7 +16,7 @@ export const Login: React.FC = () => {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await insforge.auth.signInWithPassword({
         email,
         password,
       });

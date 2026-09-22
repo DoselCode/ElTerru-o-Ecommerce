@@ -64,12 +64,15 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
         <Reveal variant="fade-up" delay={80} className="max-w-md mx-auto">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-terruno-subtle" size={18} />
+            <label htmlFor="catalog-search" className="sr-only">Buscar productos</label>
             <input
+              id="catalog-search"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar un sabor..."
               maxLength={100}
+              aria-label="Buscar productos en el catálogo"
               className="w-full pl-11 pr-5 py-2.5 sm:py-3 rounded-full bg-white border border-terruno-brown/15 text-terruno-brown placeholder-terruno-subtle focus:outline-none focus:border-terruno-burgundy focus:ring-2 focus:ring-terruno-burgundy/20 shadow-sm transition-all text-sm"
             />
           </div>
@@ -83,6 +86,8 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
+                aria-pressed={isActive}
+                aria-label={`Filtrar por ${cat}`}
                 className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer ${
                   isActive
                     ? 'bg-terruno-burgundy text-white shadow-sm'
