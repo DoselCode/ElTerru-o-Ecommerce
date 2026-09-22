@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { insforge } from '../lib/insforge';
+import { productService } from '../services/productService';
+import { storageService } from '../services/storageService';
 import { ArrowLeft, Save, Upload, Loader2, Image as ImageIcon, FolderDown, CheckCircle2, PlusCircle } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 // import { openGoogleDrivePicker } from '../lib/googleDrivePicker'; // Feature disabled — uncomment when ready
@@ -52,12 +53,8 @@ export const ProductForm: React.FC = () => {
     if (isEditing) {
       const fetchProduct = async () => {
         try {
-          const { data, error } = await insforge.database.from('products')
-            .select('*')
-            .eq('id', id)
-            .single();
+          const data = await productService.getProduct(id as string);
 
-          if (error) throw error;
           if (data) {
             setFormData({
               name: data.name || '',
@@ -201,20 +198,7 @@ export const ProductForm: React.FC = () => {
   */
 
   const uploadImage = async (file: File | Blob): Promise<string> => {
-    // SEC-04: Verify session before uploading
-    const { data: { user } } = await insforge.auth.getCurrentUser();
-    if (!user) throw new Error('No autorizado para subir archivos');
-
-    // SEC-05: Use crypto.randomUUID() — not Math.random()
-    const ext = file instanceof File ? (file.name.split('.').pop() || 'jpg') : 'jpg';
-    const fileName = `products/${crypto.randomUUID()}.${ext}`;
-    const { error: uploadError } = await insforge.storage
-      .from('product-images')
-      .upload(fileName, file);
-
-    if (uploadError) throw uploadError;
-    const { data } = insforge.storage.from('product-images').getPublicUrl(fileName);
-    return data.publicUrl;
+    return await storageService.uploadProductImage(file);
   };
 
   const validateForm = () => {
@@ -376,11 +360,9 @@ export const ProductForm: React.FC = () => {
       };
 
       if (isEditing) {
-        const { error } = await insforge.database.from('products').update(payload).eq('id', id);
-        if (error) throw error;
+        await productService.updateProductRaw(id as string, payload);
       } else {
-        const { error } = await insforge.database.from('products').insert([payload]);
-        if (error) throw error;
+        await productService.createProductRaw(payload);
       }
 
       setSavedProductName(formData.name.trim());

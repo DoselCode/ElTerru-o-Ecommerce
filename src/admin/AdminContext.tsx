@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { insforge } from '../lib/insforge';
+import { productService } from '../services/productService';
+import { orderService } from '../services/orderService';
+import { registerService } from '../services/registerService';
 import { Product } from '../types/product';
 
 export interface OrderItem extends Product {
@@ -127,41 +129,18 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     for (const action of queue) {
       try {
         if (action.type === 'CREATE_ORDER') {
-          const o = action.payload;
-          const { error } = await insforge.database.from('orders').insert([{
-            id: o.id, client: o.client, total: o.total,
-            neto: o.neto, iva: o.iva, descuento: o.descuento,
-            paid_efectivo: o.paidEfectivo, paid_transferencia: o.paidTransferencia, paid_tarjeta: o.paidTarjeta,
-            payment_method: o.paymentMethod,
-            date: o.date, status: o.status, items: o.items
-          }]);
-          if (error) throw error;
+          await orderService.createOrder(action.payload);
         } else if (action.type === 'UPDATE_ORDER') {
-          const { id, updates } = action.payload;
-          const { error } = await insforge.database.from('orders').update({
-            paid_efectivo: updates.paidEfectivo, paid_transferencia: updates.paidTransferencia,
-            paid_tarjeta: updates.paidTarjeta, status: updates.status
-          }).eq('id', id);
-          if (error) throw error;
+          await orderService.updateOrder(action.payload.id, action.payload.updates);
         } else if (action.type === 'UPDATE_REGISTER') {
-          const r = action.payload;
-          const { error } = await insforge.database.from('registers').upsert([{
-            id: 'global', status: r.status, efectivo: r.efectivo, transferencia: r.transferencia,
-            tarjeta: r.tarjeta, updated_at: new Date().toISOString()
-          }]);
-          if (error) throw error;
+          await registerService.upsertGlobalRegister(action.payload);
         } else if (action.type === 'ADD_MERMA') {
-          const { error } = await insforge.database.from('mermas').insert([{ qty: action.payload.qty }]);
-          if (error) throw error;
+          await productService.addMerma(action.payload.qty);
         } else if (action.type === 'DECREMENT_STOCK') {
           // H-1: Relative decrement via RPC — safe for offline replay
-          const { id, qty } = action.payload;
-          const { error } = await insforge.database.rpc('decrement_stock', { product_id: Number(id), qty });
-          if (error) throw error;
+          await productService.decrementStock(action.payload.id, action.payload.qty);
         } else if (action.type === 'UPDATE_PRODUCT') {
-          const { id, dbUpdates } = action.payload;
-          const { error } = await insforge.database.from('products').update(dbUpdates).eq('id', Number(id));
-          if (error) throw error;
+          await productService.updateProduct(action.payload.id, action.payload.dbUpdates);
         }
         successCount++;
       } catch (err) {
@@ -193,37 +172,15 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const loadCloudState = async () => {
     setLoading(true);
     try {
-      const [prodRes, ordersRes, regRes] = await Promise.all([
-        insforge.database.from('products').select('*').order('id', { ascending: false }),
-        insforge.database.from('orders').select('*').order('created_at', { ascending: false }),
-        insforge.database.from('registers').select('*').eq('id', 'global').maybeSingle(),
+      const [products, orders, register, mermas_count] = await Promise.all([
+        productService.getProducts(),
+        orderService.getOrders(),
+        registerService.getGlobalRegister(),
+        productService.getTotalMermas(),
       ]);
 
-      // L-2: Use RPC for mermas count
-      const { data: mermasTotal } = await insforge.database.rpc('get_total_mermas');
-      const mermas_count = mermasTotal || 0;
-
-      const products = (prodRes.data || []).map((item: any) => ({
-        id: item.id.toString(), name: item.name, year: item.year, category: item.category,
-        price: Number(item.price), originalPrice: item.original_price ? Number(item.original_price) : undefined,
-        discountBadge: item.discount_badge, badge: item.badge, image: item.image,
-        description: item.description, winery: item.winery, pairing: item.pairing,
-        stock: item.stock || 0, isFeatured: item.is_featured, isVisible: item.is_visible,
-      }));
-
-      const orders = (ordersRes.data || []).map((o: any) => ({
-        id: o.id, client: o.client, total: Number(o.total),
-        neto: Number(o.neto || 0), iva: Number(o.iva || 0), descuento: Number(o.descuento || 0),
-        paidEfectivo: Number(o.paid_efectivo), paidTransferencia: Number(o.paid_transferencia), paidTarjeta: Number(o.paid_tarjeta),
-        paymentMethod: o.payment_method, // H-5: restored from DB
-        date: o.date, status: o.status, items: o.items || []
-      }));
-
-      const reg = regRes.data || { status: 'cerrada', efectivo: 0, transferencia: 0, tarjeta: 0 };
-
       setState({
-        products, orders, mermas_count,
-        register: { status: reg.status, efectivo: Number(reg.efectivo), transferencia: Number(reg.transferencia), tarjeta: Number(reg.tarjeta) }
+        products, orders, mermas_count, register
       });
 
       syncOfflineQueue();
@@ -263,38 +220,25 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const action: OfflineAction = { type: 'UPDATE_PRODUCT', payload: { id, dbUpdates }, timestamp: Date.now() };
     await executeOrQueue(action, async () => {
-      const { error } = await insforge.database.from('products').update(dbUpdates).eq('id', Number(id));
-      if (error) throw error;
+      await productService.updateProduct(id, dbUpdates);
     });
     setState(prev => ({ ...prev, products: prev.products.map(p => p.id == id ? { ...p, ...updates } : p) }));
   };
 
   const createProduct = async (product: Omit<Product, 'id'>) => {
-    const { data, error } = await insforge.database.from('products').insert([{
-      name: product.name, category: product.category, price: product.price, stock: product.stock,
-      image: product.image, description: product.description, is_visible: product.isVisible
-    }]).select().single();
-    if (error) throw error;
-    if (data) {
-      const newP: Product = {
-        id: data.id.toString(), name: data.name, category: data.category, price: Number(data.price),
-        stock: data.stock, image: data.image, description: data.description, isVisible: data.is_visible
-      };
-      setState(prev => ({ ...prev, products: [newP, ...prev.products] }));
-    }
+    const newP = await productService.createProduct(product);
+    setState(prev => ({ ...prev, products: [newP, ...prev.products] }));
   };
 
   const deleteProduct = async (id: string | number) => {
-    const { error } = await insforge.database.from('products').delete().eq('id', Number(id));
-    if (error) throw error;
+    await productService.deleteProduct(id);
     setState(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id.toString()) }));
   };
 
   const addMerma = (qty: number) => {
     const action: OfflineAction = { type: 'ADD_MERMA', payload: { qty }, timestamp: Date.now() };
     executeOrQueue(action, async () => {
-      const { error } = await insforge.database.from('mermas').insert([{ qty }]);
-      if (error) throw error;
+      await productService.addMerma(qty);
     });
     setState(prev => ({ ...prev, mermas_count: prev.mermas_count + qty }));
   };
@@ -302,14 +246,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const createOrder = (order: Order) => {
     const action: OfflineAction = { type: 'CREATE_ORDER', payload: order, timestamp: Date.now() };
     executeOrQueue(action, async () => {
-      const { error } = await insforge.database.from('orders').insert([{
-        id: order.id, client: order.client, total: order.total,
-        neto: order.neto, iva: order.iva, descuento: order.descuento,
-        paid_efectivo: order.paidEfectivo, paid_transferencia: order.paidTransferencia, paid_tarjeta: order.paidTarjeta,
-        payment_method: order.paymentMethod,
-        date: order.date, status: order.status, items: order.items
-      }]);
-      if (error) throw error;
+      await orderService.createOrder(order);
     });
     setState(prev => ({ ...prev, orders: [order, ...prev.orders] }));
 
@@ -322,8 +259,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const qty = orderItem.cartQty || 1;
         const decrAction: OfflineAction = { type: 'DECREMENT_STOCK', payload: { id: p.id, qty }, timestamp: Date.now() };
         executeOrQueue(decrAction, async () => {
-          const { error } = await insforge.database.rpc('decrement_stock', { product_id: Number(p.id), qty });
-          if (error) throw error;
+          await productService.decrementStock(p.id, qty);
         });
         return { ...p, stock: Math.max(0, p.stock - qty) };
       });
@@ -334,11 +270,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const updateOrder = (id: string, updates: Partial<Order>) => {
     const action: OfflineAction = { type: 'UPDATE_ORDER', payload: { id, updates }, timestamp: Date.now() };
     executeOrQueue(action, async () => {
-      const { error } = await insforge.database.from('orders').update({
-        paid_efectivo: updates.paidEfectivo, paid_transferencia: updates.paidTransferencia,
-        paid_tarjeta: updates.paidTarjeta, status: updates.status
-      }).eq('id', id);
-      if (error) throw error;
+      await orderService.updateOrder(id, updates);
     });
     setState(prev => ({ ...prev, orders: prev.orders.map(o => o.id === id ? { ...o, ...updates } : o) }));
   };
@@ -346,11 +278,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const updateRegister = (reg: RegisterState) => {
     const action: OfflineAction = { type: 'UPDATE_REGISTER', payload: reg, timestamp: Date.now() };
     executeOrQueue(action, async () => {
-      const { error } = await insforge.database.from('registers').upsert([{
-        id: 'global', status: reg.status, efectivo: reg.efectivo, transferencia: reg.transferencia,
-        tarjeta: reg.tarjeta, updated_at: new Date().toISOString()
-      }]);
-      if (error) throw error;
+      await registerService.upsertGlobalRegister(reg);
     });
     setState(prev => ({ ...prev, register: reg }));
   };
