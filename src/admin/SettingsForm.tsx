@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { insforge } from '../lib/insforge';
 import { Save, Loader2, Store, Phone, Mail, MapPin, Clock, LayoutTemplate, Info, Upload, Image as ImageIcon } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 
@@ -87,7 +87,7 @@ export const SettingsForm: React.FC = () => {
   useEffect(() => {
     const fetchStoreInfo = async () => {
       try {
-        const { data, error } = await supabase.from('store_info').select('*').eq('id', 1).single();
+        const { data, error } = await insforge.database.from('store_info').select('*').eq('id', 1).single();
         if (error && error.code !== 'PGRST116') throw error;
         if (data) {
           setFormData(data);
@@ -109,6 +109,7 @@ export const SettingsForm: React.FC = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setErrorMsg('');
     const { name, value } = e.target;
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
@@ -130,11 +131,16 @@ export const SettingsForm: React.FC = () => {
   };
 
   const uploadFile = async (file: File | Blob): Promise<string> => {
+    // C-3c: Verify session before upload
+    const { data: { user } } = await insforge.auth.getCurrentUser();
+    if (!user) {
+      throw new Error('No autorizado para subir archivos');
+    }
     const ext = file instanceof File ? file.name.split('.').pop() : 'jpg';
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('product-images').upload(fileName, file);
+    const { error } = await insforge.storage.from('product-images').upload(fileName, file);
     if (error) throw error;
-    const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
+    const { data } = insforge.storage.from('product-images').getPublicUrl(fileName);
     return data.publicUrl;
   };
 
@@ -155,7 +161,7 @@ export const SettingsForm: React.FC = () => {
         }
       }
 
-      const { error } = await supabase.from('store_info').upsert({ ...updatedFormData, id: 1 });
+      const { error } = await insforge.database.from('store_info').upsert({ ...updatedFormData, id: 1 });
       if (error) throw error;
       
       setFormData(updatedFormData);
@@ -203,11 +209,12 @@ export const SettingsForm: React.FC = () => {
     );
   }
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-serif font-bold text-terruno-brown">Configuración de la Tienda</h1>
-      </div>
+    return (
+      <section className="view-section active" style={{ overflowY: 'auto', paddingBottom: '3rem' }}>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-serif font-bold text-terruno-brown">Configuración de la Tienda</h1>
+          </div>
 
       {errorMsg && <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">{errorMsg}</div>}
       {successMsg && <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-100">{successMsg}</div>}
@@ -464,8 +471,9 @@ export const SettingsForm: React.FC = () => {
           </button>
         </div>
       </form>
-    </div>
-  );
+        </div>
+      </section>
+    );
 };
 
 export default SettingsForm;
