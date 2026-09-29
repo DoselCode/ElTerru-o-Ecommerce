@@ -1,32 +1,50 @@
-import { Product, StoreInfo } from '../types/product';
+import type { Product } from '../types/product';
 
-/**
- * Contrato de Tipos para el Módulo B: Dashboard Administrador (Panel Privado)
- * Esta estructura sirve de base para la futura integración con el Backend REST / GraphQL / Firebase.
- */
+export type PaymentMethod = 'efectivo' | 'transferencia' | 'tarjeta' | 'mercadopago';
 
-export interface AdminUser {
+export interface OrderItem extends Product {
+  cartQty?: number;
+}
+
+export interface Order {
   id: string;
-  username: string;
-  name: string;
-  role: 'ADMIN' | 'MANAGER';
+  client: string;
+  total: number;
+  neto: number;
+  iva: number;
+  descuento: number;
+  paymentMethod: PaymentMethod;
+  date: string;
+  createdAt?: string;
+  ticketNumber?: number;
+  status: 'pagado' | 'anulada';
+  observacion?: string;
+  items: OrderItem[];
 }
 
-export interface AuthState {
-  user: AdminUser | null;
-  token: string | null;
-  isAuthenticated: boolean;
+export interface RegisterMovement {
+  id: string;
+  type: 'ingreso' | 'egreso';
+  amount: number;
+  reason: string;
+  createdAt: string;
 }
 
-export interface ProductFormData extends Omit<Product, 'id'> {
-  id?: number;
+export interface RegisterState {
+  status: 'abierta' | 'cerrada';
+  efectivoInicial: number;
+  openedAt: string | null;
+  numero: number;
+  saldoProxima: number;
+  movimientos: RegisterMovement[];
 }
 
-export interface AdminCatalogOperations {
-  createProduct: (product: ProductFormData) => Promise<Product>;
-  updateProduct: (id: number, product: Partial<ProductFormData>) => Promise<Product>;
-  toggleProductVisibility: (id: number) => Promise<boolean>;
-  deleteProduct: (id: number) => Promise<boolean>;
-  setFeaturedProduct: (id: number) => Promise<void>;
-  updateStoreInfo: (info: Partial<StoreInfo>) => Promise<StoreInfo>;
+export const EMPTY_REGISTER: RegisterState = {
+  status: 'cerrada', efectivoInicial: 0, openedAt: null, numero: 0, saldoProxima: 0, movimientos: []
+};
+
+export interface AdminState {
+  products: Product[];
+  orders: Order[];
+  register: RegisterState;
 }

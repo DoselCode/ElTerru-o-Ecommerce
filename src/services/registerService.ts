@@ -1,5 +1,5 @@
 import { insforge } from '../lib/insforge';
-import { RegisterState } from '../admin/AdminContext';
+import { RegisterState, EMPTY_REGISTER } from '../admin/types';
 
 export const registerService = {
   getGlobalRegister: async (): Promise<RegisterState> => {
@@ -10,14 +10,14 @@ export const registerService = {
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) {
-      return { status: 'cerrada', efectivo: 0, transferencia: 0, tarjeta: 0 };
-    }
+    if (!data) return EMPTY_REGISTER;
     return {
       status: data.status,
-      efectivo: Number(data.efectivo),
-      transferencia: Number(data.transferencia),
-      tarjeta: Number(data.tarjeta)
+      efectivoInicial: Number(data.efectivo_inicial || 0),
+      openedAt: data.opened_at || null,
+      numero: Number(data.numero || 0),
+      saldoProxima: Number(data.saldo_proxima || 0),
+      movimientos: Array.isArray(data.movimientos) ? data.movimientos : []
     };
   },
 
@@ -25,9 +25,11 @@ export const registerService = {
     const { error } = await insforge.database.from('registers').upsert([{
       id: 'global',
       status: reg.status,
-      efectivo: reg.efectivo,
-      transferencia: reg.transferencia,
-      tarjeta: reg.tarjeta,
+      efectivo_inicial: reg.efectivoInicial,
+      opened_at: reg.openedAt,
+      numero: reg.numero,
+      saldo_proxima: reg.saldoProxima,
+      movimientos: reg.movimientos,
       updated_at: new Date().toISOString()
     }]);
     if (error) throw error;

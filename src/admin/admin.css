@@ -226,6 +226,33 @@
 .ticket-item:last-child { border-bottom: none; }
 .pos-ticket-footer { background: #f8fafc; padding: 1.5rem; border-top: 1px solid var(--border-color); }
 
+.pos-filters { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+.pos-filters .pos-search { margin-bottom: 0; flex: 1; }
+.pos-supplier {
+    padding: 0 1rem; border-radius: var(--radius-md); border: 1px solid #c8bdae;
+    background: var(--surface-color); color: var(--text-main); font-size: 0.95rem; min-width: 190px;
+}
+.product-card .p-code { font-family: monospace; font-size: 0.7rem; color: var(--text-muted); }
+.pos-ticket-title { margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem; color: var(--text-main); }
+.pos-empty { text-align: center; color: var(--text-muted); margin-top: 2rem; }
+.pos-empty svg { opacity: 0.2; margin: 0 auto 1rem; display: block; }
+.ticket-item-name { display: block; font-size: 0.9rem; }
+.ticket-item-detail { font-size: 0.8rem; color: var(--text-muted); }
+.pos-total-row { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1.05rem; }
+.pos-total { color: var(--primary-color); font-size: 1.25rem; }
+.success-check { background: #e6ffed; color: var(--success); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2rem; }
+
+/* Modal de cobro */
+.pay-summary { text-align: center; margin-bottom: 1.5rem; }
+.pay-summary h3 { color: var(--text-main); font-size: 1.5rem; }
+.pay-label { color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; font-weight: 700; }
+.pay-discount { display: inline-block; margin-top: 0.5rem; background: #e6ffed; color: var(--success); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.875rem; font-weight: 600; }
+.pay-taxes { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; color: var(--text-muted); font-weight: 600; }
+.pay-total { color: var(--primary-color); font-size: 2.5rem; }
+.pay-methods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1.5rem; }
+.pay-method { padding: 0.75rem; border-radius: 8px; border: 2px solid var(--border-color); background: white; font-weight: 600; color: var(--text-main); cursor: pointer; transition: all 0.2s; }
+.pay-method.selected { border-color: var(--primary-color); background: rgba(85, 99, 61, 0.05); color: var(--primary-color); }
+
 /* Modals & Forms */
 .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -253,6 +280,44 @@
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-color); background: white; }
 
+/* Apertura / Cierre de caja */
+.btn-accent.btn-danger { background-color: #c53030; box-shadow: 0 4px 10px rgba(197, 48, 48, 0.25); }
+.btn-accent.btn-danger:hover { background-color: #9b2c2c; }
+.caja-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+.caja-title { display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0; }
+.caja-title svg { color: var(--accent-color); }
+.caja-link { background: none; border: none; color: var(--primary-color); font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+.caja-link:hover { text-decoration: underline; }
+.caja-box { border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; background: #fcfbf7; }
+.caja-box-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.6rem; }
+.caja-box-title svg { color: var(--primary-color); }
+.caja-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; padding: 0.2rem 0; color: var(--text-main); }
+.caja-row > span:last-child { text-align: right; white-space: nowrap; }
+.caja-row.muted { font-size: 0.8rem; color: var(--text-muted); padding-left: 0.75rem; }
+.caja-total { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--border-color); margin-top: 0.6rem; padding-top: 0.75rem; font-weight: 700; font-size: 1.1rem; }
+.caja-total span:last-child { font-size: 1.75rem; font-weight: 800; color: var(--primary-color); }
+.caja-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; }
+.caja-movements { max-height: 320px; overflow-y: auto; }
+.caja-movements .caja-row { border-bottom: 1px dashed var(--border-color); padding: 0.45rem 0; }
+.caja-time { font-family: monospace; color: var(--text-muted); margin-right: 0.6rem; }
+
+/* Ventas */
+.sales-summary { display: flex; gap: 1.5rem; margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; }
+.sales-summary strong { color: var(--text-main); }
+.sales-summary strong.text-primary { color: var(--primary-color); }
+.row-cancelled td { opacity: 0.5; text-decoration: line-through; }
+.row-cancelled td:last-child, .row-cancelled td:nth-child(4) { text-decoration: none; opacity: 1; }
+.sale-modal-header { background: #f8fafc; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+.sale-modal-header h3 { margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem; color: var(--text-main); }
+.sale-modal-edit { padding: 1.25rem 1.5rem 0; }
+.sale-modal-footer { background: #f8fafc; padding: 1.25rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.75rem; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.sale-modal-warning { flex: 1; font-size: 0.85rem; font-weight: 600; color: var(--danger); }
+.btn-secondary.btn-danger-text { color: var(--danger); }
+.period-select { padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); }
+
+.stock-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); }
+.badge-icon { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; }
+
 /* Toasts */
 .toast-container { 
     position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); 
@@ -278,6 +343,22 @@
     from { transform: rotate(0deg); } 
     to { transform: rotate(360deg); } 
 }
+
+/* Ticket de venta (pantalla + impresora térmica) */
+.ticket-paper {
+  background: white; color: #111;
+  font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.35;
+  padding: 1.25rem 1rem; border: 1px solid var(--border-color); border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.ticket-paper .tk-row { display: flex; justify-content: space-between; gap: 0.75rem; }
+.ticket-paper .tk-row > span:last-child { white-space: nowrap; text-align: right; }
+.ticket-paper .tk-center { text-align: center; }
+.ticket-paper .tk-title { font-size: 1.6em; font-weight: bold; margin-bottom: 0.25rem; }
+.ticket-paper .tk-total { font-weight: bold; font-size: 1.1em; }
+.ticket-paper .tk-item { margin-bottom: 0.3rem; }
+.ticket-paper .tk-divider { border-top: 1px dashed #555; margin: 0.4rem 0; }
+.ticket-paper .tk-footer { margin-top: 0.75rem; }
 
 .print-only {
   display: none;
@@ -310,37 +391,22 @@
   #print-root {
     position: absolute !important;
     left: 0 !important;
+    right: 0 !important;
     top: 0 !important;
-    width: 75mm !important; /* Ligeramente menor al total para evitar cortes */
+    width: 75mm !important; /* Ligeramente menor al total para evitar cortes; con left/right + margin auto queda centrado en A4 */
     margin: 0 auto !important;
     padding: 4mm !important;
+    box-sizing: border-box !important;
     background: white !important;
     color: black !important;
-    font-family: 'Courier New', Courier, monospace !important;
+  }
+
+  #print-root .ticket-paper {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    color: black !important;
     font-size: 11px !important;
     line-height: 1.2 !important;
-  }
-
-  .print-flex {
-    display: flex !important;
-    justify-content: space-between !important;
-    margin-bottom: 2px !important;
-  }
-
-  .print-center {
-    text-align: center !important;
-    display: block !important;
-  }
-
-  .print-bold {
-    font-weight: bold !important;
-    display: inline !important;
-  }
-
-  .print-divider {
-    border-top: 1px dashed black !important;
-    margin: 4px 0 !important;
-    display: block !important;
-    height: 0 !important;
   }
 }

@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { insforge } from './lib/insforge';
 import { Product, StoreInfo } from './types/product';
+import { mapProduct } from './services/productService';
 import { Navbar } from './components/navbar/Navbar';
 import { Hero } from './components/sections/Hero';
 import { FeaturedProduct } from './components/sections/FeaturedProduct';
@@ -10,7 +11,7 @@ import { Catalog } from './components/sections/Catalog';
 import { About } from './components/sections/About';
 import { Footer } from './components/sections/Footer';
 
-// PERF-01: Lazy-load all admin modules — storefront visitors won't download this code
+// El panel admin se carga bajo demanda para no sumarlo al bundle de la tienda
 const AdminLayout = lazy(() => import('./admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
 const Login       = lazy(() => import('./admin/Login').then(m => ({ default: m.Login })));
 const Dashboard   = lazy(() => import('./admin/Dashboard').then(m => ({ default: m.Dashboard })));
@@ -40,6 +41,8 @@ const Storefront: React.FC = () => {
           insforge.database.from('store_info').select('*').eq('id', 1).single(),
           insforge.database.from('products').select('*').eq('is_visible', true).order('id', { ascending: false })
         ]);
+
+        if (storeResponse.error || productsResponse.error) throw storeResponse.error ?? productsResponse.error;
 
         const storeData = storeResponse.data;
         const productsData = productsResponse.data;
@@ -81,23 +84,7 @@ const Storefront: React.FC = () => {
         }
 
         if (productsData) {
-          const mappedProducts = productsData.map((p) => ({
-            id: p.id.toString(),
-            name: p.name,
-            year: p.year,
-            category: p.category,
-            price: Number(p.price),
-            originalPrice: p.original_price ? Number(p.original_price) : undefined,
-            discountBadge: p.discount_badge,
-            badge: p.badge,
-            image: p.image,
-            description: p.description,
-            winery: p.winery,
-            pairing: p.pairing,
-            stock: p.stock,
-            isFeatured: p.is_featured,
-            isVisible: p.is_visible,
-          }));
+          const mappedProducts = productsData.map(mapProduct);
           setProducts(mappedProducts);
 
           const featured = mappedProducts.find(p => p.isFeatured) || null;

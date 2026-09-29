@@ -3,40 +3,7 @@ import { productService } from '../services/productService';
 import { orderService } from '../services/orderService';
 import { registerService } from '../services/registerService';
 import { Product } from '../types/product';
-
-export interface OrderItem extends Product {
-  cartQty?: number;
-}
-
-export interface Order {
-  id: string;
-  client: string;
-  total: number;
-  neto: number;
-  iva: number;
-  descuento: number;
-  paidEfectivo: number;
-  paidTransferencia: number;
-  paidTarjeta: number;
-  paymentMethod?: 'efectivo' | 'transferencia' | 'tarjeta';
-  date: string;
-  status: 'pagado';
-  items: OrderItem[];
-}
-
-export interface RegisterState {
-  status: 'abierta' | 'cerrada';
-  efectivo: number;
-  transferencia: number;
-  tarjeta: number;
-}
-
-export interface AdminState {
-  products: Product[];
-  orders: Order[];
-  mermas_count: number;
-  register: RegisterState;
-}
+import { AdminState, EMPTY_REGISTER, Order, OrderItem, RegisterState } from './types';
 
 export interface ToastMessage {
   id: number;
@@ -44,23 +11,34 @@ export interface ToastMessage {
   type: 'success' | 'error' | 'warning';
 }
 
+type OfflineActionType = 'CREATE_ORDER' | 'UPDATE_ORDER' | 'UPDATE_REGISTER' | 'DECREMENT_STOCK' | 'UPDATE_PRODUCT';
+
 interface OfflineAction {
-  type: 'CREATE_ORDER' | 'UPDATE_ORDER' | 'UPDATE_REGISTER' | 'ADD_MERMA' | 'DECREMENT_STOCK' | 'UPDATE_PRODUCT';
+  type: OfflineActionType;
   payload: any;
   timestamp: number;
 }
+
+const QUEUE_KEY = 'terruno_offline_queue';
+
+// Cada acción encolada se reproduce contra la nube con el mismo handler que la ejecuta online
+const cloudHandlers: Record<OfflineActionType, (payload: any) => Promise<void>> = {
+  CREATE_ORDER: (order) => orderService.createOrder(order),
+  UPDATE_ORDER: ({ id, updates }) => orderService.updateOrder(id, updates),
+  UPDATE_REGISTER: (reg) => registerService.upsertGlobalRegister(reg),
+  DECREMENT_STOCK: ({ id, qty }) => productService.decrementStock(id, qty),
+  UPDATE_PRODUCT: ({ id, dbUpdates }) => productService.updateProduct(id, dbUpdates),
+};
 
 interface AdminContextProps {
   state: AdminState;
   isOnline: boolean;
   isSyncing: boolean;
-  fetchProducts: () => Promise<void>;
   updateProduct: (id: string | number, updates: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string | number) => Promise<void>;
-  createProduct: (product: Omit<Product, 'id'>) => Promise<void>;
-  addMerma: (qty: number) => void;
   createOrder: (order: Order) => void;
-  updateOrder: (id: string, updates: Partial<Order>) => void;
+  updateOrder: (id: string, updates: Partial<Pick<Order, 'paymentMethod' | 'observacion'>>) => void;
+  cancelOrder: (id: string, observacion: string) => void;
   updateRegister: (reg: RegisterState) => void;
   cart: OrderItem[];
   addToCart: (prod: Product) => void;
@@ -79,43 +57,30 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
-  const isSyncingRef = useRef(false); // H-2: ref lock prevents stale closure double-sync
+  const isSyncingRef = useRef(false);
+  const [state, setState] = useState<AdminState>({ products: [], orders: [], register: EMPTY_REGISTER });
 
-  const showToast = (message: string, type: 'success' | 'error' | 'warning' = 'success') => {
+  const showToast = (message: string, type: ToastMessage['type'] = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, 4000);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
   };
 
-  const [state, setState] = useState<AdminState>({
-    products: [],
-    orders: [],
-    mermas_count: 0,
-    register: { status: 'cerrada', efectivo: 0, transferencia: 0, tarjeta: 0 }
-  });
-
-  // M-9: Catch localStorage quota errors
   const getQueue = (): OfflineAction[] => {
     try {
-      const q = localStorage.getItem('terruno_offline_queue');
+      const q = localStorage.getItem(QUEUE_KEY);
       return q ? JSON.parse(q) : [];
     } catch {
       return [];
     }
   };
+
   const saveQueue = (q: OfflineAction[]) => {
     try {
-      localStorage.setItem('terruno_offline_queue', JSON.stringify(q));
+      localStorage.setItem(QUEUE_KEY, JSON.stringify(q));
     } catch {
       showToast('Almacenamiento local lleno, accion no guardada offline', 'error');
     }
-  };
-  const pushToQueue = (action: OfflineAction) => {
-    const q = getQueue();
-    q.push(action);
-    saveQueue(q);
   };
 
   const syncOfflineQueue = async () => {
@@ -128,20 +93,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     for (const action of queue) {
       try {
-        if (action.type === 'CREATE_ORDER') {
-          await orderService.createOrder(action.payload);
-        } else if (action.type === 'UPDATE_ORDER') {
-          await orderService.updateOrder(action.payload.id, action.payload.updates);
-        } else if (action.type === 'UPDATE_REGISTER') {
-          await registerService.upsertGlobalRegister(action.payload);
-        } else if (action.type === 'ADD_MERMA') {
-          await productService.addMerma(action.payload.qty);
-        } else if (action.type === 'DECREMENT_STOCK') {
-          // H-1: Relative decrement via RPC — safe for offline replay
-          await productService.decrementStock(action.payload.id, action.payload.qty);
-        } else if (action.type === 'UPDATE_PRODUCT') {
-          await productService.updateProduct(action.payload.id, action.payload.dbUpdates);
-        }
+        // Las acciones de versiones anteriores sin handler se descartan
+        await cloudHandlers[action.type]?.(action.payload);
         successCount++;
       } catch (err) {
         console.error('Sync error on action:', action, err);
@@ -150,9 +103,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     if (successCount > 0) {
-      const newQueue = getQueue().slice(successCount);
-      saveQueue(newQueue);
-      if (newQueue.length === 0) showToast('Sincronizacion completada', 'success');
+      const remaining = getQueue().slice(successCount);
+      saveQueue(remaining);
+      if (remaining.length === 0) showToast('Sincronizacion completada', 'success');
     }
     isSyncingRef.current = false;
     setIsSyncing(false);
@@ -169,46 +122,50 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  const loadCloudState = async () => {
-    setLoading(true);
-    try {
-      const [products, orders, register, mermas_count] = await Promise.all([
-        productService.getProducts(),
-        orderService.getOrders(),
-        registerService.getGlobalRegister(),
-        productService.getTotalMermas(),
-      ]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const [products, orders, register] = await Promise.all([
+          productService.getProducts(),
+          orderService.getOrders(),
+          registerService.getGlobalRegister(),
+        ]);
+        setState({ products, orders, register });
+        syncOfflineQueue();
+      } catch (e) {
+        console.error('Error loading cloud state', e);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
-      setState({
-        products, orders, mermas_count, register
-      });
-
-      syncOfflineQueue();
-    } catch (e) {
-      console.error('Error loading cloud state', e);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => { loadCloudState(); }, []);
-
-  const fetchProducts = async () => {};
-
-  const executeOrQueue = async (action: OfflineAction, cloudCall: () => Promise<any>) => {
+  const runOrQueue = async (type: OfflineActionType, payload: any) => {
     if (isOnline) {
       try {
-        await cloudCall();
+        await cloudHandlers[type](payload);
+        return;
       } catch (err) {
         console.error('Cloud call failed, queueing offline', err);
-        pushToQueue(action);
       }
-    } else {
-      pushToQueue(action);
     }
+    const queue = getQueue();
+    queue.push({ type, payload, timestamp: Date.now() });
+    saveQueue(queue);
   };
 
-  // M-1 FIX: Only send defined fields — undefined fields become NULL in insforge
+  const adjustLocalStock = (items: OrderItem[], direction: 1 | -1) => {
+    setState(prev => ({
+      ...prev,
+      products: prev.products.map(p => {
+        const item = items.find(i => i.id === p.id);
+        return item ? { ...p, stock: Math.max(0, p.stock - direction * (item.cartQty || 1)) } : p;
+      })
+    }));
+    items.forEach(item => runOrQueue('DECREMENT_STOCK', { id: item.id, qty: direction * (item.cartQty || 1) }));
+  };
+
   const updateProduct = async (id: string | number, updates: Partial<Product>) => {
+    // Solo se envían los campos definidos: undefined se guardaría como NULL
     const dbUpdates: Record<string, any> = {};
     if (updates.stock !== undefined) dbUpdates.stock = updates.stock;
     if (updates.name !== undefined) dbUpdates.name = updates.name;
@@ -218,16 +175,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (updates.image !== undefined) dbUpdates.image = updates.image;
     if (updates.isFeatured !== undefined) dbUpdates.is_featured = updates.isFeatured;
 
-    const action: OfflineAction = { type: 'UPDATE_PRODUCT', payload: { id, dbUpdates }, timestamp: Date.now() };
-    await executeOrQueue(action, async () => {
-      await productService.updateProduct(id, dbUpdates);
-    });
+    await runOrQueue('UPDATE_PRODUCT', { id, dbUpdates });
     setState(prev => ({ ...prev, products: prev.products.map(p => p.id == id ? { ...p, ...updates } : p) }));
-  };
-
-  const createProduct = async (product: Omit<Product, 'id'>) => {
-    const newP = await productService.createProduct(product);
-    setState(prev => ({ ...prev, products: [newP, ...prev.products] }));
   };
 
   const deleteProduct = async (id: string | number) => {
@@ -235,56 +184,36 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setState(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id.toString()) }));
   };
 
-  const addMerma = (qty: number) => {
-    const action: OfflineAction = { type: 'ADD_MERMA', payload: { qty }, timestamp: Date.now() };
-    executeOrQueue(action, async () => {
-      await productService.addMerma(qty);
-    });
-    setState(prev => ({ ...prev, mermas_count: prev.mermas_count + qty }));
-  };
-
   const createOrder = (order: Order) => {
-    const action: OfflineAction = { type: 'CREATE_ORDER', payload: order, timestamp: Date.now() };
-    executeOrQueue(action, async () => {
-      await orderService.createOrder(order);
-    });
+    runOrQueue('CREATE_ORDER', order);
     setState(prev => ({ ...prev, orders: [order, ...prev.orders] }));
-
-    // H-3 FIX: Use functional setState to avoid stale closure
-    // H-1 FIX: Use relative RPC decrement — safe for offline replay
-    setState(prev => {
-      const updatedProducts = prev.products.map(p => {
-        const orderItem = order.items.find(i => i.id === p.id);
-        if (!orderItem) return p;
-        const qty = orderItem.cartQty || 1;
-        const decrAction: OfflineAction = { type: 'DECREMENT_STOCK', payload: { id: p.id, qty }, timestamp: Date.now() };
-        executeOrQueue(decrAction, async () => {
-          await productService.decrementStock(p.id, qty);
-        });
-        return { ...p, stock: Math.max(0, p.stock - qty) };
-      });
-      return { ...prev, products: updatedProducts };
-    });
+    adjustLocalStock(order.items, 1);
   };
 
-  const updateOrder = (id: string, updates: Partial<Order>) => {
-    const action: OfflineAction = { type: 'UPDATE_ORDER', payload: { id, updates }, timestamp: Date.now() };
-    executeOrQueue(action, async () => {
-      await orderService.updateOrder(id, updates);
-    });
+  const updateOrderLocal = (id: string, updates: Partial<Order>) => {
     setState(prev => ({ ...prev, orders: prev.orders.map(o => o.id === id ? { ...o, ...updates } : o) }));
   };
 
+  const updateOrder = (id: string, updates: Partial<Pick<Order, 'paymentMethod' | 'observacion'>>) => {
+    runOrQueue('UPDATE_ORDER', { id, updates });
+    updateOrderLocal(id, updates);
+  };
+
+  const cancelOrder = (id: string, observacion: string) => {
+    const order = state.orders.find(o => o.id === id);
+    if (!order || order.status === 'anulada') return;
+    const updates = { status: 'anulada' as const, observacion };
+    runOrQueue('UPDATE_ORDER', { id, updates });
+    updateOrderLocal(id, updates);
+    adjustLocalStock(order.items, -1);
+  };
+
   const updateRegister = (reg: RegisterState) => {
-    const action: OfflineAction = { type: 'UPDATE_REGISTER', payload: reg, timestamp: Date.now() };
-    executeOrQueue(action, async () => {
-      await registerService.upsertGlobalRegister(reg);
-    });
+    runOrQueue('UPDATE_REGISTER', reg);
     setState(prev => ({ ...prev, register: reg }));
   };
 
   const addToCart = (prod: Product) => {
-    // H-4: Block adding zero-stock items
     const currentStock = state.products.find(p => p.id === prod.id)?.stock ?? 0;
     const alreadyInCart = cart.find(p => p.id === prod.id)?.cartQty ?? 0;
     if (currentStock - alreadyInCart <= 0) {
@@ -298,17 +227,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
   };
 
-  // M-5: Remove by product ID, not array index
-  const removeFromCart = (productId: string) => {
-    setCart(prev => prev.filter(p => p.id !== productId));
-  };
+  const removeFromCart = (productId: string) => setCart(prev => prev.filter(p => p.id !== productId));
 
   const clearCart = () => setCart([]);
 
   return (
     <AdminContext.Provider value={{
-      state, isOnline, isSyncing, fetchProducts, updateProduct, deleteProduct, createProduct,
-      addMerma, createOrder, updateOrder, updateRegister,
+      state, isOnline, isSyncing, updateProduct, deleteProduct,
+      createOrder, updateOrder, cancelOrder, updateRegister,
       cart, addToCart, removeFromCart, clearCart, loading,
       toasts, showToast
     }}>

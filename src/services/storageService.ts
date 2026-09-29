@@ -13,6 +13,6 @@ export const storageService = {
 
     if (uploadError) throw uploadError;
     const { data } = insforge.storage.from('product-images').getPublicUrl(fileName);
-    return data.publicUrl;
+    return data?.publicUrl ?? '';
   }
 };
