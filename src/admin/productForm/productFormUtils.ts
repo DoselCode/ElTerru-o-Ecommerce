@@ -1,8 +1,12 @@
+import type { ProductRow } from '../../types/product';
+
 export interface ProductFormValues {
   code: string;
   name: string;
   year: string;
   category: string;
+  category_id: string;
+  provider_id: string;
   supplier: string;
   price: string;
   price_efectivo: string;
@@ -25,6 +29,8 @@ export const EMPTY_PRODUCT_FORM: ProductFormValues = {
   name: '',
   year: '',
   category: 'Vinos',
+  category_id: '',
+  provider_id: '',
   supplier: '',
   price: '',
   price_efectivo: '',
@@ -42,11 +48,13 @@ export const EMPTY_PRODUCT_FORM: ProductFormValues = {
 
 export const CATEGORIES = ['Vinos', 'Almacén', 'Fiambres', 'Regalos'];
 
-export const productFormFromRow = (row: any): ProductFormValues => ({
+export const productFormFromRow = (row: ProductRow): ProductFormValues => ({
   code: row.code || '',
   name: row.name || '',
   year: row.year || '',
   category: row.category || 'Vinos',
+  category_id: row.category_id || '',
+  provider_id: row.provider_id || '',
   supplier: row.supplier || '',
   price: row.price ? String(row.price) : '',
   price_efectivo: row.price_efectivo ? String(row.price_efectivo) : '',
@@ -57,8 +65,8 @@ export const productFormFromRow = (row: any): ProductFormValues => ({
   description: row.description || '',
   winery: row.winery || '',
   pairing: row.pairing || '',
-  stock: row.stock !== null ? String(row.stock) : '0',
-  is_visible: row.is_visible,
+  stock: row.stock != null ? String(row.stock) : '0',
+  is_visible: row.is_visible ?? true,
   image: row.image || '',
 });
 
@@ -69,7 +77,8 @@ export const productFormToPayload = (form: ProductFormValues, image: string) => 
   code: trimmedOrNull(form.code),
   name: form.name.trim(),
   year: trimmedOrNull(form.year),
-  category: form.category,
+  category_id: form.category_id || null,
+  provider_id: form.provider_id || null,
   supplier: trimmedOrNull(form.supplier),
   price: Number(form.price),
   price_efectivo: numberOrNull(form.price_efectivo),
@@ -112,7 +121,8 @@ export const validateProductForm = (form: ProductFormValues, hasImage: boolean, 
   else if (name.length < 2) errors.name = 'El nombre debe contener al menos 2 caracteres.';
   else if (name.length > 100) errors.name = 'El nombre no puede superar los 100 caracteres.';
 
-  if (!form.category) errors.category = 'Seleccioná una categoría.';
+  if (!form.category_id) errors.category_id = 'Seleccioná una categoría.';
+  // if (!form.category) errors.category = 'Seleccioná una categoría.';
 
   if (form.code.trim() && !/^\d{1,6}$/.test(form.code.trim())) errors.code = 'El código debe ser numérico (ej: 0125).';
 
@@ -163,3 +173,4 @@ export const validateProductForm = (form: ProductFormValues, hasImage: boolean, 
 
   return errors;
 };
+

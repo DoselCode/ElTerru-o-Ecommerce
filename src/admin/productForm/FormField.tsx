@@ -31,3 +31,24 @@ export const FormField: React.FC<FormFieldProps> = ({ label, name, value, error,
     {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
   </div>
 );
+
+interface SelectFieldProps {
+  label: string;
+  name: string;
+  value: string;
+  error?: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  placeholder?: { label: string; disabled?: boolean };
+  options: { id: string; name: string }[];
+}
+
+export const SelectField: React.FC<SelectFieldProps> = ({ label, name, value, error, onChange, placeholder, options }) => (
+  <div>
+    <label htmlFor={name} className="block text-sm font-medium text-terruno-muted mb-1">{label}</label>
+    <select id={name} name={name} value={value} onChange={onChange} className={inputClasses(!!error)}>
+      {placeholder && <option value="" disabled={placeholder.disabled}>{placeholder.label}</option>}
+      {options.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+    </select>
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+  </div>
+);

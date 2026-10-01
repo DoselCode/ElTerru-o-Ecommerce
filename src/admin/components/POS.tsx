@@ -1,31 +1,45 @@
 import React, { useMemo, useState } from 'react';
 import { ShoppingCart, X } from '@phosphor-icons/react';
-import { useAdmin } from './AdminContext';
+import { useAdmin } from '../context/AdminContext';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import { PaymentModal } from './PaymentModal';
+import { ModalCloseButton } from './ModalCloseButton';
+import { useModalDismiss } from '../hooks/useModalDismiss';
 import { PrintableTicket } from './Ticket';
-import { getProductIcon } from './productIcon';
-import { TICKET_CONFIG } from './ticketConfig';
-import type { Order, PaymentMethod } from './types';
-import { calculateTotals, formatMoney, getNextTicketNumber, padNumber, toLocalDateString } from './posUtils';
+import { getProductIcon } from '../utils/productIcon';
+import { TICKET_CONFIG } from '../utils/ticketConfig';
+import type { Order, PaymentMethod } from '../types';
+import { calculateTotals, formatMoney, getNextTicketNumber, padNumber, toLocalDateString } from '../utils/posUtils';
 
 export const POS: React.FC = () => {
-  const { state, cart, addToCart, removeFromCart, createOrder, clearCart, showToast } = useAdmin();
+  const { state, createOrder } = useAdmin();
+  const { cart, addToCart, removeFromCart, clearCart } = useCart();
+  const { showToast } = useToast();
   const [search, setSearch] = useState('');
   const [supplier, setSupplier] = useState('');
+  const [category, setCategory] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const { handleBackdropClick } = useModalDismiss({ onClose: () => setShowSuccessModal(false), closeOnBackdrop: true });
+
+  const categories = useMemo(
+    () => [...new Set(state.products.map(p => p.categories?.name).filter(Boolean))].sort() as string[],
+    [state.products]
+  );
 
   const suppliers = useMemo(
-    () => [...new Set(state.products.map(p => p.supplier).filter(Boolean))].sort() as string[],
+    () => [...new Set(state.products.map(p => p.providers?.name).filter(Boolean))].sort() as string[],
     [state.products]
   );
 
   const query = search.trim().toLowerCase();
   const filteredProducts = state.products.filter(p => {
-    if (supplier && p.supplier !== supplier) return false;
+    if (category && p.categories?.name !== category) return false;
+    if (supplier && p.providers?.name !== supplier) return false;
     if (!query) return true;
-    return p.code.includes(query) || p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query);
+    return p.code.includes(query) || p.name.toLowerCase().includes(query) || (p.categories?.name || '').toLowerCase().includes(query) || (p.providers?.name || '').toLowerCase().includes(query);
   });
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * (item.cartQty || 1), 0);
@@ -76,16 +90,22 @@ export const POS: React.FC = () => {
       <div className="pos-layout">
         <div className="pos-left">
           <div className="pos-filters">
+            <label htmlFor="pos-search" className="sr-only">Buscar productos</label>
             <input
+              id="pos-search"
               type="text"
               className="pos-search"
-              placeholder="Buscar por código, nombre o categoría (Enter agrega)"
+              placeholder="Buscar por código, nombre, categoría o proveedor (Enter agrega)"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleSearchKeyDown}
               autoFocus
             />
-            <select className="pos-supplier" value={supplier} onChange={(e) => setSupplier(e.target.value)} aria-label="Filtrar por proveedor">
+            <select className="pos-supplier" value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filtrar por categoría">
+                <option value="">Todas las categorías</option>
+                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <select className="pos-supplier" value={supplier} onChange={(e) => setSupplier(e.target.value)} aria-label="Filtrar por proveedor">
               <option value="">Todos los proveedores</option>
               {suppliers.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
@@ -154,8 +174,9 @@ export const POS: React.FC = () => {
       )}
 
       {showSuccessModal && lastOrder && (
-        <div className="modal-overlay">
-          <div className="modal-content card" style={{ textAlign: 'center' }}>
+        <div className="modal-overlay" onClick={handleBackdropClick}>
+          <div className="modal-content card" style={{ textAlign: "center", position: "relative" }}>
+            <ModalCloseButton onClick={() => setShowSuccessModal(false)} />
             <div className="success-check">✓</div>
             <h2 className="section-title" style={{ marginBottom: '0.5rem' }}>Venta Registrada</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
@@ -175,3 +196,8 @@ export const POS: React.FC = () => {
 };
 
 export default POS;
+
+
+
+
+

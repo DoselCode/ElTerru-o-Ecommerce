@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Receipt } from '@phosphor-icons/react';
-import { useAdmin } from './AdminContext';
+import { useAdmin } from '../context/AdminContext';
 import { SaleDetailModal } from './SaleDetailModal';
-import type { PaymentMethod } from './types';
-import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatTicketDate, padNumber } from './posUtils';
+import type { PaymentMethod } from '../types';
+import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatTicketDate, padNumber } from '../utils/posUtils';
 
 export const Sales: React.FC = () => {
   const navigate = useNavigate();
@@ -30,7 +30,9 @@ export const Sales: React.FC = () => {
       <div className="section-header" style={{ flexWrap: 'wrap', gap: '1rem' }}>
         <h2 className="section-title">Ventas y Pedidos</h2>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <label htmlFor="sales-search" className="sr-only">Buscar ventas</label>
           <input
+            id="sales-search"
             type="text"
             className="filter-input"
             placeholder="Buscar cliente o N° ticket..."

@@ -1,11 +1,50 @@
+export interface CategoryRow {
+  id: string;
+  name: string;
+}
+
+export interface ProviderRow {
+  id: string;
+  name: string;
+}
+
 export type Category = 'Todos' | 'Vinos' | 'Almacén' | 'Fiambres' | 'Regalos';
 
+export interface ProductRow {
+  id: number | string;
+  code?: string | null;
+  name: string;
+  year?: string;
+  category: string;
+  category_id?: string;
+  provider_id?: string;
+  categories?: { name: string };
+  providers?: { name: string };
+  supplier?: string | null;
+  price: number | string;
+  price_efectivo?: number | string | null;
+  price_transferencia?: number | string | null;
+  original_price?: number | string | null;
+  discount_badge?: string;
+  badge?: string;
+  image?: string;
+  description?: string;
+  winery?: string;
+  pairing?: string;
+  stock?: number | null;
+  is_featured?: boolean;
+  is_visible?: boolean;
+}
 export interface Product {
   id: string;
   code: string;
   name: string;
   year?: string;
   category: string;
+  category_id?: string;
+  provider_id?: string;
+  categories?: { name: string };
+  providers?: { name: string };
   supplier?: string;
   price: number;
   priceEfectivo?: number;
@@ -22,6 +61,20 @@ export interface Product {
   isVisible?: boolean;
 }
 
+type StoreInfoTextColumn =
+  | 'tagline' | 'logo' | 'phone' | 'whatsapp_number' | 'email' | 'address'
+  | 'hours_weekdays' | 'hours_saturday' | 'hours_sunday'
+  | 'hero_badge' | 'hero_title' | 'hero_subtitle' | 'hero_bg_image'
+  | 'about_title' | 'about_quote' | 'about_quote_author'
+  | 'about_paragraph_1' | 'about_paragraph_2' | 'about_paragraph_3'
+  | 'about_main_image' | 'about_sub_image'
+  | 'stat_years' | 'stat_producers' | 'stat_products' | 'instagram_url';
+
+type StoreInfoFlagColumn = 'show_phone' | 'show_whatsapp' | 'show_email' | 'show_address' | 'show_instagram';
+
+export type StoreInfoRow = { name: string } &
+  Partial<Record<StoreInfoTextColumn, string>> &
+  Partial<Record<StoreInfoFlagColumn, boolean>>;
 export interface StoreInfo {
   name: string;
   tagline?: string;
@@ -55,3 +108,5 @@ export interface StoreInfo {
   showAddress?: boolean;
   showInstagram?: boolean;
 }
+
+

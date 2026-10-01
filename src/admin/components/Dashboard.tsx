@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useAdmin } from './AdminContext';
-import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, sumByMethod, toLocalDateString } from './posUtils';
+import { useAdmin } from '../context/AdminContext';
+import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, sumByMethod, toLocalDateString } from '../utils/posUtils';
 
 type Period = 'daily' | 'weekly' | 'monthly';
 

@@ -1,9 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowsLeftRight, Info, Coins, Money, Archive } from '@phosphor-icons/react';
-import { useAdmin } from './AdminContext';
-import type { RegisterMovement } from './types';
-import { TICKET_CONFIG } from './ticketConfig';
-import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatOpening, formatTime, getRegisterSummary, padNumber } from './posUtils';
+import { ArrowLeft, ArrowsLeftRight, Info, Coins, Money, Archive } from '@phosphor-icons/react';
+import { useAdmin } from '../context/AdminContext';
+import { useToast } from '../context/ToastContext';
+import type { RegisterMovement } from '../types';
+import { TICKET_CONFIG } from '../utils/ticketConfig';
+import { ModalCloseButton } from './ModalCloseButton';
+import { useModalDismiss } from '../hooks/useModalDismiss';
+import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatOpening, formatTime, getRegisterSummary, padNumber } from '../utils/posUtils';
 
 type ModalType = 'none' | 'close' | 'open' | 'movement';
 
@@ -15,8 +18,11 @@ const Row: React.FC<{ label: React.ReactNode; value: React.ReactNode; muted?: bo
 );
 
 export const RegisterModule: React.FC = () => {
-  const { state, updateRegister, showToast } = useAdmin();
+  const { state, updateRegister } = useAdmin();
+  const { showToast } = useToast();
   const [modalType, setModalType] = useState<ModalType>('none');
+  const closeModal = () => setModalType('none');
+  const { handleBackdropClick } = useModalDismiss({ onClose: closeModal, closeOnBackdrop: false });
   const [amount, setAmount] = useState('');
   const [movType, setMovType] = useState<'ingreso' | 'egreso'>('egreso');
   const [reason, setReason] = useState('');
@@ -115,7 +121,7 @@ export const RegisterModule: React.FC = () => {
   return (
     <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1.5rem', paddingLeft: '1.5rem', borderLeft: '1px solid var(--border-color)' }}>
       {isOpen && (
-        <button className="btn-icon" onClick={() => openModal('movement')} title="Ingreso/Egreso de Caja" style={{ background: 'var(--bg-color)', padding: '0.5rem', borderRadius: '50%' }}>
+        <button className="btn-icon" onClick={() => openModal('movement')} title="Ingreso/Egreso de Caja" aria-label="Registrar ingreso o egreso de caja" style={{ background: 'var(--bg-color)', padding: '0.5rem', borderRadius: '50%' }}>
           <ArrowsLeftRight weight="bold" />
         </button>
       )}
@@ -136,16 +142,28 @@ export const RegisterModule: React.FC = () => {
       </button>
 
       {modalType !== 'none' && (
-        <div className="modal-overlay">
+        <div className="modal-overlay" onClick={handleBackdropClick}>
           <div className={`modal-content card${modalType === 'close' ? ' wide' : ''}`}>
             {modalType === 'close' && (
               <>
                 <div className="caja-header">
-                  <h2 className="caja-title"><Archive weight="fill" /> Cierre de Caja</h2>
-                  <button className="caja-link" onClick={() => setShowMovements(v => !v)}>
-                    {showMovements ? 'Ver Resumen' : 'Ver Movimientos'}
-                  </button>
-                </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {showMovements && (
+                        <button className="btn-icon" onClick={() => setShowMovements(false)} aria-label="Volver" style={{ padding: '0.25rem' }}>
+                          <ArrowLeft size={24} weight="bold" />
+                        </button>
+                      )}
+                      <h2 className="caja-title" style={{margin: 0}}><Archive weight="fill" /> Cierre de Caja</h2>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                      {!showMovements && (
+                        <button className="caja-link" onClick={() => setShowMovements(true)}>
+                          Ver Movimientos
+                        </button>
+                      )}
+                      <ModalCloseButton onClick={closeModal} />
+                    </div>
+                  </div>
 
                 {showMovements ? (
                   <div className="caja-box">
@@ -206,7 +224,7 @@ export const RegisterModule: React.FC = () => {
             )}
             {modalType === 'open' && (
               <>
-                <h2 className="section-title" style={{ marginBottom: '1.5rem' }}>Apertura de Caja N° {reg.numero + 1}</h2>
+                <div className="sale-modal-header" style={{ display: "flex", alignItems: "center", marginBottom: "1.5rem" }}><h2 className="section-title" style={{ margin: 0 }}>Apertura de Caja N° {reg.numero + 1}</h2><ModalCloseButton onClick={closeModal} /></div>
                 {reg.saldoProxima > 0 && (
                   <div className="caja-box">
                     <Row label="Saldo dejado en el último cierre" value={<strong>{formatMoney(reg.saldoProxima)}</strong>} />
@@ -230,7 +248,7 @@ export const RegisterModule: React.FC = () => {
             )}
             {modalType === 'movement' && (
               <>
-                <h2 className="section-title" style={{ marginBottom: '1.5rem' }}>Movimiento de Caja</h2>
+                <div className="sale-modal-header" style={{ display: "flex", alignItems: "center", marginBottom: "1.5rem" }}><h2 className="section-title" style={{ margin: 0 }}>Movimiento de Caja</h2><ModalCloseButton onClick={closeModal} /></div>
                 <div className="form-group">
                   <label>Tipo de Movimiento</label>
                   <select value={movType} onChange={(e) => setMovType(e.target.value as 'ingreso' | 'egreso')}>
@@ -260,3 +278,11 @@ export const RegisterModule: React.FC = () => {
 };
 
 export default RegisterModule;
+
+
+
+
+
+
+
+

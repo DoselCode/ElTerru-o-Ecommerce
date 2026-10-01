@@ -1,28 +1,37 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { productService } from '../services/productService';
-import { orderService } from '../services/orderService';
-import { registerService } from '../services/registerService';
-import { Product } from '../types/product';
-import { AdminState, EMPTY_REGISTER, Order, OrderItem, RegisterState } from './types';
+import { productService } from '../../services/productService';
+import { orderService } from '../../services/orderService';
+import { registerService } from '../../services/registerService';
+import { Product } from '../../types/product';
+import { AdminState, EMPTY_REGISTER, Order, OrderItem, RegisterState } from '../types';
+import { useToast } from './ToastContext';
 
-export interface ToastMessage {
-  id: number;
-  message: string;
-  type: 'success' | 'error' | 'warning';
+type OrderUpdates = Partial<Pick<Order, 'paymentMethod' | 'status' | 'observacion'>>;
+
+interface UpdateOrderPayload { id: string; updates: OrderUpdates }
+interface DecrementStockPayload { id: string | number; qty: number }
+interface UpdateProductPayload { id: string | number; dbUpdates: Record<string, unknown> }
+
+interface OfflinePayloads {
+  CREATE_ORDER: Order;
+  UPDATE_ORDER: UpdateOrderPayload;
+  UPDATE_REGISTER: RegisterState;
+  DECREMENT_STOCK: DecrementStockPayload;
+  UPDATE_PRODUCT: UpdateProductPayload;
 }
 
-type OfflineActionType = 'CREATE_ORDER' | 'UPDATE_ORDER' | 'UPDATE_REGISTER' | 'DECREMENT_STOCK' | 'UPDATE_PRODUCT';
+type OfflineActionType = keyof OfflinePayloads;
 
-interface OfflineAction {
-  type: OfflineActionType;
-  payload: any;
-  timestamp: number;
-}
+type OfflineAction = {
+  [K in OfflineActionType]: { type: K; payload: OfflinePayloads[K]; timestamp: number };
+}[OfflineActionType];
 
 const QUEUE_KEY = 'terruno_offline_queue';
 
+type CloudHandlers = { [K in OfflineActionType]: (payload: OfflinePayloads[K]) => Promise<void> };
+
 // Cada acción encolada se reproduce contra la nube con el mismo handler que la ejecuta online
-const cloudHandlers: Record<OfflineActionType, (payload: any) => Promise<void>> = {
+const cloudHandlers: CloudHandlers = {
   CREATE_ORDER: (order) => orderService.createOrder(order),
   UPDATE_ORDER: ({ id, updates }) => orderService.updateOrder(id, updates),
   UPDATE_REGISTER: (reg) => registerService.upsertGlobalRegister(reg),
@@ -30,41 +39,34 @@ const cloudHandlers: Record<OfflineActionType, (payload: any) => Promise<void>> 
   UPDATE_PRODUCT: ({ id, dbUpdates }) => productService.updateProduct(id, dbUpdates),
 };
 
+// The queue is persisted, so its entries may come from older versions with unknown types.
+const replayAction = (action: OfflineAction): Promise<void> | undefined => {
+  const handler = cloudHandlers[action.type] as ((payload: unknown) => Promise<void>) | undefined;
+  return handler?.(action.payload);
+};
 interface AdminContextProps {
   state: AdminState;
   isOnline: boolean;
   isSyncing: boolean;
   updateProduct: (id: string | number, updates: Partial<Product>) => Promise<void>;
+  updateProductLocal: (id: string | number, updates: Partial<Product>) => void;
   deleteProduct: (id: string | number) => Promise<void>;
   createOrder: (order: Order) => void;
   updateOrder: (id: string, updates: Partial<Pick<Order, 'paymentMethod' | 'observacion'>>) => void;
   cancelOrder: (id: string, observacion: string) => void;
   updateRegister: (reg: RegisterState) => void;
-  cart: OrderItem[];
-  addToCart: (prod: Product) => void;
-  removeFromCart: (productId: string) => void;
-  clearCart: () => void;
   loading: boolean;
-  toasts: ToastMessage[];
-  showToast: (message: string, type?: 'success' | 'error' | 'warning') => void;
 }
 
 const AdminContext = createContext<AdminContextProps | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState<OrderItem[]>([]);
-  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const { showToast } = useToast();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
   const isSyncingRef = useRef(false);
   const [state, setState] = useState<AdminState>({ products: [], orders: [], register: EMPTY_REGISTER });
-
-  const showToast = (message: string, type: ToastMessage['type'] = 'success') => {
-    const id = Date.now();
-    setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
-  };
 
   const getQueue = (): OfflineAction[] => {
     try {
@@ -94,7 +96,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     for (const action of queue) {
       try {
         // Las acciones de versiones anteriores sin handler se descartan
-        await cloudHandlers[action.type]?.(action.payload);
+        await replayAction(action);
         successCount++;
       } catch (err) {
         console.error('Sync error on action:', action, err);
@@ -139,17 +141,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     })();
   }, []);
 
-  const runOrQueue = async (type: OfflineActionType, payload: any) => {
+  const runOrQueue = async <K extends OfflineActionType>(type: K, payload: OfflinePayloads[K]) => {
     if (isOnline) {
       try {
-        await cloudHandlers[type](payload);
+        await (cloudHandlers[type] as (p: OfflinePayloads[K]) => Promise<void>)(payload);
         return;
       } catch (err) {
         console.error('Cloud call failed, queueing offline', err);
       }
     }
     const queue = getQueue();
-    queue.push({ type, payload, timestamp: Date.now() });
+    queue.push({ type, payload, timestamp: Date.now() } as OfflineAction);
     saveQueue(queue);
   };
 
@@ -166,7 +168,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const updateProduct = async (id: string | number, updates: Partial<Product>) => {
     // Solo se envían los campos definidos: undefined se guardaría como NULL
-    const dbUpdates: Record<string, any> = {};
+    const dbUpdates: Record<string, unknown> = {};
     if (updates.stock !== undefined) dbUpdates.stock = updates.stock;
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.price !== undefined) dbUpdates.price = updates.price;
@@ -176,6 +178,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (updates.isFeatured !== undefined) dbUpdates.is_featured = updates.isFeatured;
 
     await runOrQueue('UPDATE_PRODUCT', { id, dbUpdates });
+    setState(prev => ({ ...prev, products: prev.products.map(p => p.id == id ? { ...p, ...updates } : p) }));
+  };
+
+  const updateProductLocal = (id: string | number, updates: Partial<Product>) => {
     setState(prev => ({ ...prev, products: prev.products.map(p => p.id == id ? { ...p, ...updates } : p) }));
   };
 
@@ -213,30 +219,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setState(prev => ({ ...prev, register: reg }));
   };
 
-  const addToCart = (prod: Product) => {
-    const currentStock = state.products.find(p => p.id === prod.id)?.stock ?? 0;
-    const alreadyInCart = cart.find(p => p.id === prod.id)?.cartQty ?? 0;
-    if (currentStock - alreadyInCart <= 0) {
-      showToast('Stock insuficiente para este producto', 'error');
-      return;
-    }
-    setCart(prev => {
-      const existing = prev.find(p => p.id === prod.id);
-      if (existing) return prev.map(p => p.id === prod.id ? { ...p, cartQty: (p.cartQty || 1) + 1 } : p);
-      return [...prev, { ...prod, cartQty: 1 }];
-    });
-  };
-
-  const removeFromCart = (productId: string) => setCart(prev => prev.filter(p => p.id !== productId));
-
-  const clearCart = () => setCart([]);
-
   return (
     <AdminContext.Provider value={{
-      state, isOnline, isSyncing, updateProduct, deleteProduct,
+      state, isOnline, isSyncing, updateProduct, updateProductLocal, deleteProduct,
       createOrder, updateOrder, cancelOrder, updateRegister,
-      cart, addToCart, removeFromCart, clearCart, loading,
-      toasts, showToast
+      loading
     }}>
       {children}
     </AdminContext.Provider>

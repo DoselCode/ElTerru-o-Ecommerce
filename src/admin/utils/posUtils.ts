@@ -1,5 +1,5 @@
-import type { Product } from '../types/product';
-import type { Order, OrderItem, PaymentMethod, RegisterState } from './types';
+import type { Product } from '../../types/product';
+import type { Order, OrderItem, PaymentMethod, RegisterState } from '../types';
 
 // La clave 'tarjeta' se conserva en la base de datos; en pantalla es el Posnet
 export const PAYMENT_LABELS: Record<PaymentMethod, string> = {

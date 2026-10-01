@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, Link, useLocation } from 'react-router-dom';
-import { insforge } from '../lib/insforge';
+import { insforge } from '../../lib/insforge';
+import type { UserSchema as User } from '@insforge/sdk';
 import { SquaresFour, Storefront, CashRegister, Package, Receipt, ArrowsLeftRight, CheckCircle, XCircle, WarningCircle } from '@phosphor-icons/react';
-import { AdminProvider, useAdmin } from './AdminContext';
-import { RegisterModule } from './RegisterModule';
-import './admin.css';
+import { AdminProvider, useAdmin } from '../context/AdminContext';
+import { CartProvider } from '../context/CartContext';
+import { ToastProvider, useToasts } from '../context/ToastContext';
+import { ErrorBoundary } from '../../components/ui/ErrorBoundary';
+import { RegisterModule } from '../components/RegisterModule';
+import '../admin.css';
 
 const ToastContainer: React.FC = () => {
-  const { toasts } = useAdmin();
+  const toasts = useToasts();
   if (toasts.length === 0) return null;
 
   const getIcon = (type: string) => {
@@ -101,7 +105,9 @@ const AdminInner: React.FC = () => {
         </header>
 
         <div className="views-container">
-          <Outlet />
+          <ErrorBoundary key={location.pathname} variant="admin">
+            <Outlet />
+          </ErrorBoundary>
         </div>
       </main>
     </div>
@@ -109,7 +115,7 @@ const AdminInner: React.FC = () => {
 };
 
 export const AdminLayout: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
   useEffect(() => {
@@ -118,16 +124,23 @@ export const AdminLayout: React.FC = () => {
       setUser(user);
     };
     loadUser().then(() => setLoadingAuth(false));
-    return insforge.auth.onAuthStateChange(loadUser);
+    const unsubscribe = insforge.auth.onAuthStateChange(loadUser);
+    return unsubscribe;
   }, []);
 
   if (loadingAuth) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Cargando...</div>;
   if (!user) return <Navigate to="/admin/login" replace />;
 
   return (
-    <AdminProvider>
-      <AdminInner />
-    </AdminProvider>
+    <ErrorBoundary variant="admin">
+      <ToastProvider>
+        <AdminProvider>
+          <CartProvider>
+            <AdminInner />
+          </CartProvider>
+        </AdminProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 };
 

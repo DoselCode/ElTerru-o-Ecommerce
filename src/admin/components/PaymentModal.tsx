@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import type { OrderItem, PaymentMethod } from './types';
-import { TICKET_CONFIG } from './ticketConfig';
-import { PAYMENT_LABELS, PAYMENT_METHODS, calculateTotals, formatMoney, getDiscountRate } from './posUtils';
+import type { OrderItem, PaymentMethod } from '../types';
+import { TICKET_CONFIG } from '../utils/ticketConfig';
+import { PAYMENT_LABELS, PAYMENT_METHODS, calculateTotals, formatMoney, getDiscountRate } from '../utils/posUtils';
+import { ModalCloseButton } from './ModalCloseButton';
+import { useModalDismiss } from '../hooks/useModalDismiss';
 
 interface PaymentModalProps {
   items: OrderItem[];
@@ -13,13 +15,18 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ items, onCancel, onC
   const [method, setMethod] = useState<PaymentMethod>('efectivo');
   const [client, setClient] = useState('');
 
+  const { handleBackdropClick } = useModalDismiss({ onClose: onCancel, closeOnBackdrop: false });
+
   const { subtotal, total, descuento, neto, iva } = calculateTotals(items, method, TICKET_CONFIG.ivaRate);
   const discountPct = subtotal > 0 ? Math.round((descuento / subtotal) * 100) : 0;
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" onClick={handleBackdropClick}>
       <div className="modal-content wide card">
-        <h2 className="section-title" style={{ marginBottom: '1.5rem' }}>Registrar Pago</h2>
+        <div className="sale-modal-header" style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 className="section-title" style={{ margin: 0 }}>Registrar Pago</h2>
+          <ModalCloseButton onClick={onCancel} />
+        </div>
 
         <div className="pay-summary">
           <p className="pay-label">Subtotal</p>

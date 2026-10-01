@@ -15,7 +15,15 @@ const parseHours = (str: string) => {
   return { closed: false, open1: '09:00', close1: '13:00', open2: '17:00', close2: '21:00' };
 };
 
-const stringifyHours = (h: any) => {
+interface Hours {
+  closed: boolean;
+  open1: string;
+  close1: string;
+  open2: string;
+  close2: string;
+}
+
+const stringifyHours = (h: Hours) => {
   if (h.closed) return 'Cerrado';
   let str = `${h.open1} a ${h.close1} hs`;
   if (h.open2 && h.close2) str += ` y ${h.open2} a ${h.close2} hs`;
@@ -29,7 +37,7 @@ export const DayHoursEditor = ({ label, value, onChange }: { label: string, valu
     setH(parseHours(value || ''));
   }, [value]);
 
-  const update = (newH: any) => {
+  const update = (newH: Hours) => {
     setH(newH);
     onChange(stringifyHours(newH));
   };

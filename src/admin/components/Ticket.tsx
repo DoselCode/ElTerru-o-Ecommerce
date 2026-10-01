@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Order } from './types';
-import { TICKET_CONFIG } from './ticketConfig';
-import { PAYMENT_LABELS, formatMoney, formatTicketDate, padNumber } from './posUtils';
+import type { Order } from '../types';
+import { TICKET_CONFIG } from '../utils/ticketConfig';
+import { PAYMENT_LABELS, formatMoney, formatTicketDate, padNumber } from '../utils/posUtils';
 
 const Divider = () => <div className="tk-divider" />;
 

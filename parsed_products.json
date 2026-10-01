@@ -1,0 +1,464 @@
+[
+  {
+    "code": "0101",
+    "name": "Pasta de Tomates Secos al Malbec",
+    "provider": "JUCAMAR",
+    "price": 8900
+  },
+  {
+    "code": "0060",
+    "name": "Molinillo Automtico Mix Pimienta",
+    "provider": "DANKON",
+    "price": 42800
+  },
+  {
+    "code": "0029",
+    "name": "Salsa Pepper Sauce Original",
+    "provider": "DANKON",
+    "price": 10900
+  },
+  {
+    "code": "0131",
+    "name": "Hojas de Parra",
+    "provider": "JUCAMAR",
+    "price": 12000
+  },
+  {
+    "code": "0133",
+    "name": "Jalea de Membrillo",
+    "provider": "JUCAMAR",
+    "price": 7900
+  },
+  {
+    "code": "0053",
+    "name": "sazon fajita",
+    "provider": "DANKON",
+    "price": 8400
+  },
+  {
+    "code": "0100",
+    "name": "Pasta Aceitunas Negras con Roquefort",
+    "provider": "JUCAMAR",
+    "price": 8900
+  },
+  {
+    "code": "0023",
+    "name": "Langostinos al Ajillo",
+    "provider": "DANKON",
+    "price": 13600
+  },
+  {
+    "code": "0080",
+    "name": "Limonada Orgnica c/Jengibre y Miel",
+    "provider": "DANKON",
+    "price": 4400
+  },
+  {
+    "code": "0189",
+    "name": "Simonassi Roble Malbec",
+    "provider": "VINOS",
+    "price": 10800
+  },
+  {
+    "code": "0123",
+    "name": "Aceitunas Verdes Rellenas c/Almendras",
+    "provider": "JUCAMAR",
+    "price": 8500
+  },
+  {
+    "code": "0072",
+    "name": "Pistacho con Chocolate Leche",
+    "provider": "DANKON",
+    "price": 10800
+  },
+  {
+    "code": "0096",
+    "name": "Jalea Picante Maracuy",
+    "provider": "JUCAMAR",
+    "price": 8100
+  },
+  {
+    "code": "0084",
+    "name": "Halawa Pistacho",
+    "provider": "DANKON",
+    "price": 18000
+  },
+  {
+    "code": "0122",
+    "name": "Aceitunas Negras Griegas Preparadas",
+    "provider": "JUCAMAR",
+    "price": 9100
+  },
+  {
+    "code": "0085",
+    "name": "Aceitunas confitadas c/almendras",
+    "provider": "JUCAMAR",
+    "price": 9200
+  },
+  {
+    "code": "0001",
+    "name": "Trucha Ahumada al Natural",
+    "provider": "DANKON",
+    "price": 12100
+  },
+  {
+    "code": "0071",
+    "name": "Trufas 70% Chocolate",
+    "provider": "DANKON",
+    "price": 11700
+  },
+  {
+    "code": "0057",
+    "name": "Azafrn Molido Puro",
+    "provider": "DANKON",
+    "price": 3200
+  },
+  {
+    "code": "0006",
+    "name": "Ciervo en Escabeche",
+    "provider": "DANKON",
+    "price": 12900
+  },
+  {
+    "code": "0132",
+    "name": "Dulce de Leche Artesanal",
+    "provider": "JUCAMAR",
+    "price": 11000
+  },
+  {
+    "code": "0025",
+    "name": "Aderezo Caesar",
+    "provider": "DANKON",
+    "price": 5700
+  },
+  {
+    "code": "0073",
+    "name": "Arndano Chocolate Negro",
+    "provider": "DANKON",
+    "price": 10800
+  },
+  {
+    "code": "0044",
+    "name": "Risotto Porcini",
+    "provider": "DANKON",
+    "price": 8400
+  },
+  {
+    "code": "0164",
+    "name": "Mix Frutos Secos al Vaco",
+    "provider": "FINCA LA AGUADA",
+    "price": 14700
+  },
+  {
+    "code": "0171",
+    "name": "Arndanos Secos 250 g",
+    "provider": "NUTRIDIET",
+    "price": 5000
+  },
+  {
+    "code": "0126",
+    "name": "Aceitunas Verdes Rellenas c/Salame",
+    "provider": "JUCAMAR",
+    "price": 8900
+  },
+  {
+    "code": "0106",
+    "name": "Quesitos Saborizados",
+    "provider": "JUCAMAR",
+    "price": 8900
+  },
+  {
+    "code": "0175",
+    "name": "Garbanzos Fritos Original",
+    "provider": "NUTRIDIET",
+    "price": 2400
+  },
+  {
+    "code": "0121",
+    "name": "Aceite de pepitas de uva",
+    "provider": "JUCAMAR",
+    "price": 21300
+  },
+  {
+    "code": "0089",
+    "name": "Berenjenas Asadas al Tomillo en Oliva",
+    "provider": "JUCAMAR",
+    "price": 8100
+  },
+  {
+    "code": "0107",
+    "name": "Tomates Secos al Malbec en Aceite",
+    "provider": "JUCAMAR",
+    "price": 8500
+  },
+  {
+    "code": "0094",
+    "name": "Grgolas en Aceite de Oliva",
+    "provider": "JUCAMAR",
+    "price": 11200
+  },
+  {
+    "code": "0088",
+    "name": "Crema de Ajo Negro",
+    "provider": "JUCAMAR",
+    "price": 9300
+  },
+  {
+    "code": "0105",
+    "name": "Tapenade (Pasta Ac. Negras c/Anchoas)",
+    "provider": "JUCAMAR",
+    "price": 8900
+  },
+  {
+    "code": "0013",
+    "name": "Mostaza Dijon GP",
+    "provider": "DANKON",
+    "price": 8600
+  },
+  {
+    "code": "0177",
+    "name": "Dos Makilas Malbec",
+    "provider": "VINOS",
+    "price": 7100
+  },
+  {
+    "code": "0166",
+    "name": "Dulce de Membrillo 12u?40g",
+    "provider": "FINCA LA AGUADA",
+    "price": 7600
+  },
+  {
+    "code": "0087",
+    "name": "Aros de Jalapeo",
+    "provider": "JUCAMAR",
+    "price": 9300
+  },
+  {
+    "code": "0093",
+    "name": "Grgolas en Escabeche",
+    "provider": "JUCAMAR",
+    "price": 11200
+  },
+  {
+    "code": "0031",
+    "name": "Salsa Jalapea",
+    "provider": "DANKON",
+    "price": 10000
+  },
+  {
+    "code": "0108",
+    "name": "Pasta Ac. Verdes con Pistacho",
+    "provider": "JUCAMAR",
+    "price": 8500
+  },
+  {
+    "code": "0110",
+    "name": "Hummus",
+    "provider": "JUCAMAR",
+    "price": 8500
+  },
+  {
+    "code": "0135",
+    "name": "Mermelada Diet Frutilla (apta diabticos)",
+    "provider": "JUCAMAR",
+    "price": 8500
+  },
+  {
+    "code": "0098",
+    "name": "Pasta Picante de Morrones",
+    "provider": "JUCAMAR",
+    "price": 8100
+  },
+  {
+    "code": "0153",
+    "name": "Manjar Mendocino",
+    "provider": "JUCAMAR",
+    "price": 11300
+  },
+  {
+    "code": "0128",
+    "name": "Aceitunas Verdes Rellenas c/Tomate",
+    "provider": "JUCAMAR",
+    "price": 8500
+  },
+  {
+    "code": "0184",
+    "name": "Argana Pinot Noir",
+    "provider": "VINOS",
+    "price": 10700
+  },
+  {
+    "code": "0185",
+    "name": "Argana Cabernet Franc",
+    "provider": "VINOS",
+    "price": 15100
+  },
+  {
+    "code": "0156",
+    "name": "RUMTOPF (cerezas al ron 1 ao)",
+    "provider": "JUCAMAR",
+    "price": 11300
+  },
+  {
+    "code": "0182",
+    "name": "Makila Reserva Blend",
+    "provider": "VINOS",
+    "price": 12200
+  },
+  {
+    "code": "0181",
+    "name": "Makila Reserva Malbec",
+    "provider": "VINOS",
+    "price": 12800
+  },
+  {
+    "code": "0049",
+    "name": "Lima Pepper",
+    "provider": "DANKON",
+    "price": 13500
+  },
+  {
+    "code": "0050",
+    "name": "Pimienta Roja Cayenna",
+    "provider": "DANKON",
+    "price": 10700
+  },
+  {
+    "code": "0048",
+    "name": "Lemon Pepper",
+    "provider": "DANKON",
+    "price": 13500
+  },
+  {
+    "code": "0054",
+    "name": "Eneldo",
+    "provider": "DANKON",
+    "price": 7900
+  },
+  {
+    "code": "0115",
+    "name": "Sal Marina de Malbec",
+    "provider": "JUCAMAR",
+    "price": 8100
+  },
+  {
+    "code": "0111",
+    "name": "Caviar de Mostaza",
+    "provider": "JUCAMAR",
+    "price": 8600
+  },
+  {
+    "code": "0198",
+    "name": "Abismal Malbec",
+    "provider": "VINOS",
+    "price": 10500
+  },
+  {
+    "code": "0169",
+    "name": "Castaas de Caj w4 250g",
+    "provider": "NUTRIDIET",
+    "price": 6600
+  },
+  {
+    "code": "0137",
+    "name": "Mermelada de Damasco al Sol",
+    "provider": "JUCAMAR",
+    "price": 6600
+  },
+  {
+    "code": "0114",
+    "name": "Sal Marina de Mandarina",
+    "provider": "JUCAMAR",
+    "price": 8600
+  },
+  {
+    "code": "0157",
+    "name": "AOVE Extra Virgen Vidrio 500ml",
+    "provider": "FINCA LA AGUADA",
+    "price": 18200
+  },
+  {
+    "code": "0172",
+    "name": "Aceite de Coco Neutro 200g",
+    "provider": "NUTRIDIET",
+    "price": 4800
+  },
+  {
+    "code": "0136",
+    "name": "Mermelada Diet Damasco (apta diabticos)",
+    "provider": "JUCAMAR",
+    "price": 8500
+  },
+  {
+    "code": "0139",
+    "name": "Mermelada de Frambuesa al Sol",
+    "provider": "JUCAMAR",
+    "price": 9200
+  },
+  {
+    "code": "0159",
+    "name": "AOVE Extra Virgen PET 2L",
+    "provider": "FINCA LA AGUADA",
+    "price": 52200
+  },
+  {
+    "code": "0168",
+    "name": "Pistacho Pelado Natural 200g",
+    "provider": "NUTRIDIET",
+    "price": 15800
+  },
+  {
+    "code": "0170",
+    "name": "Dtiles de Argelia s/carozo 250g",
+    "provider": "NUTRIDIET",
+    "price": 6200
+  },
+  {
+    "code": "0218",
+    "name": "Salsa Cesar Alcaraz",
+    "provider": "ALCARAZ",
+    "price": 8100
+  },
+  {
+    "code": "0209",
+    "name": "Mostaza Dijon Alcaraz",
+    "provider": "ALCARAZ",
+    "price": 7650
+  },
+  {
+    "code": "0162",
+    "name": "Nueces Mix Blancas al Vaco",
+    "provider": "FINCA LA AGUADA",
+    "price": 16000
+  },
+  {
+    "code": "0021",
+    "name": "Alcaparras en Vinagre",
+    "provider": "DANKON",
+    "price": 6500
+  },
+  {
+    "code": "0036",
+    "name": "Passata Di Pomodoro",
+    "provider": "DANKON",
+    "price": 10800
+  },
+  {
+    "code": "0143",
+    "name": "Mermelada Inglesa (naranja/limn)",
+    "provider": "JUCAMAR",
+    "price": 8100
+  },
+  {
+    "code": "0210",
+    "name": "Mostaza en granos con miel",
+    "provider": "ALCARAZ",
+    "price": 6700
+  },
+  {
+    "code": "0201",
+    "name": "Berenjenas en escabeche",
+    "provider": "ALCARAZ",
+    "price": 7000
+  }
+]

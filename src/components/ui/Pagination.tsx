@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { CaretLeft, CaretRight, CaretDoubleLeft, CaretDoubleRight } from '@phosphor-icons/react';
 
 export type PaginationVariant = 'footer' | 'burgundy' | 'outline';
 
@@ -167,7 +167,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           aria-label="Ir a la primera página"
           className={`p-2 rounded-full transition-all duration-200 cursor-pointer ${variantStyles.edgeBtn}`}
         >
-          <ChevronsLeft size={16} />
+          <CaretDoubleLeft size={16} />
         </button>
       )}
 
@@ -179,7 +179,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         aria-label="Página anterior"
         className={`flex items-center gap-1 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${variantStyles.navBtn}`}
       >
-        <ChevronLeft size={16} />
+        <CaretLeft size={16} />
         <span className="hidden xs:inline sm:inline">Anterior</span>
       </button>
 
@@ -226,7 +226,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={`flex items-center gap-1 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${variantStyles.navBtn}`}
       >
         <span className="hidden xs:inline sm:inline">Siguiente</span>
-        <ChevronRight size={16} />
+        <CaretRight size={16} />
       </button>
 
       {/* Botón Última Página */}
@@ -238,7 +238,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           aria-label="Ir a la última página"
           className={`p-2 rounded-full transition-all duration-200 cursor-pointer ${variantStyles.edgeBtn}`}
         >
-          <ChevronsRight size={16} />
+          <CaretDoubleRight size={16} />
         </button>
       )}
     </nav>
