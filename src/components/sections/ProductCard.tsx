@@ -52,10 +52,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo, on
           </p>
         </div>
 
-        <div className="pt-1 flex items-center justify-between">
+        <div className="pt-2 flex items-center justify-between mt-auto">
           <span className="font-serif text-xl font-bold text-terruno-burgundy">
             ${product.price.toLocaleString('es-AR')}
           </span>
+          {onSelect && (
+            <button
+              type="button"
+              className="text-[11px] font-semibold uppercase tracking-wider text-terruno-olive hover:text-terruno-burgundy transition-colors px-3 py-1.5 border border-terruno-olive/30 hover:border-terruno-burgundy/50 rounded-full bg-white shadow-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(product);
+              }}
+            >
+              Ver detalle
+            </button>
+          )}
         </div>
       </div>
     </article>
