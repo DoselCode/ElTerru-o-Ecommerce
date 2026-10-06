@@ -1,12 +1,11 @@
 import type { Product } from '../types/product';
 import type { Order, OrderItem, PaymentMethod, RegisterState } from './types';
 
-// La clave 'tarjeta' se conserva en la base de datos; en pantalla es el Posnet
 export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   efectivo: 'Efectivo',
   transferencia: 'Transferencia',
-  tarjeta: 'Posnet',
-  mercadopago: 'Mercado Pago',
+  credito: 'Tarjeta Crédito',
+  debito: 'Tarjeta Débito',
 };
 
 export const PAYMENT_METHODS = Object.keys(PAYMENT_LABELS) as PaymentMethod[];
@@ -14,8 +13,8 @@ export const PAYMENT_METHODS = Object.keys(PAYMENT_LABELS) as PaymentMethod[];
 const DISCOUNT_RATES: Record<PaymentMethod, number> = {
   efectivo: 0.10,
   transferencia: 0.05,
-  tarjeta: 0,
-  mercadopago: 0,
+  credito: 0,
+  debito: 0,
 };
 
 export const getDiscountRate = (method: PaymentMethod) => DISCOUNT_RATES[method];
@@ -70,7 +69,7 @@ export const getNextTicketNumber = (orders: Order[]) =>
   orders.reduce((max, o) => Math.max(max, o.ticketNumber || 0), 0) + 1;
 
 export const sumByMethod = (orders: Order[]): Record<PaymentMethod, number> => {
-  const totals: Record<PaymentMethod, number> = { efectivo: 0, transferencia: 0, tarjeta: 0, mercadopago: 0 };
+  const totals: Record<PaymentMethod, number> = { efectivo: 0, transferencia: 0, credito: 0, debito: 0 };
   for (const o of orders) {
     if (o.status !== 'anulada') totals[o.paymentMethod] += o.total;
   }

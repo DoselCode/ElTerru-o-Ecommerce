@@ -107,7 +107,7 @@ export const ProductForm: React.FC = () => {
 
   return (
     <div className="view-section active">
-      <div className="max-w-4xl mx-auto space-y-6 pb-12 pr-4">
+      <div className="max-w-6xl mx-auto space-y-6 pb-12 pr-4">
         <div className="flex items-center gap-4">
           <Link to="/admin/stock" className="p-2 text-terruno-muted hover:bg-terruno-border rounded-xl transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -124,13 +124,11 @@ export const ProductForm: React.FC = () => {
         <form onSubmit={handleSubmit} noValidate className="bg-white rounded-2xl shadow-sm border border-terruno-border p-6 md:p-8 space-y-8">
           <div className="space-y-4">
             <SectionTitle>Información Básica</SectionTitle>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField label="Código" placeholder="Automático si se deja vacío" maxLength={6} {...fieldProps('code')} />
               <div className="md:col-span-2">
                 <FormField label="Nombre *" placeholder="ej: Malbec Reserva 2021" maxLength={100} {...fieldProps('name')} />
               </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-terruno-muted mb-1">Categoría *</label>
                 <select
@@ -143,15 +141,21 @@ export const ProductForm: React.FC = () => {
                   {categoryOptions.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-              <FormField label="Proveedor (opcional)" placeholder="ej: DANKON" maxLength={60} {...fieldProps('supplier')} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField label="Precio de lista (PSP) *" type="number" step="0.01" max={999999999} placeholder="ej: 12700" {...fieldProps('price')} />
               <FormField label="Precio Efectivo (opcional)" type="number" step="0.01" max={999999999} placeholder="Automático: -10%" {...fieldProps('price_efectivo')} />
               <FormField label="Precio Transferencia (opcional)" type="number" step="0.01" max={999999999} placeholder="Automático: -5%" {...fieldProps('price_transferencia')} />
+              <FormField label="Precio Original (oferta)" type="number" step="0.01" max={999999999} placeholder="ej: 15000" {...fieldProps('original_price')} />
             </div>
-            <FormField label="Precio Original (opcional para oferta)" type="number" step="0.01" max={999999999} placeholder="ej: 15000 (mayor al precio actual)" {...fieldProps('original_price')} />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <FormField label="Proveedor (opcional)" placeholder="ej: DANKON" maxLength={60} {...fieldProps('supplier')} />
+              </div>
+              <FormField label="Stock *" type="number" max={999999} placeholder="0" {...fieldProps('stock')} />
+            </div>
 
             <FormField label="Descripción *" rows={4} maxLength={1000} placeholder="Describí las características, notas de cata o detalles del producto..." {...fieldProps('description')} />
           </div>
@@ -164,8 +168,7 @@ export const ProductForm: React.FC = () => {
             </div>
             <FormField label="Maridaje sugerido (opcional)" placeholder="ej: Carnes rojas, quesos duros y pastas con salsas intensas" maxLength={250} {...fieldProps('pairing')} />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField label="Stock *" type="number" max={999999} placeholder="0" {...fieldProps('stock')} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="Etiqueta Especial (opc.)" placeholder="ej: Novedad, Destacado" maxLength={30} {...fieldProps('badge')} />
               <FormField label="Desc. Etiqueta (autocompleta %)" placeholder="ej: -20%" maxLength={20} {...fieldProps('discount_badge')} />
             </div>

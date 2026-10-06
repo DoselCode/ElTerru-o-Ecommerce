@@ -20,22 +20,104 @@
     color: var(--text-main);
     min-height: 100vh;
     overflow: hidden;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
 }
 
 /* App Layout */
-.app-layout { display: flex; height: 100vh; padding: 1.5rem; gap: 1.5rem; }
+.app-layout { display: flex; height: 100vh; padding: 1.5rem; gap: 1.5rem; position: relative; }
 
-/* Sidebar */
+/* Sidebar — collapsible */
 .sidebar {
     width: 280px;
+    min-width: 280px;
     background-color: var(--primary-color);
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
-    padding: 2.5rem 1rem;
+    padding: 1.25rem 1rem 2.5rem;
     color: white;
     box-shadow: 0 10px 30px rgba(11, 93, 58, 0.2);
+    transition: width 0.25s ease, min-width 0.25s ease, padding 0.25s ease;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 40;
+}
+
+.sidebar--collapsed {
+    width: 64px;
+    min-width: 64px;
+    padding: 1.25rem 0.5rem 2.5rem;
+}
+
+/* Oculta textos cuando está colapsado */
+.sidebar--collapsed .sidebar-title--text,
+.sidebar--collapsed .nav-label {
+    display: none;
+}
+
+/* Header del sidebar centrado cuando colapsa */
+.sidebar--collapsed .sidebar-header {
+    margin-bottom: 2rem;
+}
+
+/* Toggle button dentro del sidebar */
+.sidebar-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    padding: 0.25rem 0.25rem 0.75rem;
+    transition: color 0.2s;
+    flex-shrink: 0;
+}
+.sidebar-toggle-btn:hover { color: white; }
+
+/* Hamburger button en el header */
+.hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+.hamburger-btn:hover { background: var(--border-color); color: var(--primary-color); }
+
+/* Overlay móvil (fondo oscuro al abrir sidebar en pantallas pequeñas) */
+.sidebar-overlay {
+    display: none;
+}
+@media (max-width: 768px) {
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 39;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    }
+    .sidebar--collapsed {
+        width: 0;
+        min-width: 0;
+        padding: 0;
+    }
 }
 
 .sidebar-header {
@@ -54,10 +136,17 @@
     clip-path: circle(42% at 50% 50%);
     background: white;
     padding: 0.5rem;
+    transition: width 0.25s ease, height 0.25s ease;
+}
+.sidebar--collapsed .sidebar-logo {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0;
+    padding: 0.2rem;
 }
 
-.sidebar-title { font-family: 'Georgia', serif; font-size: 1.15rem; font-weight: 500; letter-spacing: 1px; }
-.sidebar-title span { font-family: sans-serif; font-size: 0.65rem; letter-spacing: 3px; opacity: 0.7; display: block; margin-top: 4px; }
+.sidebar-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 600; letter-spacing: 0.5px; }
+.sidebar-title span { font-family: 'Inter', sans-serif; font-size: 0.62rem; letter-spacing: 3px; opacity: 0.7; display: block; margin-top: 4px; font-weight: 500; }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; }
 
@@ -80,6 +169,14 @@
 .nav-item i { font-size: 1.25rem; }
 .nav-item:hover { color: white; background: rgba(255, 255, 255, 0.1); }
 .nav-item.active { background: var(--surface-color); color: var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+/* Cuando el sidebar está colapsado, los nav-items se centran sobre el icono */
+.sidebar--collapsed .nav-item {
+    padding: 0.9rem;
+    justify-content: center;
+    gap: 0;
+    border-radius: 12px;
+}
 
 /* Main Content */
 .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 0.5rem; }
@@ -262,6 +359,7 @@
 }
 .modal-overlay.hidden { display: none; }
 .modal-content {
+    position: relative;
     background: var(--surface-color); width: 100%; max-width: 500px;
     border-radius: var(--radius-lg); padding: 2.5rem;
     box-shadow: 0 20px 50px rgba(0,0,0,0.3);
@@ -269,6 +367,14 @@
     max-height: 90vh; overflow-y: auto;
 }
 .modal-content.wide { max-width: 650px; }
+.modal-close-btn {
+    position: absolute; top: 1rem; right: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: 50%;
+    background: var(--bg-color); color: var(--text-muted);
+    border: none; cursor: pointer; z-index: 1;
+}
+.modal-close-btn:hover { background: var(--border-color); color: var(--text-main); }
 
 .form-group { margin-bottom: 1.25rem; }
 .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -409,4 +515,64 @@
     font-size: 11px !important;
     line-height: 1.2 !important;
   }
+}
+
+/* ── Paginator ────────────────────────────────────── */
+.paginator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.paginator-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--surface-color);
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.paginator-btn:hover:not(:disabled) {
+  background: var(--bg-color);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.paginator-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.paginator-btn--active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+  font-weight: 700;
+}
+
+.paginator-btn--active:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: white;
+}
+
+.paginator-ellipsis {
+  width: 28px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  user-select: none;
 }

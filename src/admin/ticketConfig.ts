@@ -4,10 +4,9 @@
  */
 export const TICKET_CONFIG = {
   nombreFantasia: 'El Terruño',
-  razonSocial: 'COMPLETAR RAZÓN SOCIAL',
-  cuit: '00-00000000-0',
-  direccion: 'COMPLETAR DIRECCIÓN',
-  condicionIva: 'IVA Responsable Inscripto',
+  razonSocial: '"EL TERRUÑO" de BONI GABRIELA TAMARA',
+  cuit: '27-26397150-2',
+  direccion: 'Lavalleja 812 loc. 8 - Jesús María',
   puntoVenta: 1,
   ivaRate: 0.21,
 };

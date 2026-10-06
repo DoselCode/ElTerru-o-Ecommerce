@@ -20,10 +20,7 @@ describe('PaymentModal', () => {
     fireEvent.click(screen.getByText(/Transferencia/));
     expect(screen.getByText('$12.100,00', { selector: 'h2' })).toBeTruthy();
 
-    fireEvent.click(screen.getByText(/Mercado Pago/));
-    expect(screen.getByText('$12.700,00', { selector: 'h2' })).toBeTruthy();
-
     fireEvent.click(screen.getByText('Confirmar Cobro'));
-    expect(onConfirm).toHaveBeenCalledWith('mercadopago', '');
+    expect(onConfirm).toHaveBeenCalledWith('transferencia', '');
   });
 });

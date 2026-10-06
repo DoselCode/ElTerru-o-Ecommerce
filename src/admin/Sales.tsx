@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Receipt } from '@phosphor-icons/react';
 import { useAdmin } from './AdminContext';
 import { SaleDetailModal } from './SaleDetailModal';
 import type { PaymentMethod } from './types';
 import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatTicketDate, padNumber } from './posUtils';
+import { Paginator, usePaginator } from './Paginator';
+
+const PAGE_SIZE = 20;
 
 export const Sales: React.FC = () => {
-  const navigate = useNavigate();
   const { state } = useAdmin();
   const [search, setSearch] = useState('');
   const [methodFilter, setMethodFilter] = useState<PaymentMethod | 'todos'>('todos');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const filteredOrders = state.orders.filter(o => {
     if (methodFilter !== 'todos' && o.paymentMethod !== methodFilter) return false;
+    const orderDay = (o.createdAt || o.date || '').slice(0, 10);
+    if (dateFrom && (!orderDay || orderDay < dateFrom)) return false;
+    if (dateTo && (!orderDay || orderDay > dateTo)) return false;
     if (!search) return true;
     const q = search.toLowerCase();
     const matchesTicket = o.ticketNumber !== undefined && String(o.ticketNumber).includes(q.replace(/^0+/, ''));
     return o.client.toLowerCase().includes(q) || matchesTicket;
   });
+
+  const { page, totalPages, setPage, slice: pageOrders } = usePaginator(filteredOrders, PAGE_SIZE);
 
   const activeOrders = filteredOrders.filter(o => o.status !== 'anulada');
   const filteredTotal = activeOrders.reduce((acc, o) => acc + o.total, 0);
@@ -47,9 +55,27 @@ export const Sales: React.FC = () => {
             <option value="todos">Todos los métodos</option>
             {PAYMENT_METHODS.map(m => <option key={m} value={m}>{PAYMENT_LABELS[m]}</option>)}
           </select>
-          <button className="btn-accent" style={{ padding: '0.65rem 1.5rem' }} onClick={() => navigate('/admin/pos')}>
-            + Nueva Venta (Ir a POS)
-          </button>
+          <input
+            type="date"
+            className="filter-input"
+            value={dateFrom}
+            max={dateTo || undefined}
+            onChange={(e) => setDateFrom(e.target.value)}
+            aria-label="Desde"
+          />
+          <input
+            type="date"
+            className="filter-input"
+            value={dateTo}
+            min={dateFrom || undefined}
+            onChange={(e) => setDateTo(e.target.value)}
+            aria-label="Hasta"
+          />
+          {(dateFrom || dateTo) && (
+            <button className="btn-secondary" style={{ padding: '0.65rem 1rem' }} onClick={() => { setDateFrom(''); setDateTo(''); }}>
+              Limpiar fechas
+            </button>
+          )}
         </div>
       </div>
 
@@ -71,10 +97,10 @@ export const Sales: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.length === 0 ? (
+            {pageOrders.length === 0 ? (
               <tr><td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>No hay ventas para este filtro</td></tr>
             ) : (
-              filteredOrders.map(o => (
+              pageOrders.map(o => (
                 <tr key={o.id} className={o.status === 'anulada' ? 'row-cancelled' : ''}>
                   <td style={{ fontFamily: 'monospace' }}>{o.ticketNumber ? padNumber(o.ticketNumber, 8) : '—'}</td>
                   <td>{formatTicketDate(o)}</td>
@@ -95,6 +121,7 @@ export const Sales: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <Paginator page={page} totalPages={totalPages} onPageChange={setPage} />
 
       {selectedOrder && <SaleDetailModal order={selectedOrder} onClose={() => setSelectedId(null)} />}
     </section>

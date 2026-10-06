@@ -26,7 +26,7 @@ describe('orderService', () => {
   it('fetches orders and infers the payment method of legacy rows', async () => {
     const orders = await orderService.getOrders();
     expect(insforge.database.from).toHaveBeenCalledWith('orders');
-    expect(orders.map(o => o.paymentMethod)).toEqual(['mercadopago', 'tarjeta', 'efectivo']);
+    expect(orders.map(o => o.paymentMethod)).toEqual(['transferencia', 'transferencia', 'efectivo']);
     expect(orders[0].total).toBe(1000);
   });
 });

@@ -4,6 +4,9 @@ import { PencilSimple, Trash, Star, Eye, EyeSlash } from '@phosphor-icons/react'
 import { useAdmin } from './AdminContext';
 import { formatMoney } from './posUtils';
 import type { Product } from '../types/product';
+import { Paginator, usePaginator } from './Paginator';
+
+const PAGE_SIZE = 15;
 
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2240%22 height%3D%2240%22 viewBox%3D%220 0 40 40%22%3E%3Crect width%3D%2240%22 height%3D%2240%22 fill%3D%22%23e8e3d9%22%2F%3E%3Ctext x%3D%2250%25%22 y%3D%2255%25%22 text-anchor%3D%22middle%22 fill%3D%22%23a09070%22 font-size%3D%2218%22%3E%3F%3C%2Ftext%3E%3C%2Fsvg%3E';
 
@@ -24,6 +27,8 @@ export const Stock: React.FC = () => {
     if (supplier && p.supplier !== supplier) return false;
     return !query || p.name.toLowerCase().includes(query) || p.code.includes(query);
   });
+
+  const { page, totalPages, setPage, slice: pageProducts } = usePaginator(filteredProducts, PAGE_SIZE);
 
   const handleToggleFeatured = async (product: Product) => {
     if (!product.isFeatured) {
@@ -71,6 +76,7 @@ export const Stock: React.FC = () => {
               <th>Código</th>
               <th>Producto</th>
               <th>Proveedor</th>
+              <th>Categoría</th>
               <th>Precio</th>
               <th>Stock</th>
               <th>Estado</th>
@@ -78,7 +84,7 @@ export const Stock: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map(p => (
+            {pageProducts.map(p => (
               <tr key={p.id}>
                 <td style={{ fontFamily: 'monospace' }}>{p.code}</td>
                 <td>
@@ -87,7 +93,8 @@ export const Stock: React.FC = () => {
                     <strong>{p.name}</strong>
                   </div>
                 </td>
-                <td><span className="badge warning">{p.supplier || p.category}</span></td>
+                <td><span className="badge warning">{p.supplier || '—'}</span></td>
+                <td>{p.category || '—'}</td>
                 <td><strong>{formatMoney(p.price)}</strong></td>
                 <td style={{ color: p.stock <= 5 ? 'var(--danger)' : 'inherit' }}>{p.stock}</td>
                 <td>
@@ -110,6 +117,7 @@ export const Stock: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <Paginator page={page} totalPages={totalPages} onPageChange={setPage} />
 
       {deleteConfirmId && (
         <div className="modal-overlay">

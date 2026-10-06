@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { insforge } from '../lib/insforge';
-import { SquaresFour, Storefront, CashRegister, Package, Receipt, ArrowsLeftRight, CheckCircle, XCircle, WarningCircle } from '@phosphor-icons/react';
+import { SquaresFour, Storefront, CashRegister, Package, Receipt, ArrowsLeftRight, CheckCircle, XCircle, WarningCircle, List } from '@phosphor-icons/react';
 import { AdminProvider, useAdmin } from './AdminContext';
 import { RegisterModule } from './RegisterModule';
 import './admin.css';
@@ -30,6 +30,7 @@ const ToastContainer: React.FC = () => {
 
 const AdminInner: React.FC = () => {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleLogout = async () => {
     await insforge.auth.signOut();
@@ -40,58 +41,74 @@ const AdminInner: React.FC = () => {
   return (
     <div className="admin-pos-theme app-layout">
       <ToastContainer />
-      {/* Sidebar */}
-      <aside className="sidebar">
+
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <aside className={`sidebar${sidebarOpen ? ' sidebar--open' : ' sidebar--collapsed'}`}>
+        <button
+          className="sidebar-toggle-btn"
+          onClick={() => setSidebarOpen(o => !o)}
+          title={sidebarOpen ? 'Colapsar menu' : 'Expandir menu'}
+          aria-label={sidebarOpen ? 'Colapsar menu' : 'Expandir menu'}
+        >
+          {sidebarOpen ? <XCircle size={20} weight="bold" /> : <List size={20} weight="bold" />}
+        </button>
+
         <div className="sidebar-header">
           <img
             src="/logoterruno.png"
-            alt="Logo Terruño"
+            alt="Logo Terruno"
             className="sidebar-logo"
-            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '50%', border: '2px solid var(--primary-color)' }}
+            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.4)' }}
           />
-          <h1 className="sidebar-title">El Terruño<br /><span>ALMACÉN</span></h1>
+          <h1 className="sidebar-title sidebar-title--text">El Terruno<br /><span>ALMACEN</span></h1>
         </div>
 
         <nav className="sidebar-nav">
-          <Link to="/admin" className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`}>
-            <SquaresFour /> Dashboard
+          <Link to="/admin" className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`} title="Dashboard">
+            <SquaresFour size={20} weight={location.pathname === '/admin' ? 'fill' : 'regular'} />
+            <span className="nav-label">Dashboard</span>
           </Link>
-          <Link to="/admin/pos" className={`nav-item ${location.pathname === '/admin/pos' ? 'active' : ''}`}>
-            <CashRegister /> Punto de Venta
+          <Link to="/admin/pos" className={`nav-item ${location.pathname === '/admin/pos' ? 'active' : ''}`} title="Punto de Venta">
+            <CashRegister size={20} weight={location.pathname === '/admin/pos' ? 'fill' : 'regular'} />
+            <span className="nav-label">Punto de Venta</span>
           </Link>
-          <Link to="/admin/stock" className={`nav-item ${location.pathname === '/admin/stock' ? 'active' : ''}`}>
-            <Package /> Inventario y Stock
+          <Link to="/admin/stock" className={`nav-item ${location.pathname === '/admin/stock' ? 'active' : ''}`} title="Inventario y Stock">
+            <Package size={20} weight={location.pathname === '/admin/stock' ? 'fill' : 'regular'} />
+            <span className="nav-label">Inventario y Stock</span>
           </Link>
-          <Link to="/admin/sales" className={`nav-item ${location.pathname === '/admin/sales' ? 'active' : ''}`}>
-            <Receipt /> Ventas
+          <Link to="/admin/sales" className={`nav-item ${location.pathname === '/admin/sales' ? 'active' : ''}`} title="Ventas">
+            <Receipt size={20} weight={location.pathname === '/admin/sales' ? 'fill' : 'regular'} />
+            <span className="nav-label">Ventas</span>
           </Link>
-          <Link to="/admin/settings" className={`nav-item ${location.pathname === '/admin/settings' ? 'active' : ''}`}>
-            <Storefront /> Landing Page
+          <Link to="/admin/settings" className={`nav-item ${location.pathname === '/admin/settings' ? 'active' : ''}`} title="Landing Page">
+            <Storefront size={20} weight={location.pathname === '/admin/settings' ? 'fill' : 'regular'} />
+            <span className="nav-label">Landing Page</span>
           </Link>
         </nav>
       </aside>
 
-      {/* Main Content */}
       <main className="main-content">
         <header className="top-header">
           <div className="top-controls card p-2" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1.5rem', fontWeight: 600, color: 'var(--primary-color)' }}>
-                <Storefront size={20} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0.75rem', fontWeight: 600, color: 'var(--primary-color)', fontSize: '0.95rem' }}>
+                <Storefront size={18} />
                 <span>Caja Central</span>
               </div>
 
-              {/* Indicador de conexión */}
               {!isOnline && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fee2e2', color: '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.875rem', fontWeight: 500 }}>
-                  <WarningCircle size={16} weight="fill" />
-                  Modo Offline - Guardando en cola
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fee2e2', color: '#991b1b', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 500 }}>
+                  <WarningCircle size={15} weight="fill" />
+                  Modo Offline
                 </div>
               )}
               {isOnline && isSyncing && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fef3c7', color: '#92400e', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.875rem', fontWeight: 500 }}>
-                  <ArrowsLeftRight size={16} weight="bold" className="spin-animation" />
-                  Sincronizando a la nube...
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fef3c7', color: '#92400e', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 500 }}>
+                  <ArrowsLeftRight size={15} weight="bold" className="spin-animation" />
+                  Sincronizando...
                 </div>
               )}
             </div>

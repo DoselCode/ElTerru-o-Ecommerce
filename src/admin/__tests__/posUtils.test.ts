@@ -30,8 +30,6 @@ describe('posUtils', () => {
     it('usa el precio redondeado del catálogo cuando existe', () => {
       expect(getUnitPrice(trucha, 'efectivo')).toBe(11400);
       expect(getUnitPrice(trucha, 'transferencia')).toBe(12100);
-      expect(getUnitPrice(trucha, 'tarjeta')).toBe(12700);
-      expect(getUnitPrice(trucha, 'mercadopago')).toBe(12700);
     });
 
     it('aplica el porcentaje cuando el producto no tiene precio por método', () => {
@@ -53,11 +51,10 @@ describe('posUtils', () => {
   it('suma por método ignorando ventas anuladas', () => {
     const totals = sumByMethod([
       order({ total: 1000, paymentMethod: 'efectivo' }),
-      order({ total: 500, paymentMethod: 'tarjeta' }),
-      order({ total: 700, paymentMethod: 'mercadopago' }),
+      order({ total: 500, paymentMethod: 'transferencia' }),
       order({ total: 9999, paymentMethod: 'efectivo', status: 'anulada' }),
     ]);
-    expect(totals).toEqual({ efectivo: 1000, transferencia: 0, tarjeta: 500, mercadopago: 700 });
+    expect(totals).toEqual({ efectivo: 1000, transferencia: 500, credito: 0, debito: 0 });
   });
 
   it('resume la caja solo con las ventas posteriores a la apertura', () => {
@@ -73,7 +70,7 @@ describe('posUtils', () => {
     const orders = [
       order({ total: 5000, createdAt: '2026-09-28T10:00:00.000Z' }),
       order({ total: 100000, createdAt: '2026-09-28T12:00:00+00:00' }),
-      order({ total: 32700, paymentMethod: 'tarjeta', createdAt: '2026-09-28T14:00:00.000Z' }),
+      order({ total: 32700, paymentMethod: 'transferencia', createdAt: '2026-09-28T14:00:00.000Z' }),
       order({ total: 8000, status: 'anulada', createdAt: '2026-09-28T15:00:00.000Z' }),
     ];
 

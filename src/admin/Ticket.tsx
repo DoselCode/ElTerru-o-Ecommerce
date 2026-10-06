@@ -20,7 +20,6 @@ export const Ticket: React.FC<{ order: Order }> = ({ order }) => {
       <div>{TICKET_CONFIG.razonSocial}</div>
       <div>CUIT: {TICKET_CONFIG.cuit}</div>
       <div>{TICKET_CONFIG.direccion}</div>
-      <div>{TICKET_CONFIG.condicionIva}</div>
       <div>{isConsumidorFinal ? 'A Consumidor Final' : `Cliente: ${order.client}`}</div>
       <Divider />
       {order.status === 'anulada' && <div className="tk-center tk-title">*** ANULADO ***</div>}

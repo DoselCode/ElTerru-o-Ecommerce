@@ -1,6 +1,6 @@
 import type { Product } from '../types/product';
 
-export type PaymentMethod = 'efectivo' | 'transferencia' | 'tarjeta' | 'mercadopago';
+export type PaymentMethod = 'efectivo' | 'transferencia' | 'credito' | 'debito';
 
 export interface OrderItem extends Product {
   cartQty?: number;

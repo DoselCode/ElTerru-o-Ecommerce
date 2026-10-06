@@ -1,10 +1,11 @@
 import { insforge } from '../lib/insforge';
 import type { Order, PaymentMethod } from '../admin/types';
 
-// Ventas anteriores a la columna payment_method solo guardan los montos por método
 const inferPaymentMethod = (row: any): PaymentMethod => {
-  if (row.payment_method) return row.payment_method;
-  if (Number(row.paid_tarjeta) > 0) return 'tarjeta';
+  const method = row.payment_method;
+  if (method === 'efectivo' || method === 'transferencia' || method === 'credito' || method === 'debito') return method;
+  if (method === 'tarjeta' || Number(row.paid_tarjeta) > 0) return 'debito';
+  if (method === 'mercadopago') return 'transferencia';
   if (Number(row.paid_transferencia) > 0) return 'transferencia';
   return 'efectivo';
 };

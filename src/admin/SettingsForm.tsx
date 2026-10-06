@@ -138,7 +138,7 @@ export const SettingsForm: React.FC = () => {
 
     return (
       <section className="view-section active" style={{ overflowY: 'auto', paddingBottom: '3rem' }}>
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-serif font-bold text-terruno-brown">Configuración de la Tienda</h1>
           </div>
@@ -172,7 +172,7 @@ export const SettingsForm: React.FC = () => {
             <h2 className="text-lg font-medium text-terruno-brown">Contacto y Ubicación</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <div className="mb-1 flex items-center justify-between gap-3">
                 <label className="block text-sm font-medium text-terruno-muted">Teléfono</label>

@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowsLeftRight, Info, Coins, Money, Archive } from '@phosphor-icons/react';
+import { ArrowsLeftRight, Info, Coins, Money, Archive, X } from '@phosphor-icons/react';
 import { useAdmin } from './AdminContext';
 import type { RegisterMovement } from './types';
 import { TICKET_CONFIG } from './ticketConfig';
 import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatOpening, formatTime, getRegisterSummary, padNumber } from './posUtils';
+import { Paginator, usePaginator } from './Paginator';
 
 type ModalType = 'none' | 'close' | 'open' | 'movement';
 
@@ -13,6 +14,25 @@ const Row: React.FC<{ label: React.ReactNode; value: React.ReactNode; muted?: bo
     <span>{value}</span>
   </div>
 );
+
+/** Lista paginada de movimientos del cierre de caja */
+const MovementsPage: React.FC<{ list: { id: string; createdAt: string; label: string; amount: number }[] }> = ({ list }) => {
+  const { page, totalPages, setPage, slice } = usePaginator(list, 10);
+  return (
+    <>
+      <div className="caja-movements">
+        {slice.map(m => (
+          <Row
+            key={m.id}
+            label={<><span className="caja-time">{formatTime(m.createdAt)}</span>{m.label}</>}
+            value={<span style={{ color: m.amount < 0 ? 'var(--danger)' : undefined }}>{m.amount < 0 ? '-' : ''}{formatMoney(Math.abs(m.amount))}</span>}
+          />
+        ))}
+      </div>
+      <Paginator page={page} totalPages={totalPages} onPageChange={setPage} windowSize={5} />
+    </>
+  );
+};
 
 export const RegisterModule: React.FC = () => {
   const { state, updateRegister, showToast } = useAdmin();
@@ -138,6 +158,9 @@ export const RegisterModule: React.FC = () => {
       {modalType !== 'none' && (
         <div className="modal-overlay">
           <div className={`modal-content card${modalType === 'close' ? ' wide' : ''}`}>
+            <button className="modal-close-btn" onClick={() => setModalType('none')} aria-label="Cerrar">
+              <X weight="bold" />
+            </button>
             {modalType === 'close' && (
               <>
                 <div className="caja-header">
@@ -153,15 +176,7 @@ export const RegisterModule: React.FC = () => {
                     {movementsList.length === 0 ? (
                       <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '1rem 0' }}>No hay movimientos en esta caja.</p>
                     ) : (
-                      <div className="caja-movements">
-                        {movementsList.map(m => (
-                          <Row
-                            key={m.id}
-                            label={<><span className="caja-time">{formatTime(m.createdAt)}</span>{m.label}</>}
-                            value={<span style={{ color: m.amount < 0 ? 'var(--danger)' : undefined }}>{m.amount < 0 ? '-' : ''}{formatMoney(Math.abs(m.amount))}</span>}
-                          />
-                        ))}
-                      </div>
+                      <MovementsPage list={movementsList} />
                     )}
                   </div>
                 ) : (
