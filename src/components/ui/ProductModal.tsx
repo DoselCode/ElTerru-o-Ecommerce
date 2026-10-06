@@ -10,7 +10,7 @@ interface ProductModalProps {
 const buildWhatsAppUrl = (product: Product, storeInfo: StoreInfo) => {
   const phone = storeInfo.whatsappNumber.replace(/\D/g, "");
   const details = [
-    product.winery && `Bodega: ${product.winery}`,
+    product.winery && `${product.category === 'Vinos' ? 'Bodega' : 'Marca'}: ${product.winery}`,
     product.year && `Año: ${product.year}`,
   ].filter(Boolean).join(" - ");
 
@@ -75,7 +75,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, storeInfo, 
                 Sin imagen
               </div>
             )}
-            
+
             {/* Category / Stock Badges */}
             <div className="absolute top-4 left-4 flex flex-col gap-2">
               <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-md text-[10px] font-semibold text-terruno-brown uppercase tracking-[0.15em] shadow-sm w-fit">
@@ -100,7 +100,9 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, storeInfo, 
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-terruno-subtle">
                   {product.winery && (
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-terruno-olive">Bodega:</span>
+                      <span className="font-semibold text-terruno-olive">
+                        {product.category === 'Vinos' ? 'Bodega:' : 'Marca:'}
+                      </span>
                       <span>{product.winery}</span>
                     </div>
                   )}
@@ -126,35 +128,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, storeInfo, 
                   ${product.price.toLocaleString("es-AR")}
                 </span>
                 <span
-                  className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${
-                    product.stock !== 0
+                  className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${product.stock !== 0
                       ? "bg-terruno-olive/10 text-terruno-olive"
                       : "bg-red-500/10 text-red-600"
-                  }`}
+                    }`}
                 >
                   {product.stock !== 0 ? "Disponible" : "Sin stock"}
                 </span>
               </div>
-
-              {storeInfo && (
-                product.stock !== 0 ? (
-                  <a
-                    href={buildWhatsAppUrl(product, storeInfo)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full rounded-xl bg-terruno-olive px-4 py-3.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-terruno-olive/90 transition-colors"
-                  >
-                    Pedir por WhatsApp
-                  </a>
-                ) : (
-                  <button
-                    disabled
-                    className="block w-full rounded-xl bg-terruno-bg px-4 py-3.5 text-center text-sm font-semibold text-terruno-subtle border border-terruno-brown/10 cursor-not-allowed"
-                  >
-                    Producto no disponible
-                  </button>
-                )
-              )}
             </div>
           </div>
         </div>
