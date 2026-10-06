@@ -7,21 +7,6 @@ interface ProductModalProps {
   onClose: () => void;
 }
 
-const buildWhatsAppUrl = (product: Product, storeInfo: StoreInfo) => {
-  const phone = storeInfo.whatsappNumber.replace(/\D/g, "");
-  const details = [
-    product.winery && `${product.category === 'Vinos' ? 'Bodega' : 'Marca'}: ${product.winery}`,
-    product.year && `Año: ${product.year}`,
-  ].filter(Boolean).join(" - ");
-
-  const message =
-    `Hola ${storeInfo.name}! Me interesa pedir: *${product.name}*` +
-    (details ? ` (${details})` : "") +
-    ` - $${product.price.toLocaleString("es-AR")}`;
-
-  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-};
-
 export const ProductModal: React.FC<ProductModalProps> = ({ product, storeInfo, onClose }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
