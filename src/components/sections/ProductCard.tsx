@@ -4,12 +4,22 @@ import { Product, StoreInfo } from '../../types/product';
 interface ProductCardProps {
   product: Product;
   storeInfo: StoreInfo;
+  onSelect?: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo, onSelect }) => {
   return (
     <article
-      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-terruno-brown/5 group"
+      className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-terruno-brown/5 group ${onSelect ? 'cursor-pointer focus-within:ring-2 focus-within:ring-terruno-burgundy outline-none' : ''}`}
+      role={onSelect ? "button" : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      onClick={() => onSelect?.(product)}
+      onKeyDown={(e) => {
+        if (onSelect && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onSelect(product);
+        }
+      }}
     >
       {/* Image with category tag */}
       <div className="relative h-64 overflow-hidden bg-terruno-bg">
