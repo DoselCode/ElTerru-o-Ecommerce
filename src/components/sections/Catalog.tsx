@@ -4,6 +4,7 @@ import { ProductCard } from './ProductCard';
 import { Reveal } from '../ui/Reveal';
 import { Pagination } from '../ui/Pagination';
 import { Search } from 'lucide-react';
+import { ProductModal } from '../ui/ProductModal';
 
 interface CatalogProps {
   products: Product[];
@@ -16,6 +17,7 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const itemsPerPage = 6; // 6 productos por página (2 filas de 3 en pantallas grandes)
 
   // Reset pagination to page 1 if user searches or changes category
@@ -110,7 +112,7 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
                   delay={(i % 3) * 70 + Math.floor(i / 3) * 40}
                   className="h-full"
                 >
-                  <ProductCard product={product} storeInfo={storeInfo} />
+                  <ProductCard product={product} storeInfo={storeInfo} onSelect={setSelectedProduct} />
                 </Reveal>
               ))}
             </div>
@@ -131,6 +133,12 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
           </div>
         )}
       </div>
+
+      <ProductModal
+        product={selectedProduct}
+        storeInfo={storeInfo}
+        onClose={() => setSelectedProduct(null)}
+      />
     </section>
   );
 };
