@@ -20,8 +20,7 @@ jobs:
           # Hacemos una consulta a la raíz de la API REST (limit=1 no duele)
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: $SUPABASE_ANON_KEY" \
-            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            "$SUPABASE_URL/rest/v1/?limit=1")
+            "$SUPABASE_URL/auth/v1/health")
           
           if [ "$HTTP_STATUS" -eq 200 ]; then
             echo "✅ Ping exitoso (Status: $HTTP_STATUS)"
