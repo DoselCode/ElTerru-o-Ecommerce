@@ -13,6 +13,7 @@ interface CartContextProps {
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
 
+/** Carrito del POS; impide agregar más unidades que el stock disponible. */
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { state } = useAdmin();
   const { showToast } = useToast();

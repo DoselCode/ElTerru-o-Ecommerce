@@ -12,6 +12,7 @@ import { TICKET_CONFIG } from '../utils/ticketConfig';
 import type { Order, PaymentMethod } from '../types';
 import { calculateTotals, formatMoney, getNextTicketNumber, padNumber, toLocalDateString } from '../utils/posUtils';
 
+/** Punto de venta: catálogo con filtros, carrito, cobro (PaymentModal) y emisión del ticket. */
 export const POS: React.FC = () => {
   const { state, createOrder } = useAdmin();
   const { cart, addToCart, removeFromCart, clearCart } = useCart();

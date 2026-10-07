@@ -10,6 +10,7 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
+/** Evita que un error de render deje la pantalla en blanco; muestra un mensaje de fallback. */
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = { error: null };
 

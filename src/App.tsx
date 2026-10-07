@@ -28,6 +28,7 @@ const AdminFallback = () => (
   </div>
 );
 
+/** Landing pública: resuelve loading/error y arma las secciones con los datos de la tienda. */
 const Storefront: React.FC = () => {
   const { storeInfo, products, featuredProduct, loading, fetchError, refetch } = useStorefrontData();
 

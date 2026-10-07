@@ -30,8 +30,17 @@ export const EMPTY_STORE_SETTINGS: StoreSettingsData = {
 
 const IMAGE_FIELDS: ImageField[] = ['logo', 'hero_bg_image', 'about_main_image', 'about_sub_image'];
 
+const isHttpsUrl = (value: string) => {
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 const errorMessage = (err: unknown, fallback: string) => (err instanceof Error && err.message ? err.message : fallback);
 
+/** Carga y guarda `store_info` (id 1); comprime y sube las imágenes nuevas antes del upsert. */
 export const useStoreSettings = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -80,7 +89,8 @@ export const useStoreSettings = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const compressed = await imageCompression(file, { maxSizeMB: 0.3, maxWidthOrHeight: 1600, useWebWorker: true });
+      // Sin web worker: el worker carga la librería desde un CDN externo que la CSP bloquea
+      const compressed = await imageCompression(file, { maxSizeMB: 0.3, maxWidthOrHeight: 1600, useWebWorker: false });
       setFiles(prev => ({ ...prev, [fieldName]: compressed }));
       setPreviews(prev => ({ ...prev, [fieldName]: URL.createObjectURL(compressed) }));
     } catch (error) {
@@ -92,9 +102,14 @@ export const useStoreSettings = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
     setErrorMsg('');
     setSuccessMsg('');
+    const instagramUrl = formData.instagram_url.trim();
+    if (instagramUrl && !isHttpsUrl(instagramUrl)) {
+      setErrorMsg('El perfil de Instagram debe ser una URL que empiece con https://');
+      return;
+    }
+    setSaving(true);
 
     try {
       const updated: StoreSettingsData = { ...formData };

@@ -8,6 +8,7 @@ import { PAYMENT_LABELS, PAYMENT_METHODS } from '../utils/posUtils';
 import { ModalCloseButton } from './ModalCloseButton';
 import { useModalDismiss } from '../hooks/useModalDismiss';
 
+/** Detalle de una venta: ticket, cambio de método de pago y anulación (repone stock). */
 export const SaleDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ order, onClose }) => {
   const { updateOrder, cancelOrder } = useAdmin();
   const { showToast } = useToast();

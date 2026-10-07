@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { insforge } from '../lib/insforge';
 import { LockSimple, Envelope, CircleNotch, WarningCircle } from '@phosphor-icons/react';
 
@@ -42,6 +42,14 @@ export const Login: React.FC = () => {
   const [cooldownUntil, setCooldownUntil] = useState(() => readThrottle().cooldownUntil);
   const [remaining, setRemaining] = useState(() => secondsLeft(readThrottle().cooldownUntil));
   const navigate = useNavigate();
+  const location = useLocation();
+  const notAdmin = Boolean((location.state as { notAdmin?: boolean } | null)?.notAdmin);
+
+  useEffect(() => {
+    if (!notAdmin) return;
+    insforge.auth.signOut();
+    setError('Tu cuenta no tiene permisos de administrador.');
+  }, [notAdmin]);
 
   useEffect(() => {
     if (cooldownUntil <= Date.now()) return;

@@ -105,6 +105,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ name, label, preview, onChang
   </div>
 );
 
+/** Configuración de la tienda y la landing pública (tabla `store_info`); la lógica vive en useStoreSettings. */
 export const SettingsForm: React.FC = () => {
   const { formData, previews, loading, saving, errorMsg, successMsg, setField, handleChange, handleImageChange, handleSave } = useStoreSettings();
   const text = { onChange: handleChange };

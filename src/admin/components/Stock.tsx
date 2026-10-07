@@ -59,6 +59,7 @@ interface PendingVisibility {
   next: boolean;
 }
 
+/** Inventario: grilla ordenable con filtros; permite ocultar/mostrar, marcar best seller, editar y eliminar productos. */
 export const Stock: React.FC = () => {
   const navigate = useNavigate();
   const { state, updateProduct, updateProductLocal, deleteProduct } = useAdmin();

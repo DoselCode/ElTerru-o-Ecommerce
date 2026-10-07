@@ -131,22 +131,36 @@ const AdminInner: React.FC = () => {
   );
 };
 
+type AccessState = 'loading' | 'admin' | 'not-admin' | 'anonymous';
+
+// La protección real es RLS (is_admin()); esto solo evita mostrar el panel a quien no es admin.
+const isAdminUser = async (user: User) => {
+  const { data, error } = await insforge.database.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+  return !error && Boolean(data);
+};
+
+/** Guard de las rutas /admin: exige sesión de un usuario listado en `admins` y monta los providers. */
 export const AdminLayout: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loadingAuth, setLoadingAuth] = useState(true);
+  const [access, setAccess] = useState<AccessState>('loading');
 
   useEffect(() => {
-    const loadUser = async () => {
+    let cancelled = false;
+    const checkAccess = async () => {
       const { data: { user } } = await insforge.auth.getCurrentUser();
-      setUser(user);
+      const next: AccessState = !user ? 'anonymous' : (await isAdminUser(user)) ? 'admin' : 'not-admin';
+      if (!cancelled) setAccess(next);
     };
-    loadUser().then(() => setLoadingAuth(false));
-    const unsubscribe = insforge.auth.onAuthStateChange(loadUser);
-    return unsubscribe;
+    checkAccess();
+    const unsubscribe = insforge.auth.onAuthStateChange(checkAccess);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, []);
 
-  if (loadingAuth) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Cargando...</div>;
-  if (!user) return <Navigate to="/admin/login" replace />;
+  if (access === 'loading') return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Cargando...</div>;
+  if (access === 'anonymous') return <Navigate to="/admin/login" replace />;
+  if (access === 'not-admin') return <Navigate to="/admin/login" replace state={{ notAdmin: true }} />;
 
   return (
     <ErrorBoundary variant="admin">

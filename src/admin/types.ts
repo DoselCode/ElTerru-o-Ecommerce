@@ -6,6 +6,7 @@ export interface OrderItem extends Product {
   cartQty?: number;
 }
 
+/** Venta. Si está 'anulada' repone el stock y queda fuera de los totales de caja. */
 export interface Order {
   id: string;
   client: string;
@@ -30,6 +31,7 @@ export interface RegisterMovement {
   createdAt: string;
 }
 
+/** Caja global; `saldoProxima` es el efectivo que queda como inicial de la próxima apertura. */
 export interface RegisterState {
   status: 'abierta' | 'cerrada';
   efectivoInicial: number;

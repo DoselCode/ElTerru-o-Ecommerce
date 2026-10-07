@@ -10,6 +10,7 @@ export interface ProviderRow {
 
 export type Category = 'Todos' | 'Vinos' | 'Almacén' | 'Fiambres' | 'Regalos';
 
+/** Fila cruda de `products` tal como viene de la BD (snake_case); `Product` es el modelo de la app. */
 export interface ProductRow {
   id: number | string;
   code?: string | null;

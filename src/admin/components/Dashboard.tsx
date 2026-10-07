@@ -10,6 +10,7 @@ const getPeriodStart = (period: Period, now: Date) => {
   return toLocalDateString(new Date(now.getFullYear(), now.getMonth(), 1));
 };
 
+/** Resumen de lo cobrado por método de pago en el día, semana o mes en curso. */
 export const Dashboard: React.FC = () => {
   const { state } = useAdmin();
   const [period, setPeriod] = useState<Period>('daily');

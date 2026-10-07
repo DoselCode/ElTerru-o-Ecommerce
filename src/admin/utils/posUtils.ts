@@ -10,6 +10,7 @@ export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
 
 export const PAYMENT_METHODS = Object.keys(PAYMENT_LABELS) as PaymentMethod[];
 
+/** Descuento por método de pago: 10% efectivo, 5% transferencia. */
 const DISCOUNT_RATES: Record<PaymentMethod, number> = {
   efectivo: 0.10,
   transferencia: 0.05,
@@ -76,7 +77,8 @@ export const sumByMethod = (orders: Order[]): Record<PaymentMethod, number> => {
   return totals;
 };
 
-export const getRegisterSummary = (reg: RegisterState, orders: Order[]) => {
+/** Totales del turno de caja: solo cuenta ventas no anuladas posteriores a la apertura. */
+export const getRegisterSummary =(reg: RegisterState, orders: Order[]) => {
   const openedAt = reg.openedAt ? new Date(reg.openedAt).getTime() : Infinity;
   const sessionOrders = orders.filter(o => o.status !== 'anulada' && o.createdAt && new Date(o.createdAt).getTime() >= openedAt);
   const ventas = sumByMethod(sessionOrders);

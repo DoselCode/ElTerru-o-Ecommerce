@@ -1,7 +1,4 @@
-/**
- * Datos fiscales que se imprimen en el encabezado del ticket.
- * TODO: completar con los datos reales del comercio antes de usar en producción.
- */
+/** Datos fiscales del encabezado del ticket (ticket no válido como factura) y alícuota de IVA para el desglose. */
 export const TICKET_CONFIG = {
   nombreFantasia: 'El Terruño',
   razonSocial: '"EL TERRUÑO" de BONI GABRIELA TAMARA',

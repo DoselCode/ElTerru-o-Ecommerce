@@ -8,6 +8,7 @@ import { Paginator, usePaginator } from '../Paginator';
 
 const PAGE_SIZE = 20;
 
+/** Historial de ventas con filtros (texto, método de pago, fechas) y acceso al detalle del ticket. */
 export const Sales: React.FC = () => {
   const { state } = useAdmin();
   const [search, setSearch] = useState('');

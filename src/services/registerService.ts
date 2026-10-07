@@ -1,6 +1,7 @@
 import { insforge } from '../lib/insforge';
 import { RegisterState, EMPTY_REGISTER } from '../admin/types';
 
+/** Caja única compartida: una sola fila de `registers` con id 'global'. */
 export const registerService = {
   getGlobalRegister: async (): Promise<RegisterState> => {
     const { data, error } = await insforge.database

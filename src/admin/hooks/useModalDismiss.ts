@@ -5,7 +5,8 @@ interface UseModalDismissOptions {
   closeOnBackdrop?: boolean;
 }
 
-export const useModalDismiss = ({ onClose, closeOnBackdrop = false }: UseModalDismissOptions) => {
+/** Cierra el modal con Escape y, opcionalmente, al hacer clic en el fondo. */
+export const useModalDismiss =({ onClose, closeOnBackdrop = false }: UseModalDismissOptions) => {
   // Manejador para la tecla Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

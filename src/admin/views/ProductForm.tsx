@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, FloppyDisk, CircleNotch } from '@phosphor-icons/react';
 import { productService } from '../../services/productService';
 import { storageService } from '../../services/storageService';
+import { useAdmin } from '../context/AdminContext';
 import { FormField, SelectField } from '../productForm/FormField';
 import { ProductDetailsSection } from '../productForm/ProductDetailsSection';
 import { useProductImage } from '../productForm/useProductImage';
@@ -17,9 +18,11 @@ const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   <h2 className="text-lg font-medium text-terruno-brown border-b border-terruno-border pb-2">{children}</h2>
 );
 
+/** Alta y edición de productos (modo edición si la ruta trae :id); sube la imagen a storage al guardar. */
 export const ProductForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { refreshProducts } = useAdmin();
   const isEditing = Boolean(id);
 
   const [saving, setSaving] = useState(false);
@@ -57,11 +60,40 @@ export const ProductForm: React.FC = () => {
       .finally(() => setFetching(false));
   }, [id, isEditing]);
 
+  useEffect(() => {
+    if (categories.length > 0 && !form.category_id && form.category) {
+      const match = categories.find(c => c.name.toLowerCase() === form.category.toLowerCase());
+      if (match) {
+        setForm(prev => ({ ...prev, category_id: match.id }));
+      }
+    }
+  }, [categories, form.category, form.category_id]);
+
+  useEffect(() => {
+    if (providers.length > 0 && !form.provider_id && form.supplier) {
+      const match = providers.find(p => p.name.toLowerCase() === form.supplier.toLowerCase());
+      if (match) {
+        setForm(prev => ({ ...prev, provider_id: match.id }));
+      }
+    }
+  }, [providers, form.supplier, form.provider_id]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const nextValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
 
-    setForm(prev => withAutoDiscountBadge(prev, { ...prev, [name]: nextValue }, name));
+    setForm(prev => {
+      const next = { ...prev, [name]: nextValue };
+      if (name === 'category_id') {
+        const found = categories.find(c => c.id === nextValue);
+        if (found) next.category = found.name;
+      }
+      if (name === 'provider_id') {
+        const found = providers.find(p => p.id === nextValue);
+        next.supplier = found ? found.name : '';
+      }
+      return withAutoDiscountBadge(prev, next, name);
+    });
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
@@ -87,10 +119,20 @@ export const ProductForm: React.FC = () => {
     setErrorMsg('');
     try {
       const image = imageFile ? await storageService.uploadProductImage(imageFile) : form.image;
-      const payload = productFormToPayload(form, image);
+      const catName = categories.find(c => c.id === form.category_id)?.name || form.category || 'Vinos';
+      const provName = providers.find(p => p.id === form.provider_id)?.name || form.supplier;
+      const formToSubmit = {
+        ...form,
+        category: catName,
+        supplier: provName || '',
+      };
+      const payload = productFormToPayload(formToSubmit, image);
 
       if (isEditing) await productService.updateProduct(id as string, payload);
       else await productService.createProduct(payload);
+
+      // El listado de stock lee del estado del admin, que no se entera de este guardado directo a la BD
+      await refreshProducts().catch((err: unknown) => console.error('Error refreshing products:', err));
 
       setSavedProductName(form.name.trim());
       setShowSuccessModal(true);
@@ -110,7 +152,6 @@ export const ProductForm: React.FC = () => {
     );
   }
 
-  const categoryOptions = CATEGORIES.includes(form.category) ? CATEGORIES : [form.category, ...CATEGORIES];
   const fieldProps = (name: keyof ProductFormValues & string) => ({
     name, value: form[name] as string, error: errors[name], onChange: handleChange,
   });

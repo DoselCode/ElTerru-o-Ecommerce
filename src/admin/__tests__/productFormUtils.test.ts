@@ -25,6 +25,15 @@ describe('productFormUtils', () => {
 
   it('builds a payload with nulls for empty optional fields', () => {
     const payload = productFormToPayload({ ...valid, price_efectivo: '11000' }, 'img.jpg');
-    expect(payload).toMatchObject({ code: null, supplier: null, price: 12000, price_efectivo: 11000, price_transferencia: null, image: 'img.jpg' });
+    expect(payload).toMatchObject({
+      code: null,
+      supplier: null,
+      category: 'Vinos',
+      category_id: '1',
+      price: 12000,
+      price_efectivo: 11000,
+      price_transferencia: null,
+      image: 'img.jpg',
+    });
   });
 });

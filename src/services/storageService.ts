@@ -1,5 +1,6 @@
 import { insforge } from '../lib/insforge';
 
+/** Subida de imágenes al bucket `product-images`; requiere sesión de admin. */
 export const storageService = {
   uploadProductImage: async (file: File | Blob): Promise<string> => {
     const { data: { user } } = await insforge.auth.getCurrentUser();

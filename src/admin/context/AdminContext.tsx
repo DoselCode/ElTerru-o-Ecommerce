@@ -51,6 +51,7 @@ interface AdminContextProps {
   updateProduct: (id: string | number, updates: Partial<Product>) => Promise<void>;
   updateProductLocal: (id: string | number, updates: Partial<Product>) => void;
   deleteProduct: (id: string | number) => Promise<void>;
+  refreshProducts: () => Promise<void>;
   createOrder: (order: Order) => void;
   updateOrder: (id: string, updates: Partial<Pick<Order, 'paymentMethod' | 'observacion'>>) => void;
   cancelOrder: (id: string, observacion: string) => void;
@@ -60,6 +61,7 @@ interface AdminContextProps {
 
 const AdminContext = createContext<AdminContextProps | undefined>(undefined);
 
+/** Estado global del admin (productos, ventas, caja). Offline-first: las escrituras que fallan se encolan en localStorage y se reenvían al reconectar. */
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
@@ -173,6 +175,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (updates.name !== undefined) dbUpdates.name = updates.name;
     if (updates.price !== undefined) dbUpdates.price = updates.price;
     if (updates.category !== undefined) dbUpdates.category = updates.category;
+    if (updates.category_id !== undefined) dbUpdates.category_id = updates.category_id;
+    if (updates.provider_id !== undefined) dbUpdates.provider_id = updates.provider_id;
     if (updates.isVisible !== undefined) dbUpdates.is_visible = updates.isVisible;
     if (updates.image !== undefined) dbUpdates.image = updates.image;
     if (updates.isFeatured !== undefined) dbUpdates.is_featured = updates.isFeatured;
@@ -188,6 +192,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const deleteProduct = async (id: string | number) => {
     await productService.deleteProduct(id);
     setState(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id.toString()) }));
+  };
+
+  const refreshProducts = async () => {
+    const products = await productService.getProducts();
+    setState(prev => ({ ...prev, products }));
   };
 
   const createOrder = (order: Order) => {
@@ -221,7 +230,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <AdminContext.Provider value={{
-      state, isOnline, isSyncing, updateProduct, updateProductLocal, deleteProduct,
+      state, isOnline, isSyncing, updateProduct, updateProductLocal, deleteProduct, refreshProducts,
       createOrder, updateOrder, cancelOrder, updateRegister,
       loading
     }}>

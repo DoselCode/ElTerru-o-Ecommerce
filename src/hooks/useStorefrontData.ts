@@ -46,6 +46,7 @@ export interface StorefrontData {
   refetch: () => Promise<void>;
 }
 
+/** Datos de la landing pública: info de la tienda y productos visibles, cargados en paralelo. */
 export const useStorefrontData = (): StorefrontData => {
   const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
   const [products, setProducts] = useState<Product[]>([]);

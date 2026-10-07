@@ -4,6 +4,7 @@ import type { StoreInfo } from '../types/product';
 
 const SITE_URL = 'https://www.xn--elterruo-j3a.online/';
 
+/** Meta tags SEO, Open Graph y Twitter de la landing, armados con los datos de store_info. */
 export const StorefrontSeo: React.FC<{ storeInfo: StoreInfo }> = ({ storeInfo }) => {
   const title = `${storeInfo.name}${storeInfo.tagline ? ` | ${storeInfo.tagline}` : ''}`;
   const description = storeInfo.heroSubtitle || storeInfo.aboutParagraph1 || 'Tienda de vinos boutique';

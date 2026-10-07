@@ -88,7 +88,7 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
                 <span>{storeInfo.email}</span>
               </li>
             )}
-            {storeInfo.showInstagram !== false && storeInfo.instagramUrl && (
+            {storeInfo.showInstagram !== false && storeInfo.instagramUrl?.startsWith('https://') && (
               <li className="flex items-center gap-2.5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

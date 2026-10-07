@@ -7,6 +7,7 @@ if (!insforgeUrl || !insforgeAnonKey) {
   throw new Error('Faltan las variables de entorno de InsForge (VITE_INSFORGE_URL y VITE_INSFORGE_ANON_KEY).');
 }
 
+/** Cliente único de InsForge (BD, auth y storage); toma URL y anon key del .env. */
 export const insforge = createClient({
   baseUrl: insforgeUrl,
   anonKey: insforgeAnonKey,

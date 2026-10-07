@@ -11,7 +11,8 @@ interface PaymentModalProps {
   onConfirm: (method: PaymentMethod, client: string) => void;
 }
 
-export const PaymentModal: React.FC<PaymentModalProps> = ({ items, onCancel, onConfirm }) => {
+/** Modal de cobro: elige el método de pago y muestra el total con su descuento. */
+export const PaymentModal: React.FC<PaymentModalProps> =({ items, onCancel, onConfirm }) => {
   const [method, setMethod] = useState<PaymentMethod>('efectivo');
   const [client, setClient] = useState('');
 

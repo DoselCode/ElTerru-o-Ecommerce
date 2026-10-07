@@ -13,7 +13,8 @@ export const useProductImage = (onError: (message: string) => void, onValid: () 
     let processed: File | Blob = file;
     if (COMPRESSIBLE_TYPES.includes(file.type)) {
       try {
-        processed = await imageCompression(file, { maxSizeMB: 0.2, maxWidthOrHeight: 1200, useWebWorker: true });
+        // Sin web worker: el worker carga la librería desde un CDN externo que la CSP bloquea
+        processed = await imageCompression(file, { maxSizeMB: 0.2, maxWidthOrHeight: 1200, useWebWorker: false });
       } catch (err) {
         console.warn('Compresión omitida, se usa la imagen original:', err);
       }

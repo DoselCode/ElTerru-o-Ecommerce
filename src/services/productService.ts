@@ -3,6 +3,7 @@ import { Product, ProductRow } from '../types/product';
 
 const toNumberOrUndefined = (value: unknown) => (value ? Number(value) : undefined);
 
+/** Convierte la fila de la BD (snake_case) al modelo de la app (camelCase). */
 export const mapProduct = (row: ProductRow): Product => ({
   id: row.id.toString(),
   code: row.code || String(row.id).padStart(4, '0'),
@@ -29,6 +30,7 @@ export const mapProduct = (row: ProductRow): Product => ({
   isVisible: row.is_visible,
 });
 
+/** Acceso a productos, categorías y proveedores en InsForge. */
 export const productService = {
   getCategories: async () => {
     const { data, error } = await insforge.database.from('categories').select('*').order('name');

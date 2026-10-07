@@ -73,10 +73,12 @@ export const productFormFromRow = (row: ProductRow): ProductFormValues => ({
 const trimmedOrNull = (value: string) => (value.trim() ? value.trim() : null);
 const numberOrNull = (value: string) => (value ? Number(value) : null);
 
-export const productFormToPayload = (form: ProductFormValues, image: string) => ({
+/** Convierte el formulario (todo strings) al payload de la BD: vacíos a null y números parseados. */
+export const productFormToPayload =(form: ProductFormValues, image: string) => ({
   code: trimmedOrNull(form.code),
   name: form.name.trim(),
   year: trimmedOrNull(form.year),
+  category: form.category || 'Vinos',
   category_id: form.category_id || null,
   provider_id: form.provider_id || null,
   supplier: trimmedOrNull(form.supplier),
@@ -112,7 +114,8 @@ export const withAutoDiscountBadge = (prev: ProductFormValues, next: ProductForm
 
 const isPositiveNumber = (value: string) => value.trim() !== '' && Number(value) > 0;
 
-export const validateProductForm = (form: ProductFormValues, hasImage: boolean, isEditing: boolean): FormErrors => {
+/** Devuelve un mapa campo → mensaje; queda vacío si el formulario es válido. */
+export const validateProductForm =(form: ProductFormValues, hasImage: boolean, isEditing: boolean): FormErrors => {
   const errors: FormErrors = {};
   const name = form.name.trim();
   const description = form.description.trim();

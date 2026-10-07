@@ -45,6 +45,7 @@ const mapOrder = (row: OrderRow): Order => ({
   items: row.items || []
 });
 
+/** Ventas en la tabla `orders` de InsForge. */
 export const orderService = {
   getOrders: async (): Promise<Order[]> => {
     const { data, error } = await insforge.database

@@ -37,6 +37,7 @@ const MovementsPage: React.FC<{ list: { id: string; createdAt: string; label: st
   );
 };
 
+/** Control de caja en el header: apertura, ingresos/egresos manuales y cierre con arqueo. */
 export const RegisterModule: React.FC = () => {
   const { state, updateRegister } = useAdmin();
   const { showToast } = useToast();
