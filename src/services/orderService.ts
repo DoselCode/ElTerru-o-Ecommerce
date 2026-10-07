@@ -1,7 +1,26 @@
 import { insforge } from '../lib/insforge';
-import type { Order, PaymentMethod } from '../admin/types';
+import type { Order, OrderItem, PaymentMethod } from '../admin/types';
 
-const inferPaymentMethod = (row: any): PaymentMethod => {
+// Ventas anteriores a la columna payment_method solo guardan los montos por método
+interface OrderRow {
+  id: string;
+  client: string;
+  total: number | string;
+  neto?: number | string | null;
+  iva?: number | string | null;
+  descuento?: number | string | null;
+  payment_method?: PaymentMethod | null;
+  paid_tarjeta?: number | string | null;
+  paid_transferencia?: number | string | null;
+  date: string;
+  created_at?: string | null;
+  ticket_number?: number | string | null;
+  status: Order['status'];
+  observacion?: string | null;
+  items?: OrderItem[] | null;
+}
+
+const inferPaymentMethod = (row: OrderRow | any): PaymentMethod => {
   const method = row.payment_method;
   if (method === 'efectivo' || method === 'transferencia' || method === 'credito' || method === 'debito') return method;
   if (method === 'tarjeta' || Number(row.paid_tarjeta) > 0) return 'debito';
@@ -10,7 +29,7 @@ const inferPaymentMethod = (row: any): PaymentMethod => {
   return 'efectivo';
 };
 
-const mapOrder = (row: any): Order => ({
+const mapOrder = (row: OrderRow): Order => ({
   id: row.id,
   client: row.client,
   total: Number(row.total),

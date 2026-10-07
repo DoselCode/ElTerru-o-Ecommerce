@@ -1,6 +1,6 @@
 import React from 'react';
 import { StoreInfo } from '../../types/product';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Envelope } from '@phosphor-icons/react';
 import { Reveal } from '../ui/Reveal';
 
 interface FooterProps {
@@ -84,7 +84,7 @@ export const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
             )}
             {storeInfo.showEmail !== false && storeInfo.email && (
               <li className="flex items-center gap-2.5">
-                <Mail size={16} className="text-terruno-cream shrink-0" />
+                <Envelope size={16} className="text-terruno-cream shrink-0" />
                 <span>{storeInfo.email}</span>
               </li>
             )}

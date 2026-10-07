@@ -450,7 +450,7 @@
     to { transform: rotate(360deg); } 
 }
 
-/* Ticket de venta (pantalla + impresora térmica) */
+/* Ticket de venta (pantalla + impresora termica) */
 .ticket-paper {
   background: white; color: #111;
   font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.35;
@@ -473,7 +473,7 @@
 @media print {
   @page {
     margin: 0;
-    size: 80mm auto; /* Formato de impresora térmica típica */
+    size: 80mm auto; /* Formato de impresora termica tipica */
   }
 
   body {
@@ -575,4 +575,87 @@
   color: var(--text-muted);
   font-size: 0.875rem;
   user-select: none;
+}
+
+/* Modal Close UX Action */
+.modal-content {
+    position: relative; /* Asegura el anclaje del boton absoluto */
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--danger);
+}
+
+.modal-close:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.sale-modal-header .modal-close {
+    position: static;
+    margin-left: auto;
+}
+
+/* Estilos de scrollbar para modal redondeado */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 12px; /* Margen para no pisar el border-radius del modal */
+}
+.modal-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.caja-header .modal-close {
+    position: static;
+    margin-left: 0;
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #fdf6e3;
+  color: #92400e;
+  letter-spacing: 0.5px;
+}
+
+.toast-action {
+  margin-left: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }

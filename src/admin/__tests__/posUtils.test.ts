@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EMPTY_REGISTER, Order, OrderItem, RegisterState } from '../types';
-import { calculateTotals, formatMoney, getNextTicketNumber, getRegisterSummary, getUnitPrice, padNumber, sumByMethod } from '../posUtils';
+import { calculateTotals, formatMoney, getNextTicketNumber, getRegisterSummary, getUnitPrice, padNumber, sumByMethod } from '../utils/posUtils';
 
 const order = (overrides: Partial<Order>): Order => ({
   id: crypto.randomUUID(), client: 'Consumidor Final', total: 0, neto: 0, iva: 0, descuento: 0,

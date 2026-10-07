@@ -5,10 +5,34 @@
 // Tipos para las APIs globales de Google cargadas dinámicamente
 declare global {
   interface Window {
+    // Google SDKs are loaded from a CDN script without bundled typings
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     gapi: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     google: any;
   }
 }
+
+interface GoogleTokenResponse {
+  error?: string;
+  error_description?: string;
+  access_token: string;
+  expires_in?: number | string;
+}
+
+interface PickerDoc {
+  id: string;
+  name?: string;
+  mimeType?: string;
+  thumbnails?: { url?: string }[];
+}
+
+interface PickerData {
+  action: string;
+  docs: PickerDoc[];
+}
+
+const errorText = (err: unknown) => (err instanceof Error ? err.message : String(err));
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || '';
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
@@ -111,7 +135,7 @@ export const getOAuthToken = (): Promise<string> => {
       const tokenClient = window.google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: SCOPES,
-        callback: (tokenResponse: any) => {
+        callback: (tokenResponse: GoogleTokenResponse) => {
           if (tokenResponse.error) {
             reject(new Error(`Error de autenticación con Google: ${tokenResponse.error_description || tokenResponse.error}`));
             return;
@@ -124,8 +148,8 @@ export const getOAuthToken = (): Promise<string> => {
       });
 
       tokenClient.requestAccessToken({ prompt: accessToken ? '' : 'consent' });
-    } catch (err: any) {
-      reject(new Error(`Error al inicializar cliente de autenticación: ${err?.message || err}`));
+    } catch (err: unknown) {
+      reject(new Error(`Error al inicializar cliente de autenticación: ${errorText(err)}`));
     }
   });
 };
@@ -183,7 +207,7 @@ export const openGoogleDrivePicker = async (): Promise<PickedGoogleDriveFile | n
         pickerBuilder.setAppId(GOOGLE_APP_ID);
       }
 
-      pickerBuilder.setCallback(async (data: any) => {
+      pickerBuilder.setCallback(async (data: PickerData) => {
         if (data.action === window.google.picker.Action.PICKED) {
           const doc = data.docs[0];
           const fileId = doc.id;
@@ -276,7 +300,7 @@ export const openGoogleDrivePicker = async (): Promise<PickedGoogleDriveFile | n
               id: fileId,
               previewUrl,
             });
-          } catch (processErr: any) {
+          } catch (processErr: unknown) {
             console.error('Error procesando archivo de Google Drive:', processErr);
             reject(processErr);
           }
@@ -287,8 +311,8 @@ export const openGoogleDrivePicker = async (): Promise<PickedGoogleDriveFile | n
 
       const picker = pickerBuilder.build();
       picker.setVisible(true);
-    } catch (err: any) {
-      reject(new Error(`Error al abrir Google Picker: ${err?.message || err}`));
+    } catch (err: unknown) {
+      reject(new Error(`Error al abrir Google Picker: ${errorText(err)}`));
     }
   });
 };

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { EMPTY_PRODUCT_FORM, productFormToPayload, validateProductForm, withAutoDiscountBadge } from '../productForm/productFormUtils';
 
-const valid = { ...EMPTY_PRODUCT_FORM, name: 'Malbec', price: '12000', description: 'Vino tinto', stock: '5' };
+const valid = { ...EMPTY_PRODUCT_FORM, name: 'Malbec', category_id: '1', price: '12000', description: 'Vino tinto', stock: '5' };
 
 describe('productFormUtils', () => {
   it('accepts a complete form', () => {

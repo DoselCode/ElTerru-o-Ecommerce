@@ -1,6 +1,6 @@
 import React from 'react';
 import { StoreInfo } from '../../types/product';
-import { MapPin } from 'lucide-react';
+import { MapPin } from '@phosphor-icons/react';
 import { Reveal } from '../ui/Reveal';
 
 interface HeroProps {

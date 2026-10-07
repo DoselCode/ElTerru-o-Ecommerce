@@ -1,6 +1,6 @@
 import React from 'react';
 import { Product, StoreInfo } from '../../types/product';
-import { ArrowRight, Star } from 'lucide-react';
+import { Star } from '@phosphor-icons/react';
 import { Reveal } from '../ui/Reveal';
 
 interface FeaturedProductProps {
@@ -54,7 +54,7 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
                 </div>
               ) : (
                 <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 z-20 bg-terruno-burgundy text-white w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full flex flex-col items-center justify-center p-1 sm:p-1.5 shadow-xl border-2 border-terruno-bg">
-                <Star size={12} className="fill-white text-white mb-0.5 sm:w-3.5 sm:h-3.5" />
+                <Star weight="fill" size={12} className="fill-white text-white mb-0.5 sm:w-3.5 sm:h-3.5" />
                 <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold tracking-wider uppercase text-center leading-tight">
                   {badgeText.includes(' ') ? (
                     badgeText.split(' ').map((word, i) => (
