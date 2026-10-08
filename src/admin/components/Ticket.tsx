@@ -68,13 +68,9 @@ export const Ticket: React.FC<{ order: Order }> = ({ order }) => {
         <span>Neto Gravado</span>
         <span>{formatMoney(order.neto || 0)}</span>
       </div>
+      <div>Régimen de Transparencia Fiscal Ley 27.743</div>
       <div className="tk-row">
-        <span>IVA {Math.round(TICKET_CONFIG.ivaRate * 100)}%</span>
-        <span>{formatMoney(order.iva || 0)}</span>
-      </div>
-      <div>Régimen de Transparencia Fiscal Ley 27743</div>
-      <div className="tk-row">
-        <span>IVA Contenido</span>
+        <span>IVA Contenido ({Math.round(TICKET_CONFIG.ivaRate * 100)}%)</span>
         <span>{formatMoney(order.iva || 0)}</span>
       </div>
       <Divider />

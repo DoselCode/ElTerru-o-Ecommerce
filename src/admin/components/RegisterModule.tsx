@@ -165,9 +165,6 @@ export const RegisterModule: React.FC = () => {
       {modalType !== 'none' && (
         <div className="modal-overlay" onClick={handleBackdropClick}>
           <div className={`modal-content card${modalType === 'close' ? ' wide' : ''}`}>
-            <button className="modal-close-btn" onClick={() => setModalType('none')} aria-label="Cerrar">
-              <X weight="bold" />
-            </button>
             {modalType === 'close' && (
               <>
                 <div className="caja-header">

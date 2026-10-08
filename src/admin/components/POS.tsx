@@ -169,8 +169,27 @@ export const POS: React.FC = () => {
 
         <div className="pos-right">
           <div className="pos-ticket">
-            <div className="pos-ticket-header">
+            <div className="pos-ticket-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 className="pos-ticket-title"><ShoppingCart weight="fill" /> Ticket Actual</h3>
+              {cart.length > 0 && (
+                <button
+                  type="button"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--danger)',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '4px',
+                  }}
+                  onClick={clearCart}
+                  title="Vaciar carrito completo"
+                >
+                  Vaciar carrito
+                </button>
+              )}
             </div>
             <div className="pos-ticket-items">
               {cart.length === 0 ? (
