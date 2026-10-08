@@ -27,7 +27,7 @@ export const ProductDetailsSection: React.FC<ProductDetailsSectionProps> = ({ fo
     <FormField label="Maridaje sugerido (opcional)" placeholder="ej: Carnes rojas, quesos duros y pastas con salsas intensas" maxLength={250} {...fieldProps('pairing')} />
 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <FormField label="Stock *" type="number" max={999999} placeholder="0" {...fieldProps('stock')} />
+      <FormField label="Stock *" type="number" integer min={0} max={999999} placeholder="0" {...fieldProps('stock')} />
       <FormField label="Etiqueta Especial (opc.)" placeholder="ej: Novedad, Destacado" maxLength={30} {...fieldProps('badge')} />
       <FormField label="Desc. Etiqueta (autocompleta %)" placeholder="ej: -20%" maxLength={20} {...fieldProps('discount_badge')} />
     </div>

@@ -147,9 +147,17 @@ export const validateProductForm =(form: ProductFormValues, hasImage: boolean, i
   if (!form.stock.trim()) {
     errors.stock = 'El stock es obligatorio (usá 0 si no hay stock).';
   } else {
-    const stock = Number(form.stock);
-    if (!Number.isInteger(stock) || stock < 0) errors.stock = 'El stock debe ser un número entero mayor o igual a 0.';
-    else if (stock > 999999) errors.stock = 'El stock no puede superar las 999.999 unidades.';
+    const stockStr = form.stock.trim();
+    if (stockStr.includes('.') || stockStr.includes(',')) {
+      errors.stock = 'El stock debe ser un número entero (sin decimales).';
+    } else {
+      const stock = Number(stockStr);
+      if (!Number.isFinite(stock) || !Number.isInteger(stock) || stock < 0) {
+        errors.stock = 'El stock debe ser un número entero mayor o igual a 0.';
+      } else if (stock > 999999) {
+        errors.stock = 'El stock no puede superar las 999.999 unidades.';
+      }
+    }
   }
 
   if (form.year.trim()) {

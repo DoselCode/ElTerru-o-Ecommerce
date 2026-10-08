@@ -9,6 +9,25 @@ import type { Product } from '../../types/product';
 import { Paginator, usePaginator } from '../Paginator';
 
 const PAGE_SIZE = 15;
+const LOW_STOCK_THRESHOLD = 5;
+
+const StockBadge: React.FC<{ stock: number }> = ({ stock }) => {
+  if (stock <= 0) {
+    return (
+      <span className="badge-tag" style={{ background: '#fee2e2', color: '#991b1b', border: '1px solid #fca5a5', fontWeight: 600 }} role="status">
+        ⛔ Agotado
+      </span>
+    );
+  }
+  if (stock <= LOW_STOCK_THRESHOLD) {
+    return (
+      <span className="badge-tag" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', fontWeight: 600 }} role="status">
+        ⚠️ Crítico ({stock})
+      </span>
+    );
+  }
+  return <span>{stock}</span>;
+};
 
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2240%22 height%3D%2240%22 viewBox%3D%220 0 40 40%22%3E%3Crect width%3D%2240%22 height%3D%2240%22 fill%3D%22%23e8e3d9%22%2F%3E%3Ctext x%3D%2250%25%22 y%3D%2255%25%22 text-anchor%3D%22middle%22 fill%3D%22%23a09070%22 font-size%3D%2218%22%3E%3F%3C%2Ftext%3E%3C%2Fsvg%3E';
 
@@ -69,6 +88,7 @@ export const Stock: React.FC = () => {
   const [category, setCategory] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
+  const [featuringId, setFeaturingId] = useState<string | null>(null);
 
   const categories = useMemo(
     () => [...new Set(state.products.map(p => p.categories?.name).filter(Boolean))].sort() as string[],
@@ -81,11 +101,13 @@ export const Stock: React.FC = () => {
   );
 
   const query = search.trim().toLowerCase();
-  const filteredProducts = state.products.filter(p => {
-    if (category && p.categories?.name !== category) return false;
-    if (supplier && p.providers?.name !== supplier) return false;
-    return !query || p.name.toLowerCase().includes(query) || p.code.includes(query) || (p.providers?.name || '').toLowerCase().includes(query);
-  });
+  const filteredProducts = useMemo(() => {
+    return state.products.filter(p => {
+      if (category && p.categories?.name !== category) return false;
+      if (supplier && p.providers?.name !== supplier) return false;
+      return !query || p.name.toLowerCase().includes(query) || p.code.includes(query) || (p.providers?.name || '').toLowerCase().includes(query);
+    });
+  }, [state.products, category, supplier, query]);
 
   const sortedProducts = useMemo(() => {
     if (!sortConfig) return filteredProducts;
@@ -167,12 +189,20 @@ export const Stock: React.FC = () => {
   }, []);
 
   const handleToggleFeatured = useCallback(async (product: Product) => {
-    if (!product.isFeatured) {
-      const currentlyFeatured = state.products.filter(p => p.isFeatured && p.id !== product.id);
-      for (const p of currentlyFeatured) await updateProduct(p.id, { isFeatured: false });
+    if (featuringId) return;
+    setFeaturingId(product.id);
+    try {
+      if (!product.isFeatured) {
+        const currentlyFeatured = state.products.filter(p => p.isFeatured && p.id !== product.id);
+        for (const p of currentlyFeatured) await updateProduct(p.id, { isFeatured: false });
+      }
+      await updateProduct(product.id, { isFeatured: !product.isFeatured });
+    } catch {
+      showToast('Error al actualizar producto destacado', 'error');
+    } finally {
+      setFeaturingId(null);
     }
-    await updateProduct(product.id, { isFeatured: !product.isFeatured });
-  }, [state.products, updateProduct]);
+  }, [featuringId, showToast, state.products, updateProduct]);
 
   const executeDeleteProduct = useCallback(async () => {
     if (!deleteConfirmId) return;
@@ -236,7 +266,7 @@ export const Stock: React.FC = () => {
                     : <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic' }}>Sin proveedor</span>}
                 </td>
                 <td><strong>{formatMoney(p.price)}</strong></td>
-                <td style={{ color: p.stock <= 5 ? 'var(--danger)' : 'inherit' }}>{p.stock}</td>
+                <td><StockBadge stock={p.stock} /></td>
                 <td>
                   <span
                     className={`badge ${p.isVisible ? 'success' : 'danger'} badge-icon`}
@@ -254,7 +284,7 @@ export const Stock: React.FC = () => {
                 </td>
                 <td style={{ textAlign: 'right' }}>
                   <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                    <button className="btn-icon" title={p.isFeatured ? 'Quitar Best Seller' : 'Marcar Best Seller'} aria-label={p.isFeatured ? 'Quitar Best Seller' : 'Marcar Best Seller'} onClick={() => handleToggleFeatured(p)} style={{ color: p.isFeatured ? 'var(--accent-color)' : 'var(--text-muted)' }}>
+                    <button className="btn-icon" disabled={featuringId !== null} title={p.isFeatured ? 'Quitar Best Seller' : 'Marcar Best Seller'} aria-label={p.isFeatured ? 'Quitar Best Seller' : 'Marcar Best Seller'} onClick={() => handleToggleFeatured(p)} style={{ color: p.isFeatured ? 'var(--accent-color)' : 'var(--text-muted)' }}>
                       <Star weight={p.isFeatured ? 'fill' : 'regular'} />
                     </button>
                     <button className="btn-icon" aria-label={`Editar producto ${p.name}`} onClick={() => navigate(`/admin/products/edit/${p.id}`)}><PencilSimple /></button>

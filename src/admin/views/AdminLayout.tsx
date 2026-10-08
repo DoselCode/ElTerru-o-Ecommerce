@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, Outlet, Link, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { insforge } from '../../lib/insforge';
 import type { UserSchema as User } from '@insforge/sdk';
-import { SquaresFour, Storefront, CashRegister, Package, Receipt, ArrowsLeftRight, CheckCircle, XCircle, WarningCircle, List } from '@phosphor-icons/react';
+import { SquaresFour, Storefront, CashRegister, Package, Receipt, ArrowsLeftRight, CheckCircle, XCircle, WarningCircle, List, SignOut } from '@phosphor-icons/react';
 import { AdminProvider, useAdmin } from '../context/AdminContext';
 import { CartProvider } from '../context/CartContext';
 import { ToastProvider, useToasts } from '../context/ToastContext';
@@ -34,10 +34,20 @@ const ToastContainer: React.FC = () => {
 
 const AdminInner: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
-    await insforge.auth.signOut();
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await insforge.auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      navigate('/admin/login', { replace: true });
+    }
   };
 
   const { isOnline, isSyncing } = useAdmin();
@@ -92,6 +102,20 @@ const AdminInner: React.FC = () => {
             <span className="nav-label">Landing Page</span>
           </Link>
         </nav>
+
+        <div className="sidebar-footer" style={{ marginTop: 'auto', padding: '1rem 0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <button
+            className="nav-item"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            title="Cerrar sesión"
+            aria-label="Cerrar sesión"
+            style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: '#f87171' }}
+          >
+            <SignOut size={20} weight="bold" />
+            <span className="nav-label">{loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}</span>
+          </button>
+        </div>
       </aside>
 
       <main className="main-content">
@@ -146,15 +170,21 @@ export const AdminLayout: React.FC = () => {
   useEffect(() => {
     let cancelled = false;
     const checkAccess = async () => {
-      const { data: { user } } = await insforge.auth.getCurrentUser();
-      const next: AccessState = !user ? 'anonymous' : (await isAdminUser(user)) ? 'admin' : 'not-admin';
-      if (!cancelled) setAccess(next);
+      try {
+        const { data } = await insforge.auth.getCurrentUser();
+        const user = data?.user;
+        const next: AccessState = !user ? 'anonymous' : (await isAdminUser(user)) ? 'admin' : 'not-admin';
+        if (!cancelled) setAccess(next);
+      } catch (err) {
+        console.error('Error checking admin access:', err);
+        if (!cancelled) setAccess('anonymous');
+      }
     };
     checkAccess();
     const unsubscribe = insforge.auth.onAuthStateChange(checkAccess);
     return () => {
       cancelled = true;
-      unsubscribe();
+      if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, []);
 

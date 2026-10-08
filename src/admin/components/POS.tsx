@@ -10,17 +10,19 @@ import { PrintableTicket } from './Ticket';
 import { getProductIcon } from '../utils/productIcon';
 import { TICKET_CONFIG } from '../utils/ticketConfig';
 import type { Order, PaymentMethod } from '../types';
+import type { Product } from '../../types/product';
 import { calculateTotals, formatMoney, getNextTicketNumber, padNumber, toLocalDateString } from '../utils/posUtils';
 
 /** Punto de venta: catálogo con filtros, carrito, cobro (PaymentModal) y emisión del ticket. */
 export const POS: React.FC = () => {
-  const { state, createOrder } = useAdmin();
+  const { state, createOrder, updateProduct } = useAdmin();
   const { cart, addToCart, removeFromCart, clearCart } = useCart();
   const { showToast } = useToast();
   const [search, setSearch] = useState('');
   const [supplier, setSupplier] = useState('');
   const [category, setCategory] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { handleBackdropClick } = useModalDismiss({ onClose: () => setShowSuccessModal(false), closeOnBackdrop: true });
@@ -36,14 +38,30 @@ export const POS: React.FC = () => {
   );
 
   const query = search.trim().toLowerCase();
-  const filteredProducts = state.products.filter(p => {
-    if (category && p.categories?.name !== category) return false;
-    if (supplier && p.providers?.name !== supplier) return false;
-    if (!query) return true;
-    return p.code.includes(query) || p.name.toLowerCase().includes(query) || (p.categories?.name || '').toLowerCase().includes(query) || (p.providers?.name || '').toLowerCase().includes(query);
-  });
+  const filteredProducts = useMemo(() => {
+    return state.products.filter(p => {
+      if (category && p.categories?.name !== category) return false;
+      if (supplier && p.providers?.name !== supplier) return false;
+      if (!query) return true;
+      return p.code.includes(query) || p.name.toLowerCase().includes(query) || (p.categories?.name || '').toLowerCase().includes(query) || (p.providers?.name || '').toLowerCase().includes(query);
+    });
+  }, [state.products, category, supplier, query]);
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * (item.cartQty || 1), 0);
+
+  const getQtyInCart = (id: string) => cart.find(i => i.id === id)?.cartQty ?? 0;
+
+  const tryAddToCart = (p: Product) => {
+    if (p.stock <= 0) {
+      showToast(`"${p.name}" está agotado y no se puede agregar al carrito.`, 'error');
+      return;
+    }
+    if (getQtyInCart(p.id) >= p.stock) {
+      showToast(`Stock insuficiente. Solo hay ${p.stock} unidad${p.stock !== 1 ? 'es' : ''} disponible${p.stock !== 1 ? 's' : ''} de "${p.name}".`, 'warning');
+      return;
+    }
+    addToCart(p);
+  };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter' || !query) return;
@@ -53,36 +71,56 @@ export const POS: React.FC = () => {
       showToast('No se encontró el producto.', 'error');
       return;
     }
-    addToCart(match);
+    tryAddToCart(match);
     setSearch('');
   };
 
-  const handlePayment = (paymentMethod: PaymentMethod, client: string) => {
+  const handlePayment = async (paymentMethod: PaymentMethod, client: string) => {
+    if (isProcessing) return;
     if (state.register.status !== 'abierta') {
       showToast('No puedes cobrar, la caja está cerrada.', 'error');
       setShowPaymentModal(false);
       return;
     }
 
-    const now = new Date();
-    const { total, descuento, neto, iva } = calculateTotals(cart, paymentMethod, TICKET_CONFIG.ivaRate);
-    const order: Order = {
-      id: crypto.randomUUID(),
-      ticketNumber: getNextTicketNumber(state.orders),
-      client: client || 'Consumidor Final',
-      total, neto, iva, descuento,
-      paymentMethod,
-      date: toLocalDateString(now),
-      createdAt: now.toISOString(),
-      status: 'pagado',
-      items: [...cart],
-    };
+    setIsProcessing(true);
+    try {
+      const now = new Date();
+      const { total, descuento, neto, iva } = calculateTotals(cart, paymentMethod, TICKET_CONFIG.ivaRate);
+      const order: Order = {
+        id: crypto.randomUUID(),
+        ticketNumber: getNextTicketNumber(state.orders),
+        client: client || 'Consumidor Final',
+        total, neto, iva, descuento,
+        paymentMethod,
+        date: toLocalDateString(now),
+        createdAt: now.toISOString(),
+        status: 'pagado',
+        items: [...cart],
+      };
 
-    createOrder(order);
-    setLastOrder(order);
-    clearCart();
-    setShowPaymentModal(false);
-    setShowSuccessModal(true);
+      await createOrder(order);
+
+      // Descontar stock de cada producto vendido
+      const stockUpdates = cart.map(item => {
+        const product = state.products.find(p => p.id === item.id);
+        if (!product) return Promise.resolve();
+        const newStock = Math.max(0, product.stock - (item.cartQty || 1));
+        return updateProduct(item.id, { stock: newStock });
+      });
+
+      await Promise.allSettled(stockUpdates);
+
+      setLastOrder(order);
+      clearCart();
+      setShowPaymentModal(false);
+      setShowSuccessModal(true);
+    } catch (err) {
+      console.error('Error al procesar el pago:', err);
+      showToast('Error al procesar la venta. Intente nuevamente.', 'error');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -117,7 +155,7 @@ export const POS: React.FC = () => {
                 key={p.id}
                 className={`product-card${p.stock <= 0 ? ' opacity-50' : ''}`}
                 style={{ cursor: p.stock <= 0 ? 'not-allowed' : 'pointer' }}
-                onClick={() => p.stock > 0 && addToCart(p)}
+                onClick={() => tryAddToCart(p)}
               >
                 {getProductIcon(p.name, p.category)}
                 <div className="p-code">{p.code}</div>
@@ -171,7 +209,7 @@ export const POS: React.FC = () => {
       </div>
 
       {showPaymentModal && (
-        <PaymentModal items={cart} onCancel={() => setShowPaymentModal(false)} onConfirm={handlePayment} />
+        <PaymentModal items={cart} onCancel={() => !isProcessing && setShowPaymentModal(false)} onConfirm={handlePayment} isProcessing={isProcessing} />
       )}
 
       {showSuccessModal && lastOrder && (

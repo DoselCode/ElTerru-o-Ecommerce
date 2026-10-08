@@ -9,10 +9,11 @@ interface PaymentModalProps {
   items: OrderItem[];
   onCancel: () => void;
   onConfirm: (method: PaymentMethod, client: string) => void;
+  isProcessing?: boolean;
 }
 
 /** Modal de cobro: elige el método de pago y muestra el total con su descuento. */
-export const PaymentModal: React.FC<PaymentModalProps> =({ items, onCancel, onConfirm }) => {
+export const PaymentModal: React.FC<PaymentModalProps> = ({ items, onCancel, onConfirm, isProcessing }) => {
   const [method, setMethod] = useState<PaymentMethod>('efectivo');
   const [client, setClient] = useState('');
 
@@ -58,8 +59,10 @@ export const PaymentModal: React.FC<PaymentModalProps> =({ items, onCancel, onCo
         </div>
 
         <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-          <button className="btn-secondary" onClick={onCancel}>Cancelar</button>
-          <button className="btn-accent" onClick={() => onConfirm(method, client)}>Confirmar Cobro</button>
+          <button className="btn-secondary" disabled={isProcessing} onClick={onCancel}>Cancelar</button>
+          <button className="btn-accent" disabled={isProcessing} onClick={() => onConfirm(method, client)}>
+            {isProcessing ? 'Procesando...' : 'Confirmar Cobro'}
+          </button>
         </div>
       </div>
     </div>
