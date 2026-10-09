@@ -32,6 +32,7 @@ dist-ssr
 .augment
 .claude
 .cline
+.cursor
 .github/copilot*
 .kilocode
 .qoder
