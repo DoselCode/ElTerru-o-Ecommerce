@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import type { StoreInfo } from '../types/product';
 
-const SITE_URL = 'https://www.xn--elterruo-j3a.online/';
+const SITE_URL = 'https://elterrunoalmacen.com.ar/';
 
 /** Meta tags SEO, Open Graph y Twitter de la landing, armados con los datos de store_info. */
 export const StorefrontSeo: React.FC<{ storeInfo: StoreInfo }> = ({ storeInfo }) => {
