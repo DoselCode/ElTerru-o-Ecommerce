@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Receipt } from '@phosphor-icons/react';
+import { Printer, Receipt, Warning } from '@phosphor-icons/react';
 import { useAdmin } from '../context/AdminContext';
 import { useToast } from '../context/ToastContext';
 import { PrintableTicket, Ticket } from './Ticket';
@@ -65,8 +65,9 @@ export const SaleDetailModal: React.FC<{ order: Order; onClose: () => void }> = 
           <div className="sale-modal-footer" style={{ padding: '1rem 1.25rem' }}>
             {confirmingCancel ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', textAlign: 'left' }}>
-                <span className="sale-modal-warning" style={{ color: 'var(--danger)', fontWeight: 600 }}>
-                  ⚠️ ¿Anular esta venta? Se devolverán los productos al stock.
+                <span className="sale-modal-warning" style={{ color: 'var(--danger)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Warning size={20} weight="fill" aria-hidden="true" style={{ flexShrink: 0 }} />
+                  ¿Anular esta venta? Se devolverán los productos al stock.
                 </span>
                 <div>
                   <label htmlFor="cancel-reason-input" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.35rem' }}>
@@ -101,7 +102,7 @@ export const SaleDetailModal: React.FC<{ order: Order; onClose: () => void }> = 
             ) : (
               <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
                 <button className="btn-icon" style={{ background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.65rem' }} onClick={() => window.print()} title="Imprimir" aria-label="Imprimir ticket">
-                  🖨️
+                  <Printer size={20} weight="bold" aria-hidden="true" />
                 </button>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <button className="btn-secondary" onClick={onClose}>Cerrar</button>

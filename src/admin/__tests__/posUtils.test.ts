@@ -35,7 +35,7 @@ describe('posUtils', () => {
     it('aplica el porcentaje cuando el producto no tiene precio por método', () => {
       const sinPrecios = item({});
       expect(getUnitPrice(sinPrecios, 'efectivo')).toBeCloseTo(11430);
-      expect(getUnitPrice(sinPrecios, 'transferencia')).toBeCloseTo(12065);
+      expect(getUnitPrice(sinPrecios, 'transferencia')).toBeCloseTo(11430);
     });
 
     it('calcula subtotal, descuento e IVA sobre el total cobrado', () => {

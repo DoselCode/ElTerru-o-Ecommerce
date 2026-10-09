@@ -10,10 +10,10 @@ export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
 
 export const PAYMENT_METHODS = Object.keys(PAYMENT_LABELS) as PaymentMethod[];
 
-/** Descuento por método de pago: 10% efectivo, 5% transferencia. */
+/** Descuento por método de pago: 10% efectivo y transferencia. */
 const DISCOUNT_RATES: Record<PaymentMethod, number> = {
   efectivo: 0.10,
-  transferencia: 0.05,
+  transferencia: 0.10,
   credito: 0,
   debito: 0,
 };

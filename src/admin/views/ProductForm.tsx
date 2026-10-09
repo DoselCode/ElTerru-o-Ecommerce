@@ -189,7 +189,7 @@ export const ProductForm: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField label="Precio de lista (PSP) *" type="number" step="0.01" max={999999999} placeholder="ej: 12700" {...fieldProps('price')} />
               <FormField label="Precio Efectivo (opcional)" type="number" step="0.01" max={999999999} placeholder="Automático: -10%" {...fieldProps('price_efectivo')} />
-              <FormField label="Precio Transferencia (opcional)" type="number" step="0.01" max={999999999} placeholder="Automático: -5%" {...fieldProps('price_transferencia')} />
+              <FormField label="Precio Transferencia (opcional)" type="number" step="0.01" max={999999999} placeholder="Automático: -10%" {...fieldProps('price_transferencia')} />
               <FormField label="Precio Original (oferta)" type="number" step="0.01" max={999999999} placeholder="ej: 15000" {...fieldProps('original_price')} />
             </div>
 

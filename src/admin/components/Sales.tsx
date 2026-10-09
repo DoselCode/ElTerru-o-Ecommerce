@@ -1,12 +1,92 @@
-import React, { useState } from 'react';
-import { Receipt } from '@phosphor-icons/react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CalendarBlank, Receipt } from '@phosphor-icons/react';
 import { useAdmin } from '../context/AdminContext';
 import { SaleDetailModal } from './SaleDetailModal';
 import type { PaymentMethod } from '../types';
-import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatTicketDate, padNumber } from '../utils/posUtils';
+import { PAYMENT_LABELS, PAYMENT_METHODS, formatMoney, formatTicketDate, padNumber, toLocalDateString } from '../utils/posUtils';
 import { Paginator, usePaginator } from '../Paginator';
 
 const PAGE_SIZE = 20;
+
+const maskDate = (raw: string) => {
+  const d = raw.replace(/\D/g, '').slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+};
+
+/** dd/mm/yyyy → yyyy-mm-dd; devuelve '' si está incompleta o no es una fecha real. */
+const parseDate = (text: string) => {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text);
+  if (!m) return '';
+  const [, dd, mm, yyyy] = m;
+  const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  const valid = d.getFullYear() === Number(yyyy) && d.getMonth() === Number(mm) - 1 && d.getDate() === Number(dd);
+  return valid ? `${yyyy}-${mm}-${dd}` : '';
+};
+
+/** Campo de fecha en formato dd/mm/yyyy; expone el valor como yyyy-mm-dd ('' mientras no sea válida). */
+const DateInput: React.FC<{ value: string; onChange: (iso: string) => void; label: string }> = ({ value, onChange, label }) => {
+  const [text, setText] = useState('');
+  const pickerRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (value === '') setText(prev => (parseDate(prev) ? '' : prev));
+  }, [value]);
+
+  const openPicker = () => {
+    const picker = pickerRef.current;
+    if (!picker) return;
+    picker.value = value;
+    if (typeof picker.showPicker === 'function') picker.showPicker();
+    else picker.click();
+  };
+
+  const handlePicked = (iso: string) => {
+    if (!iso) return;
+    const [y, m, d] = iso.split('-');
+    setText(`${d}/${m}/${y}`);
+    onChange(iso);
+  };
+
+  return (
+    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+      <input
+        type="text"
+        inputMode="numeric"
+        className="filter-input"
+        style={{ width: '170px', paddingRight: '2.25rem' }}
+        placeholder={`${label} dd/mm/aaaa`}
+        aria-label={label}
+        maxLength={10}
+        value={text}
+        onChange={(e) => {
+          const next = maskDate(e.target.value);
+          setText(next);
+          onChange(parseDate(next));
+        }}
+      />
+      <button
+        type="button"
+        className="btn-icon"
+        style={{ position: 'absolute', right: '0.35rem', padding: '0.25rem' }}
+        onClick={openPicker}
+        title={`Elegir fecha (${label})`}
+        aria-label={`Abrir calendario ${label}`}
+      >
+        <CalendarBlank size={18} />
+      </button>
+      <input
+        ref={pickerRef}
+        type="date"
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(e) => handlePicked(e.target.value)}
+        style={{ position: 'absolute', right: 0, bottom: 0, width: 0, height: 0, opacity: 0, pointerEvents: 'none' }}
+      />
+    </div>
+  );
+};
 
 /** Historial de ventas con filtros (texto, método de pago, fechas) y acceso al detalle del ticket. */
 export const Sales: React.FC = () => {
@@ -19,7 +99,8 @@ export const Sales: React.FC = () => {
 
   const filteredOrders = state.orders.filter(o => {
     if (methodFilter !== 'todos' && o.paymentMethod !== methodFilter) return false;
-    const orderDay = (o.createdAt || o.date || '').slice(0, 10);
+    // Día local: slice del ISO (UTC) correría a mañana las ventas hechas después de las 21 hs
+    const orderDay = o.createdAt ? toLocalDateString(new Date(o.createdAt)) : (o.date || '').slice(0, 10);
     if (dateFrom && (!orderDay || orderDay < dateFrom)) return false;
     if (dateTo && (!orderDay || orderDay > dateTo)) return false;
     if (!search) return true;
@@ -58,22 +139,8 @@ export const Sales: React.FC = () => {
             <option value="todos">Todos los métodos</option>
             {PAYMENT_METHODS.map(m => <option key={m} value={m}>{PAYMENT_LABELS[m]}</option>)}
           </select>
-          <input
-            type="date"
-            className="filter-input"
-            value={dateFrom}
-            max={dateTo || undefined}
-            onChange={(e) => setDateFrom(e.target.value)}
-            aria-label="Desde"
-          />
-          <input
-            type="date"
-            className="filter-input"
-            value={dateTo}
-            min={dateFrom || undefined}
-            onChange={(e) => setDateTo(e.target.value)}
-            aria-label="Hasta"
-          />
+          <DateInput label="Desde" value={dateFrom} onChange={setDateFrom} />
+          <DateInput label="Hasta" value={dateTo} onChange={setDateTo} />
           {(dateFrom || dateTo) && (
             <button className="btn-secondary" style={{ padding: '0.65rem 1rem' }} onClick={() => { setDateFrom(''); setDateTo(''); }}>
               Limpiar fechas

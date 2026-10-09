@@ -58,7 +58,6 @@ export const FormField: React.FC<FormFieldProps> = ({
       <div className="flex justify-between items-center mb-1">
         <label htmlFor={name} className="block text-sm font-medium text-terruno-muted">{label}</label>
         {maxLength && !isNumeric && <span className="text-[11px] text-terruno-muted">{value.length}/{maxLength}</span>}
-        {isNumeric && max !== undefined && <span className="text-[11px] text-terruno-muted">máx. {max.toLocaleString('es-AR')}</span>}
       </div>
       {rows ? (
         <textarea

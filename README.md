@@ -1,195 +1,107 @@
-# El Terruño - Frontend & Guía para Integración Backend
+# El Terruño
 
-Bienvenido al repositorio oficial de **El Terruño** (Almacén Gourmet & Vinos Boutique). El frontend ha sido desarrollado y estructurado con la última versión de **React 19**, **TypeScript** y **Tailwind CSS v4** sobre **Vite**.
+Sitio web y sistema de gestión de **El Terruño**, un almacén gourmet y vinos boutique de Jesús María, Córdoba (Argentina).
 
----
+El proyecto tiene dos partes en una misma aplicación:
 
-## 📌 Guía para el Desarrollador Backend
+- **Tienda pública** (`/`): landing con catálogo de productos, producto destacado, historia del local, horarios y contacto. Los clientes consultan los productos y escriben por WhatsApp; no hay carrito ni pagos online.
+- **Panel de administración** (`/admin`): herramienta interna para operar el local: punto de venta (POS), inventario, historial de ventas, caja y configuración de la landing.
 
-Este proyecto está preparado para conectarse con una API REST o GraphQL. A continuación se detallan la arquitectura de datos, los modelos requeridos y los endpoints a implementar para el **Módulo B: Dashboard Administrador (Panel Privado)**.
+## Propósito
 
----
+Darle al local una presencia online que se administre sola (productos, textos, fotos y horarios editables sin tocar código) y, a la vez, reemplazar el control manual de ventas, stock y caja por un sistema simple que funcione aunque se corte internet.
 
-### 1. Definición de Tipos y DTOs
+## Funcionalidades
 
-Las interfaces principales de datos se encuentran en `src/types/product.ts` y `src/admin/types.ts`:
+**Tienda pública**
+- Catálogo con búsqueda, filtros por categoría y paginación.
+- Producto destacado con etiquetas de descuento configurables.
+- Contenido editable desde el panel: portada, historia, estadísticas, contacto y horarios.
+- SEO (meta tags, Open Graph) generado con los datos de la tienda.
 
-- **Producto (`Product`)**:
-  ```typescript
-  export interface Product {
-    id: number;
-    name: string;
-    year?: string;                   // Ej: "2021" (para vinos)
-    category: 'Vinos' | 'Almacén' | 'Fiambres' | 'Regalos';
-    price: number;                  // Precio actual
-    originalPrice?: number;         // Precio sin descuento (opcional)
-    discountBadge?: string;         // Ej: "15% OFF"
-    badge?: string;                 // Ej: "BEST SELLER"
-    image: string;                  // URL de la imagen
-    description: string;
-    winery?: string;                // Ej: "Clos de los Siete, Mendoza"
-    pairing?: string;               // Ej: "carnes rojas, quesos estacionados"
-    stock?: number;                 // Stock disponible
-    isFeatured?: boolean;           // Indica si se muestra en la sección "Producto Destacado"
-    isVisible: boolean;             // Conmutador para ocultar/mostrar en tienda pública
-  }
-  ```
+**Panel de administración**
+- **Punto de venta:** catálogo con filtros, carrito, cobro y ticket imprimible (comprobante no válido como factura).
+- **Descuentos por método de pago:** 10% en efectivo y en transferencia; sin descuento en tarjeta de crédito o débito.
+- **Inventario:** grilla ordenable con categoría y proveedor, alta y edición de productos, visibilidad y "best seller".
+- **Ventas:** historial con filtros por texto, método de pago y rango de fechas; detalle del ticket, cambio de método y anulación con reposición de stock.
+- **Caja:** apertura, ingresos y egresos manuales, cierre con arqueo.
+- **Modo offline:** las operaciones que fallan por falta de conexión se guardan en el navegador y se sincronizan al volver internet.
+- **Acceso restringido:** solo ingresan los usuarios registrados como administradores.
 
-- **Información General del Almacén (`StoreInfo`)**:
-  ```typescript
-  export interface StoreInfo {
-    name: string;
-    tagline: string;
-    logo: string;
-    phone: string;
-    whatsappNumber: string;         // Ej: "+5493525518649"
-    email: string;
-    address: string;
-    hoursWeekdays: string;
-    hoursSaturday: string;
-    hoursSunday: string;
-    heroBadge: string;
-    heroTitle: string;
-    heroSubtitle: string;
-    heroBgImage: string;
-    aboutTitle: string;
-    aboutQuote: string;
-    aboutQuoteAuthor: string;
-    aboutParagraph1: string;
-    aboutParagraph2: string;
-    aboutParagraph3: string;
-    aboutMainImage: string;
-    aboutSubImage: string;
-    statYears: string;
-    statProducers: string;
-    statProducts: string;
-  }
-  ```
+## Stack
 
----
+| Área | Tecnología |
+| :--- | :--- |
+| Frontend | React 19, TypeScript, Vite |
+| Estilos | Tailwind CSS v4, Phosphor Icons |
+| Ruteo y SEO | React Router, React Helmet Async |
+| Backend | [InsForge](https://insforge.dev) (PostgreSQL, autenticación, storage) mediante `@insforge/sdk` |
+| Tests | Vitest + React Testing Library, e2e |
+| Hosting | Vercel |
 
-### 2. Endpoints Backend Sugeridos
-
-#### 🔓 Endpoints Públicos (Tienda Frontend)
-- `GET /api/store-info` -> Retorna el objeto `StoreInfo` con la configuración general.
-- `GET /api/products` -> Lista de productos visibles (`isVisible = true`).
-  - *Filtros y paginación opcional*: `?category=Vinos&search=malbec&page=1&limit=9`.
-- `GET /api/products/featured` -> Retorna el producto marcado como `isFeatured = true` para la sección principal (incluyendo `badge` y `discount_badge`).
-
-#### 🔒 Endpoints Privados (Módulo B: Dashboard Admin)
-- `POST /api/auth/login` -> Autenticación segura. Recibe `{ username, password }`, retorna token JWT y datos de usuario.
-- `GET /api/admin/products` -> Listado paginado de stock con filtros `?page=1&limit=10&search=&category=`.
-- `POST /api/products` -> Creación de producto con validación de campos.
-- `PUT /api/products/:id` -> Edición de producto existente con validación de campos.
-- `PATCH /api/products/:id/visibility` -> Alternar visibilidad (Ocultar/Mostrar).
-- `DELETE /api/products/:id` -> Eliminación lógica/física del producto.
-- `PUT /api/store-info` -> Actualización de la información del local, teléfono de WhatsApp, textos y fotos institucionales.
-
----
-
-### 3. Requerimientos Específicos para el Backend
-
-A continuación se detallan las tareas y reglas de negocio requeridas para el backend:
-
-#### 🏷️ 1. Etiqueta de Descuento Configurable sobre Producto Destacado
-- El campo `discount_badge` en la tabla `products` (y opcionalmente en la configuración del destacado) debe ser editable desde el panel de administración.
-- El backend debe persistir y retornar este valor (ej: `"15% OFF"`, `"-20%"`, `"Promo Especial"`) para que el frontend lo proyecte dinámicamente tanto en la pastilla flotante como en el bloque de precios del producto destacado.
-
-#### 📄 2. Paginación en el Listado de Administración de Stock
-- El endpoint `GET /api/admin/products` debe soportar paginación mediante query params: `page` (número de página) y `limit` (cantidad de ítems por página, ej: 10).
-- Formato de respuesta JSON esperado:
-  ```json
-  {
-    "data": [ /* Array de productos */ ],
-    "pagination": {
-      "total": 54,
-      "page": 1,
-      "limit": 10,
-      "totalPages": 6,
-      "hasNextPage": true,
-      "hasPrevPage": false
-    }
-  }
-  ```
-
-#### 🛡️ 3. Validaciones de Campos al Crear o Editar Productos
-Al recibir peticiones `POST /api/products` o `PUT /api/products/:id`, el backend debe validar estrictamente los siguientes campos antes de persistir en base de datos:
-
-| Campo | Regla de Validación | Mensaje / Detalle |
-| :--- | :--- | :--- |
-| `name` | Requerido, tipo string, mín. 2 caracteres, máx. 255 | `"El nombre del producto es obligatorio."` |
-| `price` | Requerido, numérico, mayor a 0 (`price > 0`) | `"El precio debe ser un valor numérico positivo."` |
-| `original_price` | Opcional, numérico, si se define debe ser mayor a `price` | `"El precio original debe ser mayor al precio de venta."` |
-| `category` | Requerido, enum: `['Vinos', 'Almacén', 'Fiambres', 'Regalos']` | `"Categoría no válida."` |
-| `stock` | Opcional/Requerido, entero mayor o igual a 0 (`stock >= 0`) | `"El stock no puede ser un número negativo."` |
-| `image_url` | Requerido, string con formato de URL válida o ruta a storage | `"La imagen del producto es obligatoria."` |
-| `description` | Requerido, string, mín. 5 caracteres | `"La descripción del producto es obligatoria."` |
-| `badge` | Opcional, string, máx. 50 caracteres | Ej: `"BEST SELLER"`, `"Novedad"` |
-| `discount_badge` | Opcional, string, máx. 50 caracteres | Ej: `"15% OFF"`, `"-20%"` |
-
-- En caso de error de validación, responder con código HTTP `400 Bad Request` y un objeto estructurado:
-  ```json
-  {
-    "status": "error",
-    "message": "Error de validación en los datos del producto.",
-    "errors": {
-      "price": "El precio debe ser un valor numérico positivo.",
-      "category": "Categoría no válida."
-    }
-  }
-  ```
-
----
-
-### 4. Modelo Base para la Base de Datos (SQL / NoSQL)
-
-#### Tabla: `products`
-| Campo | Tipo | Notas |
-| :--- | :--- | :--- |
-| `id` | `BIGINT / UUID` | Primary Key |
-| `name` | `VARCHAR(255)` | Requerido |
-| `year` | `VARCHAR(10)` | Opcional |
-| `category` | `VARCHAR(50)` | `Vinos`, `Almacén`, `Fiambres`, `Regalos` |
-| `price` | `DECIMAL(10,2)` | Requerido (> 0) |
-| `original_price` | `DECIMAL(10,2)` | Opcional |
-| `discount_badge` | `VARCHAR(50)` | Opcional (ej: "15% OFF") |
-| `badge` | `VARCHAR(50)` | Opcional (ej: "BEST SELLER") |
-| `image_url` | `TEXT` | Requerido |
-| `description` | `TEXT` | Requerido |
-| `winery` | `VARCHAR(255)` | Opcional |
-| `pairing` | `VARCHAR(255)` | Opcional |
-| `stock` | `INT` | Default: `0` (>= 0) |
-| `is_featured` | `BOOLEAN` | Default: `false` |
-| `is_visible` | `BOOLEAN` | Default: `true` |
-| `created_at` | `TIMESTAMP` | Default: `NOW()` |
-
----
-
-### 5. Estructura del Código Frontend
+## Estructura
 
 ```
 src/
-├── admin/                    # Base para el Módulo B: Dashboard Admin
-│   ├── types.ts              # Contrato de operaciones CRUD y autenticación
-│   └── README.md             # Notas técnicas específicas del módulo admin
-├── components/
-│   ├── navbar/               # Header y navegación pública (con menú responsive)
-│   └── sections/             # Secciones visuales (Hero, Historia, Producto Destacado, Catálogo, Footer)
-├── docs/                     # Documentación de diseño y animaciones
-│   ├── Diseño.md             # Registro de componentes y lineamientos UX/UI
-│   └── Animaciones.md        # Documentación de animaciones de scroll y levitación
-├── types/
-│   └── product.ts            # Interfaces TypeScript principales
-├── App.tsx                   # Componente raíz y orden de secciones
-└── index.css                 # Configuración de Tailwind CSS v4, animaciones y safe-areas
+├── App.tsx / main.tsx     # Rutas y arranque (el admin se carga bajo demanda)
+├── admin/                 # Panel de administración (ver src/admin/README.md)
+├── components/            # Landing pública: navbar, secciones y piezas compartidas
+├── hooks/                 # Hooks de la landing
+├── services/              # Acceso a datos: productos, ventas, caja y storage
+├── lib/insforge.ts        # Cliente único de InsForge
+└── types/                 # Modelos de producto y de la tienda
+migrations/                # Esquema de la base de datos y políticas RLS (SQL)
+docs/                      # Documentación de diseño, animaciones y changelog
+openspec/                  # Propuestas y especificaciones de cambios
+tests/                     # Tests end-to-end
 ```
 
----
+Más detalle en [src/README.md](src/README.md) y [src/admin/README.md](src/admin/README.md).
 
-## 🚀 Scripts de Desarrollo
+## Puesta en marcha
 
-- `npm install` - Instalar dependencias.
-- `npm run dev` - Ejecutar servidor de desarrollo local en Vite.
-- `npx tsc --noEmit` - Validar los tipos de TypeScript sin emitir bundle.
-- `npm run build` - Compilar el bundle optimizado para producción en `dist/`.
+Requisitos: Node.js 20 o superior y un proyecto de InsForge.
 
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+Completá `.env.local` con los datos del proyecto (Dashboard de InsForge):
+
+| Variable | Descripción |
+| :--- | :--- |
+| `VITE_INSFORGE_URL` | URL del backend, por ejemplo `https://tu-proyecto.us-east.insforge.app` |
+| `VITE_INSFORGE_ANON_KEY` | Clave anónima (pública por diseño) |
+| `INSFORGE_API_KEY` | Opcional. Clave de administrador, solo para scripts y CLI; **nunca** se expone al navegador ni se commitea |
+
+## Scripts
+
+| Comando | Qué hace |
+| :--- | :--- |
+| `npm run dev` | Servidor de desarrollo |
+| `npm run typecheck` | Valida los tipos de TypeScript |
+| `npm run build` | Typecheck y build de producción en `dist/` |
+| `npm run preview` | Sirve el build localmente |
+| `npm test` | Tests unitarios y de componentes |
+| `npm run test:e2e` | Tests end-to-end |
+
+## Base de datos y seguridad
+
+- El esquema vive en `migrations/` y se aplica con `npx @insforge/cli db migrations up --all`.
+- **Row Level Security** en todas las tablas: el público solo puede leer productos, categorías, proveedores y la configuración de la tienda. Ventas y caja no tienen acceso público.
+- La escritura (y la lectura de ventas y caja) está limitada a los usuarios cargados en la tabla `admins`. Para sumar un administrador, agregá su `user_id` (Dashboard de InsForge, sección Authentication) a esa tabla.
+- Se recomienda mantener el registro público de usuarios deshabilitado en la configuración de autenticación.
+- `vercel.json` define los headers de seguridad (CSP, `X-Frame-Options`, HSTS, entre otros).
+
+## Entornos
+
+- **Desarrollo y testing:** InsForge (rama `develop`).
+- **Producción:** el sitio publicado en `main` corre actualmente sobre Supabase; la migración a InsForge está pendiente.
+
+## Documentación adicional
+
+- [docs/Diseño.md](docs/Diseño.md): componentes y lineamientos UX/UI.
+- [docs/Animaciones.md](docs/Animaciones.md): animaciones de scroll y levitación.
+- [docs/Changelog.md](docs/Changelog.md): historial de cambios.

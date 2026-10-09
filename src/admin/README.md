@@ -17,6 +17,6 @@ Se carga bajo demanda (lazy) desde `App.tsx` en las rutas `/admin/*`; el acceso 
 ## Cosas a tener en cuenta
 
 - **Offline-first:** las escrituras (ventas, caja, stock) que fallan se guardan en `localStorage` (`terruno_offline_queue`) y se reenvían al recuperar la conexión.
-- **Descuentos:** 10% en efectivo y 5% en transferencia (`utils/posUtils.ts`).
+- **Descuentos:** 10% en efectivo y en transferencia (`utils/posUtils.ts`).
 - **Ticket:** es un comprobante no válido como factura; sus datos fiscales salen de `utils/ticketConfig.ts`.
 - **Caja:** es una sola para todos los puestos (fila `registers` con id `global`).

@@ -242,7 +242,7 @@ export const POS: React.FC = () => {
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button className="btn-secondary" onClick={() => setShowSuccessModal(false)}>Cerrar</button>
-              <button className="btn-accent" onClick={() => window.print()}>🖨️ Imprimir Ticket</button>
+              <button className="btn-accent" onClick={() => window.print()}>Imprimir Ticket</button>
             </div>
           </div>
         </div>
