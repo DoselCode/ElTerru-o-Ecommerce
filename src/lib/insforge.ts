@@ -1,14 +1,9 @@
-import { createClient } from '@insforge/sdk';
+import { backend } from './backend';
 
-const insforgeUrl = import.meta.env.VITE_INSFORGE_URL;
-const insforgeAnonKey = import.meta.env.VITE_INSFORGE_ANON_KEY;
-
-if (!insforgeUrl || !insforgeAnonKey) {
-  throw new Error('Faltan las variables de entorno de InsForge (VITE_INSFORGE_URL y VITE_INSFORGE_ANON_KEY).');
-}
-
-/** Cliente único de InsForge (BD, auth y storage); toma URL y anon key del .env. */
-export const insforge = createClient({
-  baseUrl: insforgeUrl,
-  anonKey: insforgeAnonKey,
-});
+/**
+ * Cliente único de backend (InsForge en dev, Supabase en prod según variables de entorno).
+ * Se mantiene el alias `insforge` para retrocompatibilidad total con los servicios existentes.
+ */
+export const insforge = backend;
+export { backend };
+export default backend;

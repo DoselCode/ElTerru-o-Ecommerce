@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { insforge } from '../../lib/insforge';
-import type { UserSchema as User } from '@insforge/sdk';
+import type { BackendUser as User } from '../../lib/backend';
 import { SquaresFour, Storefront, CashRegister, Package, Receipt, ArrowsLeftRight, CheckCircle, XCircle, WarningCircle, List, SignOut } from '@phosphor-icons/react';
 import { AdminProvider, useAdmin } from '../context/AdminContext';
 import { CartProvider } from '../context/CartContext';
