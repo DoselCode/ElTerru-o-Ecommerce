@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://elterrunoalmacen.com.ar/</loc>
+    <lastmod>2026-10-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://elterrunoalmacen.com.ar/logoterruno_circle.png</image:loc>
+      <image:title>El Terruño - Almacén Gourmet &amp; Vinos Boutique</image:title>
+      <image:caption>Almacén gourmet y vinos boutique en Jesús María, Córdoba</image:caption>
+    </image:image>
   </url>
 </urlset>

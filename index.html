@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#6B2D3E" />
     <title>El Terruño - Almacén Gourmet &amp; Vinos Boutique</title>
-    <link rel="icon" type="image/png" href="/logoterruno_circle.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,31 +19,133 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="El Terruño - Almacén Gourmet & Vinos Boutique" />
     <meta property="og:description" content="Descubrí los mejores vinos boutique, escabeches exóticos y fiambres seleccionados." />
-    <meta property="og:image" content="/logoterruno_circle.png" />
+    <meta property="og:image" content="https://elterrunoalmacen.com.ar/logoterruno_circle.png" />
     
-    <!-- JSON-LD para SEO y GEO -->
+    <!-- JSON-LD para SEO Local, GEO e Inteligencia Artificial -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "El Terruño",
-      "image": "https://elterrunoalmacen.com.ar/logoterruno_circle.png",
-      "description": "Almacén gourmet y vinos boutique.",
-      "url": "https://elterrunoalmacen.com.ar/",
-      "telephone": "+5493525518649",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Jesús María",
-        "addressRegion": "Córdoba",
-        "addressCountry": "AR"
-      }
+      "@graph": [
+        {
+          "@type": "GourmetStore",
+          "@id": "https://elterrunoalmacen.com.ar/#store",
+          "name": "El Terruño - Almacén Gourmet & Vinos Boutique",
+          "image": "https://elterrunoalmacen.com.ar/logoterruno_circle.png",
+          "description": "Almacén gourmet y vinos boutique en Jesús María, Córdoba. Especialistas en vinos de autor, fiambres selectos, escabeches patagónicos y regalos corporativos.",
+          "url": "https://elterrunoalmacen.com.ar/",
+          "telephone": "+5493525518649",
+          "email": "elterrunoalmacen@gmail.com",
+          "priceRange": "$$",
+          "currenciesAccepted": "ARS",
+          "paymentAccepted": "Cash, Credit Card, Debit Card, Transfer",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Lavalleja 812, local 8",
+            "addressLocality": "Jesús María",
+            "addressRegion": "Córdoba",
+            "postalCode": "X5220",
+            "addressCountry": "AR"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": -30.9822,
+            "longitude": -64.0942
+          },
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              "opens": "08:00",
+              "closes": "18:30"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": "Saturday",
+              "opens": "09:00",
+              "closes": "21:00"
+            }
+          ],
+          "sameAs": [
+            "https://www.instagram.com/el.terruno.almacen/"
+          ],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Catálogo El Terruño",
+            "itemListElement": [
+              {
+                "@type": "OfferCatalog",
+                "name": "Vinos Boutique",
+                "description": "Vinos de autor, etiquetas reserva y partidas limitadas de bodegas boutique argentinas."
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Almacén Gourmet",
+                "description": "Escabeches patagónicos (ciervo, jabalí, trucha), aceites de oliva premium, conservas y delicatessen."
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Fiambres Seleccionados",
+                "description": "Fiambres artesanales, quesos especiales y tablas para picadas."
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Regalos Empresariales y Combos",
+                "description": "Cajas gourmet personalizadas y obsequios a medida para empresas y particulares."
+              }
+            ]
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://elterrunoalmacen.com.ar/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Dónde queda El Terruño y cuáles son los horarios de atención en Jesús María?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Estamos en Lavalleja 812, local 8, Jesús María, Córdoba. Nuestro horario es de lunes a viernes de 08:00 a 12:00 hs y de 14:00 a 18:30 hs, y los sábados de 09:00 a 13:00 hs y de 17:00 a 21:00 hs."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Qué productos de almacén gourmet y vinos se pueden comprar en El Terruño?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Contamos con una cuidada selección de vinos boutique de autor, escabeches patagónicos (jabalí, ciervo, trucha al natural), quesos y fiambres seleccionados, conservas artesanales y cajas de regalos gourmet."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Hacen envíos de productos gourmet y regalos corporativos?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, realizamos envíos locales en Jesús María, Colonia Caroya y alrededores, y envíos a coordinar para cajas de regalo corporativas y pedidos especiales."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
   </head>
   <body class="bg-terruno-bg text-terruno-brown font-sans antialiased selection:bg-terruno-burgundy selection:text-white">
     <div id="root">
-      <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #F7F5EE; color: #4A3C31; font-family: sans-serif;">
-        <p>Cargando tienda...</p>
+      <!-- Prerenderizado semántico para indexadores de Google y motores de IA -->
+      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #F7F5EE; color: #4A3C31; padding: 2rem; text-align: center; font-family: sans-serif;">
+        <header style="max-width: 700px; margin-bottom: 1.5rem;">
+          <h1 style="font-size: 1.75rem; font-weight: 700; color: #6B2D3E; margin-bottom: 0.5rem;">El Terruño - Almacén Gourmet &amp; Vinos Boutique</h1>
+          <p style="font-size: 1rem; color: #6E5D4F; line-height: 1.5;">Sabores con historia y raíz. De Jesús María a tu mesa: vinos boutique, escabeches patagónicos, fiambres selectos y regalos empresariales.</p>
+        </header>
+        <nav style="max-width: 600px; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
+          <span style="background: #EFEBE0; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">Vinos Boutique</span>
+          <span style="background: #EFEBE0; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">Almacén Gourmet</span>
+          <span style="background: #EFEBE0; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">Fiambres Seleccionados</span>
+          <span style="background: #EFEBE0; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">Regalos y Cajas Gourmet</span>
+        </nav>
+        <footer style="font-size: 0.85rem; color: #8C7B6D; border-top: 1px solid #E5DFD1; padding-top: 1rem; max-width: 600px;">
+          <p>Lavalleja 812, local 8 | Jesús María, Córdoba | Lunes a Viernes 08:00-12:00 y 14:00-18:30 hs | Sábados 09:00-13:00 y 17:00-21:00 hs</p>
+        </footer>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
