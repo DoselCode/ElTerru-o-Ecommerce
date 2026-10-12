@@ -1,115 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { supabase } from './lib/supabase';
-import { Product, StoreInfo } from './types/product';
+import { useStorefrontData } from './hooks/useStorefrontData';
 import { Navbar } from './components/navbar/Navbar';
 import { Hero } from './components/sections/Hero';
 import { FeaturedProduct } from './components/sections/FeaturedProduct';
 import { Catalog } from './components/sections/Catalog';
 import { About } from './components/sections/About';
 import { Footer } from './components/sections/Footer';
+import { StorefrontSeo } from './components/StorefrontSeo';
+import { StorefrontError, StorefrontLoading } from './components/ui/StorefrontStatus';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
-// Admin Imports
-import { AdminLayout } from './admin/AdminLayout';
-import { Login } from './admin/Login';
-import { Dashboard } from './admin/Dashboard';
-import { ProductForm } from './admin/ProductForm';
-import { SettingsForm } from './admin/SettingsForm';
+// El panel admin se carga bajo demanda para no sumarlo al bundle de la tienda
+const AdminLayout = lazy(() => import('./admin/views/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const Login       = lazy(() => import('./admin/Login').then(m => ({ default: m.Login })));
+const Dashboard   = lazy(() => import('./admin/components/Dashboard').then(m => ({ default: m.Dashboard })));
+const POS         = lazy(() => import('./admin/components/POS').then(m => ({ default: m.POS })));
+const Stock       = lazy(() => import('./admin/components/Stock').then(m => ({ default: m.Stock })));
+const Sales       = lazy(() => import('./admin/components/Sales').then(m => ({ default: m.Sales })));
+const SettingsForm = lazy(() => import('./admin/views/SettingsForm'));
+const ProductForm  = lazy(() => import('./admin/views/ProductForm'));
 
+const AdminFallback = () => (
+  <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F7F5EE' }}>
+    <p style={{ color: '#6B2D3E', fontFamily: 'sans-serif' }}>Cargando panel...</p>
+  </div>
+);
+
+/** Landing pública: resuelve loading/error y arma las secciones con los datos de la tienda. */
 const Storefront: React.FC = () => {
-  const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [featuredProduct, setFeaturedProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { storeInfo, products, featuredProduct, loading, fetchError, refetch } = useStorefrontData();
 
-  useEffect(() => {
-    async function fetchData() {
-      const [storeResponse, productsResponse] = await Promise.all([
-        supabase.from('store_info').select('*').eq('id', 1).single(),
-        supabase.from('products').select('*').order('id', { ascending: false })
-      ]);
-
-      const storeData = storeResponse.data;
-      const productsData = productsResponse.data;
-
-      if (storeData) {
-        // Map snake_case database fields to camelCase StoreInfo format
-        setStoreInfo({
-          name: storeData.name,
-          tagline: storeData.tagline,
-          logo: storeData.logo,
-          phone: storeData.phone,
-          whatsappNumber: storeData.whatsapp_number,
-          email: storeData.email,
-          address: storeData.address,
-          hoursWeekdays: storeData.hours_weekdays,
-          hoursSaturday: storeData.hours_saturday,
-          hoursSunday: storeData.hours_sunday,
-          heroBadge: storeData.hero_badge,
-          heroTitle: storeData.hero_title,
-          heroSubtitle: storeData.hero_subtitle,
-          heroBgImage: storeData.hero_bg_image,
-          aboutTitle: storeData.about_title,
-          aboutQuote: storeData.about_quote,
-          aboutQuoteAuthor: storeData.about_quote_author,
-          aboutParagraph1: storeData.about_paragraph_1,
-          aboutParagraph2: storeData.about_paragraph_2,
-          aboutParagraph3: storeData.about_paragraph_3,
-          aboutMainImage: storeData.about_main_image,
-          aboutSubImage: storeData.about_sub_image,
-          statYears: storeData.stat_years,
-          statProducers: storeData.stat_producers,
-          statProducts: storeData.stat_products,
-          instagramUrl: storeData.instagram_url,
-          showPhone: storeData.show_phone,
-          showWhatsapp: storeData.show_whatsapp,
-          showEmail: storeData.show_email,
-          showAddress: storeData.show_address,
-          showInstagram: storeData.show_instagram,
-        } as StoreInfo);
-      }
-
-      if (productsData) {
-        const mappedProducts = productsData.map((p) => ({
-          id: p.id.toString(),
-          name: p.name,
-          year: p.year,
-          category: p.category,
-          price: Number(p.price),
-          originalPrice: p.original_price ? Number(p.original_price) : undefined,
-          discountBadge: p.discount_badge,
-          badge: p.badge,
-          image: p.image,
-          description: p.description,
-          winery: p.winery,
-          pairing: p.pairing,
-          stock: p.stock,
-          isFeatured: p.is_featured,
-          isVisible: p.is_visible,
-        }));
-        setProducts(mappedProducts);
-
-        const featured = mappedProducts.find(p => p.isFeatured) || null;
-        setFeaturedProduct(featured);
-      }
-
-      setLoading(false);
-    }
-    
-    fetchData();
-  }, []);
-
-  if (loading || !storeInfo) {
-    return <div className="min-h-screen flex items-center justify-center bg-terruno-bg"><p>Cargando tienda...</p></div>;
-  }
+  if (loading) return <StorefrontLoading />;
+  if (fetchError) return <StorefrontError message={fetchError} onRetry={refetch} />;
+  if (!storeInfo) return <StorefrontError message="No pudimos cargar la información de la tienda." onRetry={refetch} />;
 
   return (
     <div className="min-h-screen bg-terruno-bg text-terruno-brown font-sans selection:bg-terruno-burgundy selection:text-white">
-      <Helmet>
-        <title>{storeInfo.name}{storeInfo.tagline ? ` | ${storeInfo.tagline}` : ''}</title>
-        <meta name="description" content={storeInfo.heroSubtitle || storeInfo.aboutParagraph1 || 'Tienda de vinos'} />
-      </Helmet>
+      <StorefrontSeo storeInfo={storeInfo} />
       <Navbar storeInfo={storeInfo} />
       <main>
         <Hero storeInfo={storeInfo} />
@@ -126,19 +55,26 @@ export const App: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>El Terruño - Almacén Gourmet & Vinos Boutique</title>
+        <title>El Terruño - Almacén Gourmet &amp; Vinos Boutique</title>
       </Helmet>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Storefront />} />
+        <Route path="/" element={<ErrorBoundary variant="public"><Storefront /></ErrorBoundary>} />
 
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<Login />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="products/new" element={<ProductForm />} />
-          <Route path="products/edit/:id" element={<ProductForm />} />
-          <Route path="settings" element={<SettingsForm />} />
+        {/* Admin Routes — lazy loaded, isolated from storefront bundle */}
+        <Route path="/admin/login" element={
+          <Suspense fallback={<AdminFallback />}><Login /></Suspense>
+        } />
+        <Route path="/admin" element={
+          <Suspense fallback={<AdminFallback />}><AdminLayout /></Suspense>
+        }>
+          <Route index element={<Suspense fallback={null}><Dashboard /></Suspense>} />
+          <Route path="pos" element={<Suspense fallback={null}><POS /></Suspense>} />
+          <Route path="stock" element={<Suspense fallback={null}><Stock /></Suspense>} />
+          <Route path="sales" element={<Suspense fallback={null}><Sales /></Suspense>} />
+          <Route path="settings" element={<Suspense fallback={null}><SettingsForm /></Suspense>} />
+          <Route path="products/new" element={<Suspense fallback={null}><ProductForm /></Suspense>} />
+          <Route path="products/edit/:id" element={<Suspense fallback={null}><ProductForm /></Suspense>} />
         </Route>
       </Routes>
     </>

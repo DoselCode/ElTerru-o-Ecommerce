@@ -8,4 +8,15 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    rolldownOptions: {
+      output: {
+        // BP-03: strip console.* calls from the production bundle (including error/warn)
+        minify: {
+          compress: { dropConsole: true, dropDebugger: true },
+          mangle: true,
+        },
+      },
+    },
+  },
 });
