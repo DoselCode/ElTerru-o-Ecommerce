@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { ForkKnife } from "@phosphor-icons/react";
 import { Product, StoreInfo } from "../../types/product";
 
 interface ProductModalProps {
@@ -101,10 +102,20 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, storeInfo, 
               )}
             </div>
 
-            <div className="flex-grow">
+            <div className="flex-grow space-y-4">
               <p className="whitespace-pre-line text-[15px] leading-relaxed text-terruno-brown/80">
                 {product.description}
               </p>
+
+              {product.pairing?.trim() && (
+                <div className="rounded-xl bg-terruno-olive/5 border border-terruno-olive/15 px-4 py-3">
+                  <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-terruno-olive">
+                    <ForkKnife size={16} weight="duotone" aria-hidden />
+                    Maridaje sugerido
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-terruno-brown/80">{product.pairing}</p>
+                </div>
+              )}
             </div>
 
             <div className="mt-auto pt-4 border-t border-terruno-brown/10">

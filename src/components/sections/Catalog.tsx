@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Product, Category, StoreInfo } from '../../types/product';
 import { ProductCard } from './ProductCard';
 import { Reveal } from '../ui/Reveal';
@@ -18,7 +18,23 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const itemsPerPage = 6; // 6 productos por página (2 filas de 3 en pantallas grandes)
+  const itemsPerPage = 8; // 2 filas de 4 en pantallas grandes, 4 filas de 2 en celular
+
+  const openedWithKeyboard = useRef(false);
+
+  const handleSelect = (product: Product, viaKeyboard: boolean) => {
+    openedWithKeyboard.current = viaKeyboard;
+    setSelectedProduct(product);
+  };
+
+  // El <dialog> devuelve el foco a la card al cerrarse; si se abrió con el mouse, se quita
+  // para que la card no quede marcada hasta hacer clic en otro lado.
+  const handleClose = () => {
+    setSelectedProduct(null);
+    if (!openedWithKeyboard.current) {
+      requestAnimationFrame(() => (document.activeElement as HTMLElement | null)?.blur());
+    }
+  };
 
   // Reset pagination to page 1 if user searches or changes category
   useEffect(() => {
@@ -110,15 +126,15 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
           </div>
         ) : (
           <div className="space-y-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 pt-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 pt-2">
               {currentProducts.map((product, i) => (
                 <Reveal
                   key={`${product.id}-${currentPage}`}
                   variant="scale-in"
-                  delay={(i % 3) * 70 + Math.floor(i / 3) * 40}
+                  delay={(i % 4) * 60 + Math.floor(i / 4) * 40}
                   className="h-full"
                 >
-                  <ProductCard product={product} storeInfo={storeInfo} onSelect={setSelectedProduct} />
+                  <ProductCard product={product} storeInfo={storeInfo} onSelect={handleSelect} />
                 </Reveal>
               ))}
             </div>
@@ -143,7 +159,7 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
       <ProductModal
         product={selectedProduct}
         storeInfo={storeInfo}
-        onClose={() => setSelectedProduct(null)}
+        onClose={handleClose}
       />
     </section>
   );
