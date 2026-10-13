@@ -10,6 +10,7 @@ interface FeaturedProductProps {
 
 export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, storeInfo }) => {
   const badgeText = product.badge?.trim() || 'BEST SELLER';
+  const badgeWords = badgeText.split(/\s+/);
   const rawDiscount = product.discountBadge?.trim() || '15% OFF';
   const discountText = rawDiscount.toLowerCase().includes('esta semana')
     ? rawDiscount
@@ -47,22 +48,19 @@ export const FeaturedProduct: React.FC<FeaturedProductProps> = ({ product, store
 
               {/* Top Right Badge: Best Seller or Agotado */}
               {(product.stock || 0) <= 0 ? (
-                <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 z-20 bg-red-600 text-white w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full flex flex-col items-center justify-center p-1 sm:p-1.5 shadow-xl border-2 border-terruno-bg">
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 z-20 bg-red-600 text-white w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full flex flex-col items-center justify-center px-2 py-2 sm:px-3 sm:py-3 shadow-xl border-2 border-terruno-bg">
                   <span className="text-[9px] sm:text-[10px] md:text-[11px] font-bold tracking-wider uppercase text-center leading-tight">
                     AGOTADO
                   </span>
                 </div>
               ) : (
-                <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5 z-20 bg-terruno-burgundy text-white w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-full flex flex-col items-center justify-center p-1 sm:p-1.5 shadow-xl border-2 border-terruno-bg">
-                <Star weight="fill" size={12} className="fill-white text-white mb-0.5 sm:w-3.5 sm:h-3.5" />
-                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold tracking-wider uppercase text-center leading-tight">
-                  {badgeText.includes(' ') ? (
-                    badgeText.split(' ').map((word, i) => (
-                      <React.Fragment key={i}>
-                        {word}
-                        {i === 0 && <br />}
-                      </React.Fragment>
-                    ))
+                // Círculo más grande y con aire interno: textos largos como "TRANSFERENCIA" no deben tocar el borde
+                <div className="absolute -top-4 -right-4 sm:-top-6 sm:-right-6 z-20 bg-terruno-burgundy text-white w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full flex flex-col items-center justify-center px-2 py-2 sm:px-3 sm:py-3 shadow-xl border-2 border-terruno-bg">
+                <Star weight="fill" size={12} className="fill-white text-white mb-1 sm:w-3.5 sm:h-3.5" />
+                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold tracking-wide uppercase text-center leading-snug text-balance">
+                  {/* Dos palabras (BEST SELLER) van en dos líneas; frases más largas ("EFECTIVO O TRANSFERENCIA") se acomodan solas */}
+                  {badgeWords.length === 2 ? (
+                    <>{badgeWords[0]}<br />{badgeWords[1]}</>
                   ) : (
                     badgeText
                   )}
