@@ -10,19 +10,20 @@ import { Paginator, usePaginator } from '../Paginator';
 
 const PAGE_SIZE = 15;
 const LOW_STOCK_THRESHOLD = 5;
+const COMPACT_FILTER_STYLE: React.CSSProperties = { padding: '0.25rem 0.75rem', fontSize: '0.75rem', minWidth: '150px' };
 
 const StockBadge: React.FC<{ stock: number }> = ({ stock }) => {
   if (stock <= 0) {
     return (
-      <span className="badge-tag" style={{ background: '#fee2e2', color: '#991b1b', border: '1px solid #fca5a5', fontWeight: 600 }} role="status">
+      <span className="badge-tag" style={{ background: '#fee2e2', color: '#991b1b', border: '1px solid #fca5a5', fontWeight: 600, whiteSpace: 'nowrap' }} role="status">
         ⛔ Agotado
       </span>
     );
   }
   if (stock <= LOW_STOCK_THRESHOLD) {
     return (
-      <span className="badge-tag" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', fontWeight: 600 }} role="status">
-        ⚠️ Crítico ({stock})
+      <span className="badge-tag" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', fontWeight: 600, whiteSpace: 'nowrap' }} role="status">
+        Crítico ({stock})
       </span>
     );
   }
@@ -216,16 +217,16 @@ export const Stock: React.FC = () => {
         <h2 className="section-title">Control de Stock</h2>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <label htmlFor="stock-search" className="sr-only">Buscar productos</label>
-          <input id="stock-search" type="text" className="filter-input" placeholder="Buscar código o nombre..." value={search} onChange={e => setSearch(e.target.value)} />
-          <select className="filter-input" style={{ minWidth: '160px' }} value={category} onChange={e => setCategory(e.target.value)} aria-label="Filtrar por categoría">
+          <input id="stock-search" type="text" className="filter-input" style={COMPACT_FILTER_STYLE} placeholder="Buscar código o nombre..." value={search} onChange={e => setSearch(e.target.value)} />
+          <select className="filter-input" style={{ ...COMPACT_FILTER_STYLE, minWidth: '110px' }} value={category} onChange={e => setCategory(e.target.value)} aria-label="Filtrar por categoría">
             <option value="">Todas las categorías</option>
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select className="filter-input" style={{ minWidth: '190px' }} value={supplier} onChange={e => setSupplier(e.target.value)} aria-label="Filtrar por proveedor">
+          <select className="filter-input" style={{ ...COMPACT_FILTER_STYLE, minWidth: '125px' }} value={supplier} onChange={e => setSupplier(e.target.value)} aria-label="Filtrar por proveedor">
             <option value="">Todos los proveedores</option>
             {suppliers.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-          <button className="btn-accent" style={{ padding: '0.65rem 1.5rem' }} onClick={() => navigate('/admin/products/new')}>
+          <button className="btn-accent" style={{ padding: '0.3rem 0.9rem', fontSize: '0.75rem' }} onClick={() => navigate('/admin/products/new')}>
             + Nuevo Producto
           </button>
         </div>
