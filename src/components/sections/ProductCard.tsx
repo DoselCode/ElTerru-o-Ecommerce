@@ -9,6 +9,14 @@ interface ProductCardProps {
   onSelect?: (product: Product, viaKeyboard: boolean) => void;
 }
 
+/** Algunas descripciones vienen cargadas en MAYÚSCULAS; se pasan a tipo oración para que todas las cards se vean parejas. */
+const toSentenceCase = (text?: string) => {
+  if (!text || text !== text.toLocaleUpperCase('es-AR')) return text;
+  return text
+    .toLocaleLowerCase('es-AR')
+    .replace(/(^\s*|[.!?]\s+)(\p{L})/gu, (_, sep: string, letter: string) => sep + letter.toLocaleUpperCase('es-AR'));
+};
+
 export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo, onSelect }) => {
   const [imageFailed, setImageFailed] = useState(false);
   const soldOut = (product.stock || 0) <= 0;
@@ -63,8 +71,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, storeInfo, on
           <h3 className="font-serif text-sm sm:text-base font-bold text-terruno-brown group-hover:text-terruno-burgundy transition-colors leading-snug line-clamp-2">
             {product.name}
           </h3>
-          <p className="hidden sm:block text-xs text-terruno-subtle line-clamp-2 leading-relaxed">
-            {product.description}
+          <p className="hidden sm:line-clamp-2 text-xs text-terruno-subtle leading-relaxed">
+            {toSentenceCase(product.description)}
           </p>
         </div>
 
