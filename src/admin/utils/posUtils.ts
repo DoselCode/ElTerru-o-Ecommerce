@@ -21,17 +21,30 @@ const DISCOUNT_RATES: Record<PaymentMethod, number> = {
 export const getDiscountRate = (method: PaymentMethod) => DISCOUNT_RATES[method];
 
 /** Precio de lista del catálogo (PSP) con el redondeo propio de cada método cuando está cargado. */
-export const getUnitPrice = (product: Pick<Product, 'price' | 'priceEfectivo' | 'priceTransferencia'>, method: PaymentMethod) => {
-  if (method === 'efectivo') return product.priceEfectivo ?? product.price * (1 - DISCOUNT_RATES.efectivo);
-  if (method === 'transferencia') return product.priceTransferencia ?? product.price * (1 - DISCOUNT_RATES.transferencia);
+export const getUnitPrice = (
+  product: Pick<Product, 'price' | 'priceEfectivo' | 'priceTransferencia'>,
+  method: PaymentMethod,
+  applyDiscount = true,
+) => {
+  if (!applyDiscount) return product.price;
+  // Un precio por método mal cargado nunca puede cobrar más que el de lista
+  if (method === 'efectivo') return Math.min(product.price, product.priceEfectivo ?? product.price * (1 - DISCOUNT_RATES.efectivo));
+  if (method === 'transferencia') return Math.min(product.price, product.priceTransferencia ?? product.price * (1 - DISCOUNT_RATES.transferencia));
   return product.price;
 };
 
-export const calculateTotals = (items: OrderItem[], method: PaymentMethod, ivaRate: number) => {
+/** `applyDiscount: false` cobra a precio de lista aunque el método tenga descuento. */
+export const calculateTotals = (items: OrderItem[], method: PaymentMethod, ivaRate: number, applyDiscount = true) => {
   const subtotal = items.reduce((acc, item) => acc + item.price * (item.cartQty || 1), 0);
-  const total = items.reduce((acc, item) => acc + getUnitPrice(item, method) * (item.cartQty || 1), 0);
+  const total = items.reduce((acc, item) => acc + getUnitPrice(item, method, applyDiscount) * (item.cartQty || 1), 0);
   const neto = total / (1 + ivaRate);
   return { subtotal, total, descuento: subtotal - total, neto, iva: total - neto };
+};
+
+/** Porcentaje real descontado (los precios por método están redondeados, no es siempre el 10% nominal). */
+export const formatDiscountPercent = (descuento: number, subtotal: number) => {
+  const pct = subtotal > 0 ? (descuento / subtotal) * 100 : 0;
+  return `${pct.toLocaleString('es-AR', { maximumFractionDigits: 1 })}%`;
 };
 
 export const formatMoney = (value: number) =>

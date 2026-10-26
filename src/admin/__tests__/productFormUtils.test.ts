@@ -18,6 +18,13 @@ describe('productFormUtils', () => {
     expect(validateProductForm({ ...valid, original_price: '10000' }, true, false).original_price).toBeDefined();
   });
 
+  it('rejects cash and transfer prices above the list price', () => {
+    const errors = validateProductForm({ ...valid, price_efectivo: '12500', price_transferencia: '12000' }, true, false);
+    expect(errors.price_efectivo).toBeDefined();
+    expect(errors.price_transferencia).toBeUndefined();
+    expect(validateProductForm({ ...valid, price_efectivo: '11000' }, true, false)).toEqual({});
+  });
+
   it('autocompletes the discount badge from the original price', () => {
     const next = { ...valid, original_price: '15000' };
     expect(withAutoDiscountBadge(valid, next, 'original_price').discount_badge).toBe('-20%');
