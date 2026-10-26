@@ -135,6 +135,7 @@ export const validateProductForm =(form: ProductFormValues, hasImage: boolean, i
 
   for (const field of ['price_efectivo', 'price_transferencia'] as const) {
     if (form[field].trim() && !isPositiveNumber(form[field])) errors[field] = 'Ingresá un precio válido mayor a 0 o dejalo vacío.';
+    else if (form[field].trim() && !errors.price && Number(form[field]) > Number(form.price)) errors[field] = 'No puede ser mayor al precio de lista.';
   }
 
   if (form.original_price.trim()) {

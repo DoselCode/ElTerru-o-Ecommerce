@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EMPTY_REGISTER, Order, OrderItem, RegisterState } from '../types';
-import { calculateTotals, formatMoney, getNextTicketNumber, getRegisterSummary, getUnitPrice, padNumber, sumByMethod } from '../utils/posUtils';
+import { calculateTotals, formatDiscountPercent, formatMoney, getNextTicketNumber, getRegisterSummary, getUnitPrice, padNumber, sumByMethod } from '../utils/posUtils';
 
 const order = (overrides: Partial<Order>): Order => ({
   id: crypto.randomUUID(), client: 'Consumidor Final', total: 0, neto: 0, iva: 0, descuento: 0,
@@ -38,6 +38,13 @@ describe('posUtils', () => {
       expect(getUnitPrice(sinPrecios, 'transferencia')).toBeCloseTo(11430);
     });
 
+    it('nunca cobra más que el precio de lista aunque el precio por método esté mal cargado', () => {
+      const mal = item({ price: 6200, priceEfectivo: 11000, priceTransferencia: 9000 });
+      expect(getUnitPrice(mal, 'efectivo')).toBe(6200);
+      expect(getUnitPrice(mal, 'transferencia')).toBe(6200);
+      expect(calculateTotals([mal], 'efectivo', 0.21).descuento).toBe(0);
+    });
+
     it('calcula subtotal, descuento e IVA sobre el total cobrado', () => {
       const totals = calculateTotals([{ ...trucha, cartQty: 2 }], 'efectivo', 0.21);
       expect(totals.subtotal).toBe(25400);
@@ -46,6 +53,20 @@ describe('posUtils', () => {
       expect(totals.neto + totals.iva).toBeCloseTo(22800);
       expect(totals.iva).toBeCloseTo(22800 - 22800 / 1.21);
     });
+  });
+
+  it('cobra a precio de lista cuando no se aplica el descuento', () => {
+    const trucha = item({ priceEfectivo: 11400, priceTransferencia: 12100 });
+    expect(getUnitPrice(trucha, 'efectivo', false)).toBe(12700);
+    const totals = calculateTotals([trucha], 'efectivo', 0.21, false);
+    expect(totals.total).toBe(12700);
+    expect(totals.descuento).toBe(0);
+  });
+
+  it('formatea el porcentaje real de descuento', () => {
+    expect(formatDiscountPercent(1300, 12700)).toBe('10,2%');
+    expect(formatDiscountPercent(1270, 12700)).toBe('10%');
+    expect(formatDiscountPercent(0, 0)).toBe('0%');
   });
 
   it('suma por método ignorando ventas anuladas', () => {

@@ -15,7 +15,7 @@ import { calculateTotals, formatMoney, getNextTicketNumber, padNumber, toLocalDa
 
 /** Punto de venta: catálogo con filtros, carrito, cobro (PaymentModal) y emisión del ticket. */
 export const POS: React.FC = () => {
-  const { state, createOrder, updateProduct } = useAdmin();
+  const { state, createOrder } = useAdmin();
   const { cart, addToCart, removeFromCart, clearCart } = useCart();
   const { showToast } = useToast();
   const [search, setSearch] = useState('');
@@ -75,7 +75,7 @@ export const POS: React.FC = () => {
     setSearch('');
   };
 
-  const handlePayment = async (paymentMethod: PaymentMethod, client: string) => {
+  const handlePayment = async (paymentMethod: PaymentMethod, client: string, applyDiscount: boolean) => {
     if (isProcessing) return;
     if (state.register.status !== 'abierta') {
       showToast('No puedes cobrar, la caja está cerrada.', 'error');
@@ -86,7 +86,7 @@ export const POS: React.FC = () => {
     setIsProcessing(true);
     try {
       const now = new Date();
-      const { total, descuento, neto, iva } = calculateTotals(cart, paymentMethod, TICKET_CONFIG.ivaRate);
+      const { total, descuento, neto, iva } = calculateTotals(cart, paymentMethod, TICKET_CONFIG.ivaRate, applyDiscount);
       const order: Order = {
         id: crypto.randomUUID(),
         ticketNumber: getNextTicketNumber(state.orders),
@@ -99,17 +99,8 @@ export const POS: React.FC = () => {
         items: [...cart],
       };
 
-      await createOrder(order);
-
-      // Descontar stock de cada producto vendido
-      const stockUpdates = cart.map(item => {
-        const product = state.products.find(p => p.id === item.id);
-        if (!product) return Promise.resolve();
-        const newStock = Math.max(0, product.stock - (item.cartQty || 1));
-        return updateProduct(item.id, { stock: newStock });
-      });
-
-      await Promise.allSettled(stockUpdates);
+      // createOrder ya descuenta el stock (RPC decrement_stock); no volver a escribirlo acá
+      createOrder(order);
 
       setLastOrder(order);
       clearCart();
