@@ -59,6 +59,12 @@ describe('productFormUtils', () => {
       expect(withMethodPricesFromRates({ ...valid, price: '1000' }, { ...rates, efectivo: 0 }).price_efectivo).toBe('1000');
     });
 
+    it('keeps the discount when rounding to $100 would bring it back to the list price', () => {
+      expect(withMethodPricesFromRates({ ...valid, price: '100' }, rates).price_efectivo).toBe('95');
+      expect(withMethodPricesFromRates({ ...valid, price: '500' }, rates).price_efectivo).toBe('475');
+      expect(withMethodPricesFromRates({ ...valid, price: '1000' }, rates).price_efectivo).toBe('950');
+    });
+
     it('leaves the form unchanged without a valid list price', () => {
       const form = { ...valid, price: '', price_efectivo: '500' };
       expect(withMethodPricesFromRates(form, rates)).toBe(form);

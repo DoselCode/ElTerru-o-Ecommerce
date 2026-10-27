@@ -40,11 +40,15 @@ export const getUnitPrice = (
   return product.price;
 };
 
-/** Precio por método sugerido: lista × (1 − descuento), redondeado a $100 (al peso si quedaría en $0), nunca mayor al de lista. */
+/**
+ * Precio por método sugerido: lista × (1 − descuento), redondeado a $100. En productos baratos el
+ * redondeo a $100 puede volver al precio de lista (o a $0) y borrar el descuento: ahí se redondea al peso.
+ */
 export const roundMethodPrice = (price: number, rate: number) => {
   const raw = price * (1 - rate);
+  if (raw >= price) return price;
   const rounded = Math.round(raw / 100) * 100;
-  return Math.min(price, rounded > 0 ? rounded : Math.round(raw));
+  return rounded > 0 && rounded < price ? rounded : Math.round(raw);
 };
 
 /** `applyDiscount: false` cobra a precio de lista aunque el método tenga descuento. */
