@@ -72,11 +72,4 @@ export const discountService = {
     if (error) throw error;
     writeCache({ ...DEFAULT_DISCOUNT_RATES, efectivo: percents.efectivo / 100, transferencia: percents.transferencia / 100 });
   },
-
-  /** Reescribe el precio por método de todos los productos con el porcentaje guardado; devuelve cuántos cambió. */
-  recalculateMethodPrices: async (method: DiscountMethod): Promise<number> => {
-    const { data, error } = await insforge.database.rpc('recalculate_method_prices', { method });
-    if (error) throw error;
-    return Number(data) || 0;
-  },
 };

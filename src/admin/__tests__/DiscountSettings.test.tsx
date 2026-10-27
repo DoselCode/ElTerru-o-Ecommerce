@@ -6,21 +6,18 @@ import { DiscountSettings } from '../settings/DiscountSettings';
 import { discountService } from '../../services/discountService';
 
 const setDiscountRates = vi.fn();
-const refreshProducts = vi.fn().mockResolvedValue(undefined);
 const showToast = vi.fn();
 
 vi.mock('../context/AdminContext', () => ({
   useAdmin: () => ({
     discountRates: { efectivo: 0.10, transferencia: 0.10, credito: 0, debito: 0 },
     setDiscountRates,
-    refreshProducts,
   }),
 }));
 vi.mock('../context/ToastContext', () => ({ useToast: () => ({ showToast }) }));
 vi.mock('../../services/discountService', () => ({
   discountService: {
     saveDiscountPercents: vi.fn().mockResolvedValue(undefined),
-    recalculateMethodPrices: vi.fn().mockResolvedValue(42),
   },
 }));
 
@@ -47,22 +44,5 @@ describe('DiscountSettings', () => {
 
     expect(discountService.saveDiscountPercents).not.toHaveBeenCalled();
     expect(showToast).toHaveBeenCalledWith(expect.stringContaining('Completá'), 'error');
-  });
-
-  it('blocks recalculation while there are unsaved changes', () => {
-    render(<DiscountSettings />);
-    fireEvent.change(screen.getByLabelText(/Descuento en efectivo/), { target: { value: '5' } });
-    expect((screen.getByText(/Recalcular precios en efectivo/) as HTMLButtonElement).disabled).toBe(true);
-  });
-
-  it('recalculates prices only after confirming and reloads the products', async () => {
-    render(<DiscountSettings />);
-    fireEvent.click(screen.getByText(/Recalcular precios en efectivo/));
-    expect(discountService.recalculateMethodPrices).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByText('Recalcular'));
-    await waitFor(() => expect(discountService.recalculateMethodPrices).toHaveBeenCalledWith('efectivo'));
-    expect(refreshProducts).toHaveBeenCalled();
-    expect(showToast).toHaveBeenCalledWith(expect.stringContaining('42'), 'success');
   });
 });

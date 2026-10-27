@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EMPTY_PRODUCT_FORM, productFormToPayload, validateProductForm, withAutoDiscountBadge } from '../productForm/productFormUtils';
+import { EMPTY_PRODUCT_FORM, productFormToPayload, validateProductForm, withAutoDiscountBadge, withMethodPricesFromRates } from '../productForm/productFormUtils';
 
 const valid = { ...EMPTY_PRODUCT_FORM, name: 'Malbec', category_id: '1', price: '12000', description: 'Vino tinto', stock: '5' };
 
@@ -41,6 +41,27 @@ describe('productFormUtils', () => {
       price_efectivo: 11000,
       price_transferencia: null,
       image: 'img.jpg',
+    });
+  });
+
+  describe('withMethodPricesFromRates', () => {
+    const rates = { efectivo: 0.05, transferencia: 0.10, credito: 0, debito: 0 };
+
+    it('fills cash and transfer prices from the list price, rounded to $100', () => {
+      const next = withMethodPricesFromRates({ ...valid, price: '9400', price_efectivo: '8500', price_transferencia: '8900' }, rates);
+      expect(next.price_efectivo).toBe('8900');
+      expect(next.price_transferencia).toBe('8500');
+      expect(next.price).toBe('9400');
+    });
+
+    it('never goes above the list price nor down to $0 for cheap products', () => {
+      expect(withMethodPricesFromRates({ ...valid, price: '40' }, rates).price_efectivo).toBe('38');
+      expect(withMethodPricesFromRates({ ...valid, price: '1000' }, { ...rates, efectivo: 0 }).price_efectivo).toBe('1000');
+    });
+
+    it('leaves the form unchanged without a valid list price', () => {
+      const form = { ...valid, price: '', price_efectivo: '500' };
+      expect(withMethodPricesFromRates(form, rates)).toBe(form);
     });
   });
 });

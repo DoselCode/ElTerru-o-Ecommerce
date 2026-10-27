@@ -13,7 +13,6 @@ vi.mock('../../lib/insforge', () => ({
         select: vi.fn(() => ({ eq: vi.fn(() => ({ single })) })),
         update: vi.fn(() => ({ eq: updateEq })),
       })),
-      rpc: vi.fn(),
     },
   },
 }));
@@ -54,11 +53,5 @@ describe('discountService', () => {
     await discountService.saveDiscountPercents({ efectivo: 5, transferencia: 10 });
     expect(updateEq).toHaveBeenCalledWith('id', 1);
     await expect(discountService.saveDiscountPercents({ efectivo: 120, transferencia: 10 })).rejects.toThrow('entre 0 y 100');
-  });
-
-  it('recalculates method prices through the RPC and returns the updated count', async () => {
-    vi.mocked(insforge.database.rpc).mockResolvedValue({ data: 42, error: null } as never);
-    expect(await discountService.recalculateMethodPrices('efectivo')).toBe(42);
-    expect(insforge.database.rpc).toHaveBeenCalledWith('recalculate_method_prices', { method: 'efectivo' });
   });
 });

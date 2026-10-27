@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, FloppyDisk, CircleNotch } from '@phosphor-icons/react';
+import { ArrowLeft, FloppyDisk, CircleNotch, ArrowsClockwise } from '@phosphor-icons/react';
 import { productService } from '../../services/productService';
 import { storageService } from '../../services/storageService';
 import { useAdmin } from '../context/AdminContext';
@@ -11,8 +11,10 @@ import { ProductImageSection } from '../productForm/ProductImageSection';
 import { ProductSavedModal } from '../productForm/ProductSavedModal';
 import {
   CATEGORIES, EMPTY_PRODUCT_FORM, FormErrors, ProductFormValues,
-  productFormFromRow, productFormToPayload, validateProductForm, withAutoDiscountBadge,
+  productFormFromRow, productFormToPayload, validateProductForm, withAutoDiscountBadge, withMethodPricesFromRates,
 } from '../productForm/productFormUtils';
+
+const pctLabel = (rate: number) => `${Math.round(rate * 1000) / 10}%`;
 
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <h2 className="text-lg font-medium text-terruno-brown border-b border-terruno-border pb-2">{children}</h2>
@@ -22,7 +24,7 @@ const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 export const ProductForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { refreshProducts } = useAdmin();
+  const { refreshProducts, discountRates } = useAdmin();
   const isEditing = Boolean(id);
 
   const [saving, setSaving] = useState(false);
@@ -188,10 +190,20 @@ export const ProductForm: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField label="Precio de lista (PSP) *" type="number" step="0.01" max={999999999} placeholder="ej: 12700" {...fieldProps('price')} />
-              <FormField label="Precio Efectivo (opcional)" type="number" step="0.01" max={999999999} placeholder="Automático: -10%" {...fieldProps('price_efectivo')} />
-              <FormField label="Precio Transferencia (opcional)" type="number" step="0.01" max={999999999} placeholder="Automático: -10%" {...fieldProps('price_transferencia')} />
+              <FormField label="Precio Efectivo (opcional)" type="number" step="0.01" max={999999999} placeholder={`Automático: -${pctLabel(discountRates.efectivo)}`} {...fieldProps('price_efectivo')} />
+              <FormField label="Precio Transferencia (opcional)" type="number" step="0.01" max={999999999} placeholder={`Automático: -${pctLabel(discountRates.transferencia)}`} {...fieldProps('price_transferencia')} />
               <FormField label="Precio Original (oferta)" type="number" step="0.01" max={999999999} placeholder="ej: 15000" {...fieldProps('original_price')} />
             </div>
+            {/* Solo completa los campos de este producto; se guarda con "Guardar" */}
+            <button
+              type="button"
+              disabled={!(parseFloat(form.price) > 0)}
+              onClick={() => setForm(prev => withMethodPricesFromRates(prev, discountRates))}
+              className="flex items-center gap-2 text-sm text-terruno-burgundy disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ArrowsClockwise className="w-4 h-4" />
+              Calcular con el descuento actual (efectivo -{pctLabel(discountRates.efectivo)}, transferencia -{pctLabel(discountRates.transferencia)})
+            </button>
 
             <FormField label="Descripción *" rows={4} maxLength={1000} placeholder="Describí las características, notas de cata o detalles del producto..." {...fieldProps('description')} />
           </div>
