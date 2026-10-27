@@ -17,6 +17,6 @@ Se carga bajo demanda (lazy) desde `App.tsx` en las rutas `/admin/*`; el acceso 
 ## Cosas a tener en cuenta
 
 - **Offline-first:** las escrituras (ventas, caja, stock) que fallan se guardan en `localStorage` (`terruno_offline_queue`) y se reenvían al recuperar la conexión.
-- **Descuentos:** porcentaje por método (efectivo y transferencia) editable en Configuración (`settings/DiscountSettings.tsx`, columnas `discount_*` de `store_info`, 10% por defecto). Es el respaldo para productos sin precio propio por método; en la ficha de cada producto, "Calcular con el descuento actual" completa sus precios por método (redondeo a $100, se guarda con el producto). Sin conexión el POS usa el último valor conocido.
+- **Descuentos:** porcentaje por método (efectivo y transferencia) editable en Configuración (`settings/DiscountSettings.tsx`, columnas `discount_*` de `store_info`, 10% por defecto). Es el respaldo para productos sin precio propio por método; en la ficha de cada producto, "Calcular con el descuento actual" completa sus precios por método (sin centavos, redondeo hacia abajo al peso; se guarda con el producto). Sin conexión el POS usa el último valor conocido.
 - **Ticket:** es un comprobante no válido como factura; sus datos fiscales salen de `utils/ticketConfig.ts`.
 - **Caja:** es una sola para todos los puestos (fila `registers` con id `global`).

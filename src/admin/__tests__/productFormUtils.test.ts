@@ -47,22 +47,22 @@ describe('productFormUtils', () => {
   describe('withMethodPricesFromRates', () => {
     const rates = { efectivo: 0.05, transferencia: 0.10, credito: 0, debito: 0 };
 
-    it('fills cash and transfer prices from the list price, rounded to $100', () => {
+    it('fills cash and transfer prices from the list price, rounded down to the peso', () => {
       const next = withMethodPricesFromRates({ ...valid, price: '9400', price_efectivo: '8500', price_transferencia: '8900' }, rates);
-      expect(next.price_efectivo).toBe('8900');
-      expect(next.price_transferencia).toBe('8500');
+      expect(next.price_efectivo).toBe('8930');
+      expect(next.price_transferencia).toBe('8460');
       expect(next.price).toBe('9400');
     });
 
-    it('never goes above the list price nor down to $0 for cheap products', () => {
-      expect(withMethodPricesFromRates({ ...valid, price: '40' }, rates).price_efectivo).toBe('38');
-      expect(withMethodPricesFromRates({ ...valid, price: '1000' }, { ...rates, efectivo: 0 }).price_efectivo).toBe('1000');
+    it('drops the cents without rounding up, so the discount is never smaller than the configured one', () => {
+      expect(withMethodPricesFromRates({ ...valid, price: '5056' }, rates).price_transferencia).toBe('4550');
+      expect(withMethodPricesFromRates({ ...valid, price: '99.9' }, rates).price_efectivo).toBe('94');
     });
 
-    it('keeps the discount when rounding to $100 would bring it back to the list price', () => {
-      expect(withMethodPricesFromRates({ ...valid, price: '100' }, rates).price_efectivo).toBe('95');
+    it('keeps the configured discount on cheap products and never goes above the list price', () => {
       expect(withMethodPricesFromRates({ ...valid, price: '500' }, rates).price_efectivo).toBe('475');
-      expect(withMethodPricesFromRates({ ...valid, price: '1000' }, rates).price_efectivo).toBe('950');
+      expect(withMethodPricesFromRates({ ...valid, price: '40' }, rates).price_efectivo).toBe('38');
+      expect(withMethodPricesFromRates({ ...valid, price: '1000' }, { ...rates, efectivo: 0 }).price_efectivo).toBe('1000');
     });
 
     it('leaves the form unchanged without a valid list price', () => {
