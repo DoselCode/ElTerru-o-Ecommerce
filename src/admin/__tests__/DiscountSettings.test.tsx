@@ -40,6 +40,15 @@ describe('DiscountSettings', () => {
     expect(setDiscountRates).toHaveBeenCalledWith({ efectivo: 0.05, transferencia: 0.10, credito: 0, debito: 0 });
   });
 
+  it('does not save an empty percentage as 0%', () => {
+    render(<DiscountSettings />);
+    fireEvent.change(screen.getByLabelText(/Descuento en efectivo/), { target: { value: '' } });
+    fireEvent.click(screen.getByText('Guardar descuentos'));
+
+    expect(discountService.saveDiscountPercents).not.toHaveBeenCalled();
+    expect(showToast).toHaveBeenCalledWith(expect.stringContaining('Completá'), 'error');
+  });
+
   it('blocks recalculation while there are unsaved changes', () => {
     render(<DiscountSettings />);
     fireEvent.change(screen.getByLabelText(/Descuento en efectivo/), { target: { value: '5' } });

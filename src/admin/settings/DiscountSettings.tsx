@@ -34,6 +34,10 @@ export const DiscountSettings: React.FC = () => {
   const busy = saving || recalculating !== null;
 
   const handleSave = async () => {
+    if (!values.efectivo.trim() || !values.transferencia.trim()) {
+      showToast('Completá los dos porcentajes (usá 0 para no aplicar descuento).', 'error');
+      return;
+    }
     const percents = { efectivo: Number(values.efectivo), transferencia: Number(values.transferencia) };
     setSaving(true);
     try {

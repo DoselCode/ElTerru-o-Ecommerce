@@ -3,7 +3,7 @@ import { productService } from '../../services/productService';
 import { orderService } from '../../services/orderService';
 import { registerService } from '../../services/registerService';
 import { discountService } from '../../services/discountService';
-import { DEFAULT_DISCOUNT_RATES, DiscountRates } from '../utils/posUtils';
+import type { DiscountRates } from '../utils/posUtils';
 import { Product } from '../../types/product';
 import { AdminState, EMPTY_REGISTER, Order, OrderItem, RegisterState } from '../types';
 import { useToast } from './ToastContext';
@@ -74,7 +74,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isSyncing, setIsSyncing] = useState(false);
   const isSyncingRef = useRef(false);
   const [state, setState] = useState<AdminState>({ products: [], orders: [], register: EMPTY_REGISTER });
-  const [discountRates, setDiscountRates] = useState<DiscountRates>(DEFAULT_DISCOUNT_RATES);
+  const [discountRates, setDiscountRates] = useState<DiscountRates>(() => discountService.getCachedDiscountRates());
 
   const getQueue = (): OfflineAction[] => {
     try {
@@ -135,14 +135,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     (async () => {
       try {
-        const [products, orders, register, rates] = await Promise.all([
+        // Aparte del Promise.all: si falla la carga del resto, los descuentos igual quedan con el último valor conocido
+        discountService.getDiscountRates().then(setDiscountRates);
+        const [products, orders, register] = await Promise.all([
           productService.getProducts(),
           orderService.getOrders(),
           registerService.getGlobalRegister(),
-          discountService.getDiscountRates(),
         ]);
         setState({ products, orders, register });
-        setDiscountRates(rates);
         syncOfflineQueue();
       } catch (e) {
         console.error('Error loading cloud state', e);

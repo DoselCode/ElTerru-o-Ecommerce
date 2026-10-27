@@ -34,6 +34,16 @@ describe('discountService', () => {
     expect(await discountService.getDiscountRates()).toEqual(rates);
   });
 
+  it('uses the cached rates when the request rejects (offline) and exposes them synchronously', async () => {
+    single.mockResolvedValue({ data: { discount_efectivo: 5, discount_transferencia: 10 }, error: null });
+    await discountService.getDiscountRates();
+
+    single.mockRejectedValue(new TypeError('Failed to fetch'));
+    const expected = { efectivo: 0.05, transferencia: 0.10, credito: 0, debito: 0 };
+    expect(await discountService.getDiscountRates()).toEqual(expected);
+    expect(discountService.getCachedDiscountRates()).toEqual(expected);
+  });
+
   it('falls back to the default 10% without cache or columns', async () => {
     single.mockResolvedValue({ data: null, error: new Error('column does not exist') });
     expect(await discountService.getDiscountRates()).toEqual({ efectivo: 0.10, transferencia: 0.10, credito: 0, debito: 0 });

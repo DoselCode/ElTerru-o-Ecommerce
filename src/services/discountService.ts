@@ -32,14 +32,23 @@ const toRate = (pct: unknown, fallback: number) => {
 };
 
 export const discountService = {
+  /** Último valor conocido (o el 10%), para arrancar el POS sin esperar a la red. */
+  getCachedDiscountRates: (): DiscountRates => readCache() ?? DEFAULT_DISCOUNT_RATES,
+
   /** Lee los porcentajes de `store_info`; sin conexión (o sin las columnas) usa el último valor conocido o el 10%. */
   getDiscountRates: async (): Promise<DiscountRates> => {
-    const { data, error } = await insforge.database
-      .from('store_info')
-      .select('discount_efectivo, discount_transferencia')
-      .eq('id', 1)
-      .single();
-    if (error || !data) return readCache() ?? DEFAULT_DISCOUNT_RATES;
+    let response;
+    try {
+      response = await insforge.database
+        .from('store_info')
+        .select('discount_efectivo, discount_transferencia')
+        .eq('id', 1)
+        .single();
+    } catch {
+      return discountService.getCachedDiscountRates();
+    }
+    const { data, error } = response;
+    if (error || !data) return discountService.getCachedDiscountRates();
 
     const row = data as { discount_efectivo?: number | string | null; discount_transferencia?: number | string | null };
     const rates: DiscountRates = {
