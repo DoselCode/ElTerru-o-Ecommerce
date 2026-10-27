@@ -20,10 +20,16 @@ CREATE POLICY "Public can read providers" ON public.providers FOR SELECT USING (
 DROP POLICY IF EXISTS "Public can read store_info" ON public.store_info;
 CREATE POLICY "Public can read store_info" ON public.store_info FOR SELECT USING (true);
 
--- CHECK constraints para stock y precio en `products`
-ALTER TABLE public.products 
-  ADD CONSTRAINT stock_non_negative CHECK (stock >= 0),
-  ADD CONSTRAINT price_positive CHECK (price > 0);
+-- CHECK constraints para stock y precio en `products` (idempotente: en dev ya existían)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'stock_non_negative' AND conrelid = 'public.products'::regclass) THEN
+    ALTER TABLE public.products ADD CONSTRAINT stock_non_negative CHECK (stock >= 0);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'price_positive' AND conrelid = 'public.products'::regclass) THEN
+    ALTER TABLE public.products ADD CONSTRAINT price_positive CHECK (price > 0);
+  END IF;
+END $$;
 
 -- Arreglar `decrement_stock` para que no falle en silencio si no encuentra la fila o no tiene permisos
 CREATE OR REPLACE FUNCTION public.decrement_stock(product_id integer, qty integer)
