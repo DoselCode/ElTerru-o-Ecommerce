@@ -199,7 +199,7 @@ export const ProductForm: React.FC = () => {
               type="button"
               disabled={!(parseFloat(form.price) > 0)}
               onClick={() => setForm(prev => withMethodPricesFromRates(prev, discountRates))}
-              className="flex items-center gap-2 text-sm text-terruno-burgundy disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-terruno-burgundy text-terruno-burgundy text-sm font-medium hover:bg-terruno-burgundy hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-terruno-burgundy cursor-pointer"
             >
               <ArrowsClockwise className="w-4 h-4" />
               Calcular con el descuento actual (efectivo -{pctLabel(discountRates.efectivo)}, transferencia -{pctLabel(discountRates.transferencia)})
