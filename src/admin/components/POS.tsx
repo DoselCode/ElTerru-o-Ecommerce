@@ -15,7 +15,7 @@ import { calculateTotals, formatMoney, getNextTicketNumber, padNumber, toLocalDa
 
 /** Punto de venta: catálogo con filtros, carrito, cobro (PaymentModal) y emisión del ticket. */
 export const POS: React.FC = () => {
-  const { state, createOrder } = useAdmin();
+  const { state, createOrder, discountRates } = useAdmin();
   const { cart, addToCart, removeFromCart, clearCart } = useCart();
   const { showToast } = useToast();
   const [search, setSearch] = useState('');
@@ -86,7 +86,7 @@ export const POS: React.FC = () => {
     setIsProcessing(true);
     try {
       const now = new Date();
-      const { total, descuento, neto, iva } = calculateTotals(cart, paymentMethod, TICKET_CONFIG.ivaRate, applyDiscount);
+      const { total, descuento, neto, iva } = calculateTotals(cart, paymentMethod, TICKET_CONFIG.ivaRate, applyDiscount, discountRates);
       const order: Order = {
         id: crypto.randomUUID(),
         ticketNumber: getNextTicketNumber(state.orders),
@@ -219,7 +219,7 @@ export const POS: React.FC = () => {
       </div>
 
       {showPaymentModal && (
-        <PaymentModal items={cart} onCancel={() => !isProcessing && setShowPaymentModal(false)} onConfirm={handlePayment} isProcessing={isProcessing} />
+        <PaymentModal items={cart} rates={discountRates} onCancel={() => !isProcessing && setShowPaymentModal(false)} onConfirm={handlePayment} isProcessing={isProcessing} />
       )}
 
       {showSuccessModal && lastOrder && (

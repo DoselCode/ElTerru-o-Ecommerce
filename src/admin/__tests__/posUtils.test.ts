@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EMPTY_REGISTER, Order, OrderItem, RegisterState } from '../types';
-import { calculateTotals, formatDiscountPercent, formatMoney, getNextTicketNumber, getRegisterSummary, getUnitPrice, padNumber, sumByMethod } from '../utils/posUtils';
+import { DEFAULT_DISCOUNT_RATES, calculateTotals, formatDiscountPercent, getDiscountRate, formatMoney, getNextTicketNumber, getRegisterSummary, getUnitPrice, padNumber, sumByMethod } from '../utils/posUtils';
 
 const order = (overrides: Partial<Order>): Order => ({
   id: crypto.randomUUID(), client: 'Consumidor Final', total: 0, neto: 0, iva: 0, descuento: 0,
@@ -52,6 +52,28 @@ describe('posUtils', () => {
       expect(totals.descuento).toBe(2600);
       expect(totals.neto + totals.iva).toBeCloseTo(22800);
       expect(totals.iva).toBeCloseTo(22800 - 22800 / 1.21);
+    });
+  });
+
+  describe('descuentos configurables', () => {
+    const rates = { efectivo: 0.05, transferencia: 0.03, credito: 0, debito: 0 };
+
+    it('usa el porcentaje configurado como respaldo para productos sin precio por método', () => {
+      const sinPrecios = item({});
+      expect(getUnitPrice(sinPrecios, 'efectivo', true, rates)).toBeCloseTo(12065);
+      expect(getUnitPrice(sinPrecios, 'transferencia', true, rates)).toBeCloseTo(12319);
+      expect(calculateTotals([sinPrecios], 'efectivo', 0.21, true, rates).total).toBeCloseTo(12065);
+      expect(getDiscountRate('efectivo', rates)).toBe(0.05);
+    });
+
+    it('el precio propio del producto sigue mandando sobre el porcentaje', () => {
+      const trucha = item({ priceEfectivo: 11400, priceTransferencia: 12100 });
+      expect(getUnitPrice(trucha, 'efectivo', true, rates)).toBe(11400);
+    });
+
+    it('sin porcentajes configurados mantiene el 10% por defecto', () => {
+      expect(DEFAULT_DISCOUNT_RATES).toEqual({ efectivo: 0.10, transferencia: 0.10, credito: 0, debito: 0 });
+      expect(getDiscountRate('efectivo')).toBe(0.10);
     });
   });
 

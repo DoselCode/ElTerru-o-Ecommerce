@@ -47,6 +47,15 @@ describe('PaymentModal', () => {
     expect(onConfirm).toHaveBeenCalledWith('efectivo', '', false);
   });
 
+  it('applies the configured rate to products without a per-method price', () => {
+    const plain: OrderItem[] = [{ ...items[0], priceEfectivo: undefined, priceTransferencia: undefined, price: 10000 }];
+    const rates = { efectivo: 0.05, transferencia: 0.10, credito: 0, debito: 0 };
+    render(<PaymentModal items={plain} rates={rates} onCancel={vi.fn()} onConfirm={vi.fn()} />);
+
+    expect(screen.getByText('$9.500,00', { selector: 'h2' })).toBeTruthy();
+    expect(screen.getByText(/Efectivo \(-5%\)/)).toBeTruthy();
+  });
+
   it('hides the toggle for card payments', () => {
     render(<PaymentModal items={items} onCancel={vi.fn()} onConfirm={vi.fn()} />);
     fireEvent.click(screen.getByText(/Tarjeta Débito/));

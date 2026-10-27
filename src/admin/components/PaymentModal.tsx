@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { OrderItem, PaymentMethod } from '../types';
 import { TICKET_CONFIG } from '../utils/ticketConfig';
-import { PAYMENT_LABELS, PAYMENT_METHODS, calculateTotals, formatDiscountPercent, formatMoney, getDiscountRate } from '../utils/posUtils';
+import { DEFAULT_DISCOUNT_RATES, DiscountRates, PAYMENT_LABELS, PAYMENT_METHODS, calculateTotals, formatDiscountPercent, formatMoney, getDiscountRate } from '../utils/posUtils';
 import { ModalCloseButton } from './ModalCloseButton';
 import { useModalDismiss } from '../hooks/useModalDismiss';
 
@@ -10,19 +10,21 @@ interface PaymentModalProps {
   onCancel: () => void;
   onConfirm: (method: PaymentMethod, client: string, applyDiscount: boolean) => void;
   isProcessing?: boolean;
+  /** Descuentos vigentes; por defecto el 10% histórico. */
+  rates?: DiscountRates;
 }
 
 /** Modal de cobro: elige el método de pago y muestra el total con su descuento. */
-export const PaymentModal: React.FC<PaymentModalProps> = ({ items, onCancel, onConfirm, isProcessing }) => {
+export const PaymentModal: React.FC<PaymentModalProps> = ({ items, onCancel, onConfirm, isProcessing, rates = DEFAULT_DISCOUNT_RATES }) => {
   const [method, setMethod] = useState<PaymentMethod>('efectivo');
   const [client, setClient] = useState('');
   const [noDiscount, setNoDiscount] = useState(false);
 
   const { handleBackdropClick } = useModalDismiss({ onClose: onCancel, closeOnBackdrop: false });
 
-  const canSkipDiscount = getDiscountRate(method) > 0;
+  const canSkipDiscount = getDiscountRate(method, rates) > 0;
   const applyDiscount = !(canSkipDiscount && noDiscount);
-  const { subtotal, total, descuento, neto, iva } = calculateTotals(items, method, TICKET_CONFIG.ivaRate, applyDiscount);
+  const { subtotal, total, descuento, neto, iva } = calculateTotals(items, method, TICKET_CONFIG.ivaRate, applyDiscount, rates);
   // Solo se muestra cuando hay un descuento real (un descuento de centavos por redondeo no cuenta)
   const hasDiscount = descuento >= 0.5;
 
@@ -51,7 +53,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ items, onCancel, onC
         <label className="pay-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Método de Pago</label>
         <div className="pay-methods">
           {PAYMENT_METHODS.map(m => {
-            const methodTotals = calculateTotals(items, m, TICKET_CONFIG.ivaRate, !(noDiscount && getDiscountRate(m) > 0));
+            const methodTotals = calculateTotals(items, m, TICKET_CONFIG.ivaRate, !(noDiscount && getDiscountRate(m, rates) > 0), rates);
             const pct = methodTotals.descuento >= 0.5 ? `-${formatDiscountPercent(methodTotals.descuento, methodTotals.subtotal)}` : '0%';
             return (
               <button key={m} className={`pay-method${method === m ? ' selected' : ''}`} onClick={() => setMethod(m)}>
