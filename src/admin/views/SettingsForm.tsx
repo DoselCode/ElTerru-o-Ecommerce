@@ -1,9 +1,10 @@
 import React from 'react';
 import {
   FloppyDisk, CircleNotch, Storefront, Phone, Envelope, MapPin, Clock, Layout, Info, UploadSimple,
-  Image as ImageIcon, WhatsappLogo, InstagramLogo,
+  Image as ImageIcon, WhatsappLogo, InstagramLogo, Percent,
 } from '@phosphor-icons/react';
 import { DayHoursEditor } from '../settings/DayHoursEditor';
+import { DiscountSettings } from '../settings/DiscountSettings';
 import {
   useStoreSettings, ImageField, StoreSettingsData,
 } from '../hooks/useStoreSettings';
@@ -126,6 +127,11 @@ export const SettingsForm: React.FC = () => {
 
         {errorMsg && <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">{errorMsg}</div>}
         {successMsg && <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-100">{successMsg}</div>}
+
+        {/* Fuera del form: los descuentos se guardan aparte de store_info general */}
+        <Card icon={<Percent className="w-5 h-5" />} title="Descuentos por Método de Pago">
+          <DiscountSettings />
+        </Card>
 
         <form onSubmit={handleSave} className="space-y-6">
           <Card icon={<Storefront className="w-5 h-5" />} title="Información Básica">

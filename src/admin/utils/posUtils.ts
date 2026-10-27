@@ -10,38 +10,62 @@ export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
 
 export const PAYMENT_METHODS = Object.keys(PAYMENT_LABELS) as PaymentMethod[];
 
-/** Descuento por método de pago: 10% efectivo y transferencia. */
-const DISCOUNT_RATES: Record<PaymentMethod, number> = {
+/** Descuento por método de pago (fracción, 0.1 = 10%). */
+export type DiscountRates = Record<PaymentMethod, number>;
+
+/** Respaldo si no hay porcentajes guardados en `store_info`: 10% efectivo y transferencia. */
+export const DEFAULT_DISCOUNT_RATES: DiscountRates = {
   efectivo: 0.10,
   transferencia: 0.10,
   credito: 0,
   debito: 0,
 };
 
-export const getDiscountRate = (method: PaymentMethod) => DISCOUNT_RATES[method];
+export const getDiscountRate = (method: PaymentMethod, rates: DiscountRates = DEFAULT_DISCOUNT_RATES) => rates[method];
 
-/** Precio de lista del catálogo (PSP) con el redondeo propio de cada método cuando está cargado. */
+/**
+ * Precio de lista del catálogo (PSP) con el redondeo propio de cada método cuando está cargado;
+ * el porcentaje (`rates`) solo se usa para los productos sin precio por método.
+ */
 export const getUnitPrice = (
   product: Pick<Product, 'price' | 'priceEfectivo' | 'priceTransferencia'>,
   method: PaymentMethod,
   applyDiscount = true,
+  rates: DiscountRates = DEFAULT_DISCOUNT_RATES,
 ) => {
   if (!applyDiscount) return product.price;
   // Un precio por método mal cargado nunca puede cobrar más que el de lista
-  if (method === 'efectivo') return Math.min(product.price, product.priceEfectivo ?? product.price * (1 - DISCOUNT_RATES.efectivo));
-  if (method === 'transferencia') return Math.min(product.price, product.priceTransferencia ?? product.price * (1 - DISCOUNT_RATES.transferencia));
+  if (method === 'efectivo') return Math.min(product.price, product.priceEfectivo ?? product.price * (1 - rates.efectivo));
+  if (method === 'transferencia') return Math.min(product.price, product.priceTransferencia ?? product.price * (1 - rates.transferencia));
   return product.price;
 };
 
+/**
+ * Precio por método sugerido: lista × (1 − descuento), redondeado a $100. En productos baratos el
+ * redondeo a $100 puede volver al precio de lista (o a $0) y borrar el descuento: ahí se redondea al peso.
+ */
+export const roundMethodPrice = (price: number, rate: number) => {
+  const raw = price * (1 - rate);
+  if (raw >= price) return price;
+  const rounded = Math.round(raw / 100) * 100;
+  return rounded > 0 && rounded < price ? rounded : Math.round(raw);
+};
+
 /** `applyDiscount: false` cobra a precio de lista aunque el método tenga descuento. */
-export const calculateTotals = (items: OrderItem[], method: PaymentMethod, ivaRate: number, applyDiscount = true) => {
+export const calculateTotals = (
+  items: OrderItem[],
+  method: PaymentMethod,
+  ivaRate: number,
+  applyDiscount = true,
+  rates: DiscountRates = DEFAULT_DISCOUNT_RATES,
+) => {
   const subtotal = items.reduce((acc, item) => acc + item.price * (item.cartQty || 1), 0);
-  const total = items.reduce((acc, item) => acc + getUnitPrice(item, method, applyDiscount) * (item.cartQty || 1), 0);
+  const total = items.reduce((acc, item) => acc + getUnitPrice(item, method, applyDiscount, rates) * (item.cartQty || 1), 0);
   const neto = total / (1 + ivaRate);
   return { subtotal, total, descuento: subtotal - total, neto, iva: total - neto };
 };
 
-/** Porcentaje real descontado (los precios por método están redondeados, no es siempre el 10% nominal). */
+/** Porcentaje real descontado (los precios por método están redondeados, no es siempre el porcentaje nominal). */
 export const formatDiscountPercent = (descuento: number, subtotal: number) => {
   const pct = subtotal > 0 ? (descuento / subtotal) * 100 : 0;
   return `${pct.toLocaleString('es-AR', { maximumFractionDigits: 1 })}%`;

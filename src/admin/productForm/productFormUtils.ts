@@ -1,4 +1,5 @@
 import type { ProductRow } from '../../types/product';
+import { roundMethodPrice, type DiscountRates } from '../utils/posUtils';
 
 export interface ProductFormValues {
   code: string;
@@ -95,6 +96,17 @@ export const productFormToPayload =(form: ProductFormValues, image: string) => (
   is_visible: form.is_visible,
   image,
 });
+
+/** Completa los precios en efectivo y transferencia del producto con los descuentos vigentes (no guarda nada). */
+export const withMethodPricesFromRates = (form: ProductFormValues, rates: DiscountRates): ProductFormValues => {
+  const price = parseFloat(form.price);
+  if (!(price > 0)) return form;
+  return {
+    ...form,
+    price_efectivo: String(roundMethodPrice(price, rates.efectivo)),
+    price_transferencia: String(roundMethodPrice(price, rates.transferencia)),
+  };
+};
 
 /** Mantiene el badge de descuento sincronizado con el precio original cuando el badge es un porcentaje. */
 export const withAutoDiscountBadge = (prev: ProductFormValues, next: ProductFormValues, changedField: string): ProductFormValues => {
