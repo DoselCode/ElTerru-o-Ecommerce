@@ -42,7 +42,7 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
   }, [selectedCategory, searchQuery]);
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    const matching = products.filter((product) => {
       if (!product.isVisible) return false;
 
       const matchesCategory =
@@ -58,6 +58,10 @@ export const Catalog: React.FC<CatalogProps> = ({ products, storeInfo }) => {
 
       return matchesCategory && matchesSearch;
     });
+
+    // Los productos sin stock van al final; el resto conserva su orden original (sort estable).
+    const isSoldOut = (product: Product) => (product.stock || 0) <= 0;
+    return matching.sort((a, b) => Number(isSoldOut(a)) - Number(isSoldOut(b)));
   }, [products, selectedCategory, searchQuery]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
